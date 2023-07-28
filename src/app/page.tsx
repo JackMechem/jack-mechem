@@ -7,7 +7,7 @@ export default function Home() {
         <main>
             <div className="absolute max-w-md min-w-min px-10 py-12 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800/30 border border-gray-300 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg opacity-90 bg-opacity-30 items-center flex flex-col shadow-[0_2px_15px_rgba(255,255,255,0.3)]">
                 <h1 className="text-yellow-200 mb-6 text-2xl font-semibold text-center">
-                    Website Under Construction
+                    Website Under Construction (Test Build)
                 </h1>
                 <Image
                     src={constructionEmoji.src}
