@@ -25,7 +25,7 @@ export default function Home() {
                 >
                     mechemjack@gmail.com
                 </a>
-                <p className="text-slate-400">Website Developer</p>
+                <p className="text-slate-400">Website Developer and Designer</p>
                 <a
                     className="text-gray-200 text-4xl text-center mt-8 cursor-pointer hover:drop-shadow-lg shadow-slate-100"
                     href="https://github.com/JackMechem/jack-mechem"
