@@ -15,7 +15,7 @@ export default function Home() {
                         " mt-[115px] lg:ml-[105px] md:text-[64px] lg:text-[96px] text-[48px] leading-normal w-auto"
                     }
                 >
-                    <span className="text-foreground-light">Hello, Im</span>{" "}
+                    <span className="text-foreground-light">Hello, I&apos;m</span>{" "}
                     <span className="text-accent">Jack</span>
                 </div>
                 <div className="flex flex-row -mt-[10px]">
@@ -27,12 +27,12 @@ export default function Home() {
                     />
                     <div className="mt-[37px] ml-[15px]">
                         <p className="lg:w-[60%] md:w-[80%] sm:w-[100%] text-foreground text-[20px] font-semibold leading-normal h-fit">
-                            I’m a react website developer and jazz drummer living in Las Vegas. I
-                            enjoy building everything from personal to small business to e commerce
-                            websites.
+                            I&apos;m a react website developer and jazz drummer living in Las Vegas.
+                            I enjoy building everything from personal to small business to e
+                            commerce websites.
                         </p>
                         <div className="text-accent font-semibold text-[20px] mt-[15px] cursor-pointer">
-                            <span>Let's Colaborate</span>
+                            <span>Let&apos;s Colaborate</span>
                             <span>
                                 <img src={toRightArrow.src} className="inline-block ml-[12px]" />
                             </span>
@@ -58,14 +58,14 @@ export default function Home() {
                         className="h-fit ml-2 mr-[17px]"
                     />
                     <p className="lg:w-[80%] md:w-[100%] sm:w-[100%] w-full mt-[38px] text-foreground text-[20px] font-semibold leading-normal h-fit">
-                        I’m a 17-year-old aspiring developer passionate about all things technology
-                        residing in the city of Las Vegas. What started as a curiosity in technology
-                        has evolved into a dedicated journey of immersing myself in the world of web
-                        development. I am committed to delivering a seamless and professional
-                        experience to each and every client, ensuring their projects are executed
-                        with utmost professionalism and attention to detail. While my expertise is
-                        mainly in react development, I can really make just about anything as long
-                        as I have the time!
+                        I&apos;m a 17-year-old aspiring developer passionate about all things
+                        technology residing in the city of Las Vegas. What started as a curiosity in
+                        technology has evolved into a dedicated journey of immersing myself in the
+                        world of web development. I am committed to delivering a seamless and
+                        professional experience to each and every client, ensuring their projects
+                        are executed with utmost professionalism and attention to detail. While my
+                        expertise is mainly in react development, I can really make just about
+                        anything as long as I have the time!
                     </p>
                 </div>
             </div>
