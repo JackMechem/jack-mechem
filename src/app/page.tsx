@@ -2,6 +2,8 @@ import { Pacifico } from "next/font/google";
 import indentArrow from "../assets/arrows/indentArrow.svg";
 import toRightArrow from "../assets/arrows/toRightArrow.svg";
 import smallIndentArrow from "../assets/arrows/smallIndentArrow.svg";
+import desktopIcon from "../assets/icons/desktop-computer.svg";
+import reactIcon from "../assets/icons/react.svg";
 
 const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
 
@@ -32,10 +34,15 @@ export default function Home() {
                             commerce websites.
                         </p>
                         <div className="text-accent font-semibold text-[20px] mt-[15px] cursor-pointer">
-                            <span>Let&apos;s Colaborate</span>
-                            <span>
-                                <img src={toRightArrow.src} className="inline-block ml-[12px]" />
-                            </span>
+                            <a href="mailto:mechemjack@gmail.com">
+                                <span>Let&apos;s Colaborate</span>
+                                <span>
+                                    <img
+                                        src={toRightArrow.src}
+                                        className="inline-block ml-[12px]"
+                                    />
+                                </span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -79,9 +86,53 @@ export default function Home() {
                 >
                     My Skills
                 </h2>
-                <div className="w-full flex flex-col md:flex-col lg:flex-row gap-[224px] md:px-[106px] justify-center">
-                    <div className="p-[30px] md:min-w-[403px] min-w-full bg-secondary">card 1</div>
-                    <div className="p-[30px] md:min-w-[403px] min-w-full bg-secondary">card 2</div>
+                <div className="w-full h-auto flex flex-col gap-[20%] gap-y-[20px] md:flex-col lg:flex-row md:px-[106px] lg:justify-center items-center">
+                    <div className="p-[30px] md:min-w-[403px] md:max-w-[400px] w-auto max-w-[403px] h-[520px] bg-secondary border-border/60 border rounded-[15px] drop-shadow-secondary-lg text-foreground flex flex-col items-center">
+                        <img src={desktopIcon.src} className="w-fit h-fit mb-[30px]" />
+                        <h3 className="text-foreground-light text-[22px] font-semibold leading-[0.75] mb-[20px] text-center">
+                            Design
+                        </h3>
+                        <p className="text-foreground text-center leading-snug text-[16px] mb-[50px]">
+                            I value simple content structure, clean design, and creative
+                            interactions.
+                        </p>
+                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
+                            Things I like designing:
+                        </h3>
+                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
+                            UX, UI, Web
+                        </p>
+                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
+                            Tools I use:
+                        </h3>
+                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
+                            Affinity <br /> Figma <br /> Pen & Paper <br /> Font Awesome <br />
+                            React Icons
+                        </p>
+                    </div>
+                    <div className="p-[30px] md:min-w-[403px] md:max-w-[400px] w-auto max-w-[403px] h-[520px] bg-secondary border-border/60 border rounded-[15px] drop-shadow-secondary-lg text-foreground flex flex-col items-center">
+                        <img src={reactIcon.src} className="w-fit h-fit mb-[30px]" />
+                        <h3 className="text-foreground-light text-[22px] font-semibold leading-[0.75] mb-[20px] text-center">
+                            Web Development
+                        </h3>
+                        <p className="text-foreground text-center leading-snug text-[16px] mb-[50px]">
+                            I like to code things from the ground up, bringing creative ideas to
+                            life in the browser.
+                        </p>
+                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
+                            Languages I speak:
+                        </h3>
+                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
+                            React, Next.js, HTML, CSS, Git
+                        </p>
+                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
+                            Tools I use:
+                        </h3>
+                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
+                            Neovim <br /> GitHub <br /> Tailwind CSS <br /> Arch Linux <br />
+                            Terminal <br /> Vercel
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

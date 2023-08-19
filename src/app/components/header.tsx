@@ -5,7 +5,7 @@ const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
 
 const Header = () => {
     return (
-        <div className="h-[60px] fixed top-0 left-0 right-0 bg-primary flex flex-row items-center justify-center md:justify-normal lg:justify-normal border-b-[1px] border-b-border/60 drop-shadow-secondary select-none">
+        <div className="h-[60px] fixed top-0 left-0 right-0 bg-primary flex flex-row items-center justify-center md:justify-normal lg:justify-normal border-b-[1px] border-b-border/60 drop-shadow-secondary select-none z-10">
             <Link
                 href="/"
                 className={
