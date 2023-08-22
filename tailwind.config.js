@@ -17,8 +17,9 @@ module.exports = {
         },
         extend: {
             dropShadow: {
-                secondary: "0px 3px 5px rgba(234, 240, 239, 1)",
+                secondary: "0px 3px 5px rgba(234, 240, 239, 0.8)",
                 "secondary-lg": "0px 5px 8px rgba(234, 240, 239, 1)",
+                "secondary-right": "3px 5px 5px rgba(234, 240, 239, 1)",
             },
             boxShadow: {
                 "secondary-center": "0px 0px 10px 9px rgba(234, 240, 239, 1)",
