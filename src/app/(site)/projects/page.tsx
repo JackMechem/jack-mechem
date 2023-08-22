@@ -1,28 +1,51 @@
+"use client";
+
 import reactIcon from "../../../assets/icons/react.svg";
-import { FiArrowUpRight } from "react-icons/fi";
+import { FiArrowUpRight, FiArrowLeft } from "react-icons/fi";
+import { useState } from "react";
 
 const Projects = () => {
+    const [menuShown, setMenuShown] = useState(true);
+
     return (
         <div>
-            <div className="bg-secondary fixed top-[60px] bottom-0 w-[300px] border-r border-border/60 z-20 drop-shadow-secondary-right">
-                <p className="text-[16px] font-semibold leading-normal mt-[10px] ml-[18px] text-foreground">
-                    Projects
-                </p>
-                <div className="w-full h-fit flex flex-col items-center cursor-pointer select-none">
-                    <div className="w-[278px] h-[60px] mt-[10px] bg-primary rounded-[8px] py-[8px] px-[12px] flex">
-                        <img src={reactIcon.src} className="w-[30px] h-[30px] self-center" />
-                        <div className="h-full flex flex-col justify-between pl-[15px]">
-                            <p className="text-foreground-light text-[16px] font-semibold">
-                                Doem Shop
-                            </p>
-                            <p className="text-foreground-light text-[12px] mb-0 justify-end">
-                                August, 2023
-                            </p>
+            {menuShown && (
+                <div className="bg-secondary fixed top-[60px] bottom-0 md:w-[300px] w-screen border-r border-border/60 z-50 md:drop-shadow-secondary-right overflow-y-scroll overscroll-y-none">
+                    <p className="text-[16px] font-semibold leading-normal mt-[10px] md:ml-[18px] ml-[34px] text-foreground">
+                        Projects
+                    </p>
+
+                    <div className="md:px-0 px-[24px] w-full h-fit flex flex-col items-center cursor-pointer select-none">
+                        <div
+                            onClick={() => {
+                                setMenuShown(false);
+                            }}
+                            className="md:w-[278px] w-full h-[60px] mt-[10px] bg-primary rounded-[8px] py-[8px] px-[12px] flex"
+                        >
+                            <img src={reactIcon.src} className="w-[30px] h-[30px] self-center" />
+                            <div className="h-full flex flex-col justify-between pl-[15px]">
+                                <p className="text-foreground-light text-[16px] font-semibold">
+                                    Doem Shop
+                                </p>
+                                <p className="text-foreground-light text-[12px] mb-0 justify-end">
+                                    August, 2023
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="bg-primary absolute top-[60px] left-[300px] right-0 lg:px-[200px] px-[50px] py-[75px]">
+            )}
+            <div className="bg-primary absolute top-[60px] md:left-[300px] left-0 right-0 lg:px-[200px] md:px-[50px] md:py-[75px] px-[24px] py-[20px]">
+                {!menuShown && (
+                    <div
+                        onClick={() => {
+                            setMenuShown(true);
+                        }}
+                        className="w-[30px] h-[30px] mb-[10px] rounded-full bg-border/60 text-foreground-light text-[20px] flex items-center justify-center cursor-pointer"
+                    >
+                        <FiArrowLeft />
+                    </div>
+                )}
                 <a
                     className="text-foreground text-[24px] font-bold flex items-center cursor-pointer"
                     href="https://doemshop.com"
