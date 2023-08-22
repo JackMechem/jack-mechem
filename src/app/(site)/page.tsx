@@ -1,9 +1,9 @@
 import { Pacifico } from "next/font/google";
-import indentArrow from "../assets/arrows/indentArrow.svg";
-import toRightArrow from "../assets/arrows/toRightArrow.svg";
-import smallIndentArrow from "../assets/arrows/smallIndentArrow.svg";
-import desktopIcon from "../assets/icons/desktop-computer.svg";
-import reactIcon from "../assets/icons/react.svg";
+import indentArrow from "../../assets/arrows/indentArrow.svg";
+import toRightArrow from "../../assets/arrows/toRightArrow.svg";
+import smallIndentArrow from "../../assets/arrows/smallIndentArrow.svg";
+import desktopIcon from "../../assets/icons/desktop-computer.svg";
+import reactIcon from "../../assets/icons/react.svg";
 
 const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
 
