@@ -10,7 +10,7 @@ import { PortableText, PortableTextComponent, PortableTextComponents } from "@po
 const fullConfig: any = resolveConfig(tailwindCondig);
 
 interface Props {
-    projects: any;
+    thoughts: any;
 }
 
 const BodyComponents = {
@@ -49,7 +49,7 @@ const BodyComponents = {
     },
 };
 
-const ProjectContent = ({ projects }: Props) => {
+const ThoughtContent = ({ thoughts }: Props) => {
     const [menuShown, setMenuShown] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -58,7 +58,7 @@ const ProjectContent = ({ projects }: Props) => {
     // ignore error, it exists
     const tailwindMobileSize = fullConfig.theme?.screens?.md;
 
-    console.log(projects);
+    console.log(thoughts);
     useEffect(() => {
         const checkForMobile = () => {
             if (window.innerWidth <= tailwindMobileSize.slice(0, -2)) {
@@ -79,10 +79,10 @@ const ProjectContent = ({ projects }: Props) => {
             {menuShown && (
                 <div className="bg-secondary fixed top-[60px] bottom-0 md:w-[300px] w-screen border-r border-border/60 z-50 md:drop-shadow-secondary-right overflow-y-scroll overscroll-y-none">
                     <p className="text-[16px] md:font-semibold font-bold leading-normal mt-[10px] md:ml-[18px] ml-[34px] text-foreground">
-                        Projects
+                        Thoughts
                     </p>
 
-                    {projects.map((project: any, index: number) => (
+                    {thoughts.map((project: any, index: number) => (
                         <div
                             key={project.slug}
                             className="md:px-0 px-[24px] w-full h-fit flex flex-col items-center cursor-pointer select-none"
@@ -98,10 +98,9 @@ const ProjectContent = ({ projects }: Props) => {
                                         setMenuShown(false);
                                     }
                                 }}
-                                className="md:w-[278px] w-full h-[60px] mt-[10px] bg-primary rounded-[12px] py-[8px] px-[12px] flex"
+                                className="md:w-[278px] w-full h-[60px] mt-[10px] bg-primary rounded-[12px] py-[8px] px-[14px] flex"
                             >
-                                <img src={project.logo} className="w-[30px] h-[30px] self-center" />
-                                <div className="h-full flex flex-col justify-between pl-[15px]">
+                                <div className="h-full flex flex-col justify-between">
                                     <p className="text-foreground-light text-[16px] font-semibold">
                                         {project.name}
                                     </p>
@@ -127,25 +126,15 @@ const ProjectContent = ({ projects }: Props) => {
                             <FiArrowLeft />
                         </div>
                     )}
-                    <a
-                        className="text-foreground text-[24px] font-bold flex items-center cursor-pointer"
-                        href={projects[currentProjectIndex].link}
-                    >
-                        <span className="mr-[5px]">{projects[currentProjectIndex].name}</span>
-                        <span>
-                            <FiArrowUpRight />
-                        </span>
-                    </a>
+                    <div className="text-foreground text-[24px] font-bold flex items-center">
+                        <span className="mr-[5px]">{thoughts[currentProjectIndex].name}</span>
+                    </div>
                     <p className="text-foreground-light text-[15px] font-bold mb-[30px]">
-                        {projects[currentProjectIndex].date}
+                        {thoughts[currentProjectIndex].date}
                     </p>
-                    <img
-                        src={projects[currentProjectIndex].hero}
-                        className="lg:h-auto h-[50%] w-full rounded-[10px] object-cover mb-[20px]"
-                    />
                     <div className="w-full h-auto text-foreground-light flex flex-col">
                         <PortableText
-                            value={projects[currentProjectIndex].body}
+                            value={thoughts[currentProjectIndex].body}
                             components={BodyComponents}
                         />
 
@@ -171,7 +160,7 @@ const ProjectContent = ({ projects }: Props) => {
             ) : (
                 <div className="bg-[radial-gradient(#B6C3C1_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 bottom-0 lg:px-[200px] overflow-hidden md:px-[50px] md:py-[75px] px-[24px] py-[20px] flex flex-col items-center">
                     <h3 className="text-foreground-light font-bold opacity-20 text-[20px] mb-[10px]">
-                        Select a Project
+                        Select a Thought
                     </h3>
                 </div>
             )}
@@ -179,4 +168,4 @@ const ProjectContent = ({ projects }: Props) => {
     );
 };
 
-export default ProjectContent;
+export default ThoughtContent;
