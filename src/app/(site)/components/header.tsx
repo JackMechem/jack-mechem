@@ -37,7 +37,7 @@ const Header = () => {
                 onClick={() => {
                     setMobileMenuShown(!mobileMenuShown);
                 }}
-                className="lg:hidden absolute right-[20px] p-[6px] shadow-[0_0_4px_2px_rgba(201,212,210,0.5)] rounded-full bg-border/60 text-foreground-light text-[20px] flex items-center justify-center cursor-pointer"
+                className="hidden lg:hidden md:flex absolute right-[20px] p-[6px] shadow-[0_0_4px_2px_rgba(201,212,210,0.5)] rounded-full bg-border/60 text-foreground-light text-[20px] items-center justify-center cursor-pointer"
             >
                 <IoIosArrowDown />
             </div>

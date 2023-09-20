@@ -1,18 +1,6 @@
-import { createClient, groq } from "next-sanity";
+import { groq } from "next-sanity";
 
-// const utcDate = new Date().toISOString().replace(/T.*/, "").split("-").join("-");
-// console.log("Sanity API Version UTC Date: ", utcDate);
-
-const client = createClient({
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-    dataset: "production",
-    useCdn: true,
-    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
-});
-
-const getProjects = () => {
-    return client.fetch(
-        groq`
+export const projectsQuery = groq`
             *[_type == "project"]{
                 _id,
                 _createdAt,
@@ -30,22 +18,9 @@ const getProjects = () => {
                     _type == "block" => @,
                 }
             }
-        `
-    );
-};
+        `;
 
-const getThoughts = () => {
-    const utcDate = new Date().toISOString().replace(/T.*/, "").split("-").join("-");
-    console.log("Sanity API Version UTC Date: ", utcDate);
-    const client = createClient({
-        projectId: "e4i7tez4",
-        dataset: "production",
-        useCdn: false,
-        apiVersion: "1",
-    });
-
-    return client.fetch(
-        groq`
+export const thoughtsQuery = groq`
             *[_type == "thought"]{
                 _id,
                 _createdAt,
@@ -60,8 +35,4 @@ const getThoughts = () => {
                     _type == "block" => @,
                 }
             }
-        `
-    );
-};
-
-export { getProjects, getThoughts };
+        `;

@@ -114,7 +114,7 @@ const ThoughtContent = ({ thoughts }: Props) => {
                 </div>
             )}
             {currentProjectIndex !== null ? (
-                <div className="bg-primary bg-[radial-gradient(#B6C3C1_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 lg:px-[200px] md:px-[50px] md:py-[75px] px-[24px] py-[20px] min-h-[calc(100%-60px)]">
+                <div className="bg-primary bg-[radial-gradient(#B6C3C1_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 lg:px-[200px] md:px-[50px] md:py-[75px] px-[24px] pt-[20px] pb-[85px] min-h-[calc(100%-60px)]">
                     {!menuShown && (
                         <div
                             onClick={() => {
