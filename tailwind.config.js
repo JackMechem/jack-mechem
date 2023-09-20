@@ -24,6 +24,20 @@ module.exports = {
             boxShadow: {
                 "secondary-center": "0px 0px 10px 9px rgba(234, 240, 239, 1)",
             },
+            keyframes: {
+                slideInDown: {
+                    "0%": { transform: "translateY(-10px)", opacity: "0" },
+                    "100%": { transform: "translateY(0px)", opacity: "1" },
+                },
+                page: {
+                    "0%": { transform: "translateY(-20px)", opacity: "0" },
+                    "100%": { transform: "translateY(0px)", opacity: "1" },
+                },
+            },
+            animation: {
+                slideInDown: "slideInDown 0.1s ease-in-out 1",
+                page: "page 1s ease-in-out 1",
+            },
         },
     },
     plugins: [],

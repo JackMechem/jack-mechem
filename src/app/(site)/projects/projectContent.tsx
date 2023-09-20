@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import reactIcon from "../../../assets/icons/react.svg";
 import { FiArrowUpRight, FiArrowLeft } from "react-icons/fi";
 import resolveConfig from "tailwindcss/resolveConfig";

@@ -15,3 +15,9 @@
         --background-end-rgb: 0, 0, 0;
     }
 }
+
+@layer base {
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
