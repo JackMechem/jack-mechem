@@ -15,7 +15,6 @@ import {
     AiFillSound,
 } from "react-icons/ai";
 import { usePathname } from "next/navigation";
-import path from "path";
 
 const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
 
@@ -43,7 +42,7 @@ const Header = () => {
                 <IoIosArrowDown />
             </div>
             {mobileMenuShown && (
-                <div className="fixed bg-secondary border border-border drop-shadow-secondary rounded-[25px] py-[8px] px-[25px] mt-[10px] mx-[10px] top-full flex flex-row gap-[30px] right-0 z-50">
+                <div className="fixed bg-secondary border border-border drop-shadow-secondary rounded-[25px] py-[8px] px-[25px] mt-[10px] mx-[10px] top-[60px] flex flex-row gap-[30px] right-0 z-50">
                     {pathname === "/" ? (
                         <div className="text-accent text-[30px] flex flex-col items-center min-w-[50px]">
                             <AiFillHome />
