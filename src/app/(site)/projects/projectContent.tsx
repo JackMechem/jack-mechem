@@ -77,7 +77,7 @@ const ProjectContent = ({ projects }: Props) => {
     return (
         <div>
             {menuShown && (
-                <div className="bg-secondary fixed top-[60px] bottom-0 md:w-[300px] w-screen border-r border-border/60 z-50 md:drop-shadow-secondary-right overflow-y-scroll overscroll-y-none">
+                <div className="bg-secondary fixed top-[60px] bottom-0 md:w-[300px] w-screen border-r border-border/60 z-30 md:drop-shadow-secondary-right overflow-y-scroll overscroll-y-none">
                     <p className="text-[16px] md:font-semibold font-bold leading-normal mt-[10px] md:ml-[18px] ml-[34px] text-foreground">
                         Projects
                     </p>
