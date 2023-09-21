@@ -19,5 +19,10 @@
 @layer base {
     * {
         -webkit-tap-highlight-color: transparent;
+        -webkit-overflow-scrolling: touch;
+    }
+    html,
+    body {
+        height: 100%;
     }
 }

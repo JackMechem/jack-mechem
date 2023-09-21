@@ -169,7 +169,7 @@ const ProjectContent = ({ projects }: Props) => {
                     </div>
                 </div>
             ) : (
-                <div className="bg-[radial-gradient(#B6C3C1_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 bottom-0 lg:px-[200px] overflow-hidden md:px-[50px] md:py-[75px] px-[24px] py-[20px] md:hidden flex flex-col items-center">
+                <div className="bg-[radial-gradient(#B6C3C1_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 bottom-0 lg:px-[200px] overflow-hidden md:px-[50px] md:py-[75px] px-[24px] py-[20px] hidden md:flex flex-col items-center">
                     <h3 className="text-foreground-light font-bold opacity-20 text-[20px] mb-[10px]">
                         Select a Project
                     </h3>
