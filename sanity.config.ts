@@ -7,7 +7,7 @@ const config = defineConfig({
     projectId: "e4i7tez4",
     dataset: "production",
     title: "Jack Mechem",
-    apiVersion: "2023-08-20",
+    apiVersion: "2023-01-01",
     basePath: "/admin",
     plugins: [
         deskTool({
