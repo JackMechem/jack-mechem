@@ -15,13 +15,16 @@ import {
     AiFillSound,
 } from "react-icons/ai";
 import { usePathname } from "next/navigation";
+import { useSetTheme, useTheme } from "@/stores/useThemeStore";
+import { BsFillMoonFill, BsSunFill } from "react-icons/bs";
 
 const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
 
 const Header = () => {
     const pathname = usePathname();
     const [mobileMenuShown, setMobileMenuShown] = useState(false);
-    console.log(pathname);
+    const theme = useTheme();
+    const setTheme = useSetTheme();
     return (
         <div className="h-[60px] fixed top-0 left-0 right-0 bg-primary/60 backdrop-blur-md flex flex-row items-center justify-center md:justify-normal lg:justify-normal border-b-[1px] border-b-border/60 drop-shadow-secondary select-none z-50">
             <Link
@@ -37,7 +40,7 @@ const Header = () => {
                 onClick={() => {
                     setMobileMenuShown(!mobileMenuShown);
                 }}
-                className="hidden lg:hidden md:flex absolute right-[20px] p-[6px] shadow-[0_0_4px_2px_rgba(201,212,210,0.5)] rounded-full bg-border/60 text-foreground-light text-[20px] items-center justify-center cursor-pointer"
+                className="hidden lg:hidden md:flex absolute right-[20px] p-[6px] shadow-[0_0_4px_2px_theme(colors.border)] rounded-full bg-border/60 text-foreground-light text-[20px] items-center justify-center cursor-pointer"
             >
                 <IoIosArrowDown />
             </div>
@@ -130,6 +133,16 @@ const Header = () => {
                 <Link href="/music" className="font-semibold">
                     Music
                 </Link>
+            </div>
+            <div
+                onClick={setTheme}
+                className="absolute left-[20px] p-[8px] rounded-full bg-foreground-light text-secondary shadow-[theme(colors.accent)_0_0_3px_1px] cursor-pointer"
+            >
+                {theme.includes("light") ? (
+                    <BsFillMoonFill />
+                ) : (
+                    theme.includes("dark") && <BsSunFill />
+                )}
             </div>
         </div>
     );

@@ -11,7 +11,7 @@ const Music = () => {
                     when I finish it!
                 </p>
                 <Link href={"/"}>
-                    <div className="bg-accent py-2 px-4 text-primary rounded-xl border-2 border-[#689cb0] drop-shadow-md font-semibold cursor-pointer active:drop-shadow-xl">
+                    <div className="bg-accent py-2 px-4 text-primary dark-theme:text-foreground-light rounded-xl border-2 border-[#689cb0] drop-shadow-md font-semibold cursor-pointer active:drop-shadow-xl">
                         Return To Landing Page
                     </div>
                 </Link>

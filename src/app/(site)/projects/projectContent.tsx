@@ -43,9 +43,9 @@ const BodyComponents = {
 
     block: {
         h3: ({ children }: any) => (
-            <h3 className="text-foreground font-bold text-[20px] mb-[10px]">{children}</h3>
+            <h3 className="text-foreground-light font-bold text-[20px] mb-[10px]">{children}</h3>
         ),
-        normal: ({ children }: any) => <p className="mb-[20px]">{children}</p>,
+        normal: ({ children }: any) => <p className="mb-[20px] text-foreground">{children}</p>,
     },
 };
 
@@ -115,7 +115,7 @@ const ProjectContent = ({ projects }: Props) => {
                 </div>
             )}
             {currentProjectIndex !== null ? (
-                <div className="bg-primary bg-[radial-gradient(#B6C3C1_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 lg:px-[200px] md:px-[50px] md:py-[75px] px-[24px] pt-[20px] pb-[85px] min-h-[calc(100%-60px)]">
+                <div className="bg-primary bg-[radial-gradient(theme(colors.border)_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 lg:px-[200px] md:px-[50px] md:py-[75px] px-[24px] pt-[20px] pb-[85px] min-h-[calc(100%-60px)]">
                     {!menuShown && (
                         <div
                             onClick={() => {
@@ -169,7 +169,7 @@ const ProjectContent = ({ projects }: Props) => {
                     </div>
                 </div>
             ) : (
-                <div className="bg-[radial-gradient(#B6C3C1_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 bottom-0 lg:px-[200px] overflow-hidden md:px-[50px] md:py-[75px] px-[24px] py-[20px] hidden md:flex flex-col items-center">
+                <div className="bg-[radial-gradient(theme(colors.border)_0.25px,transparent_1px)] [background-size:14px_14px] absolute top-[60px] md:left-[300px] left-0 right-0 bottom-0 lg:px-[200px] overflow-hidden md:px-[50px] md:py-[75px] px-[24px] py-[20px] hidden md:flex flex-col items-center">
                     <h3 className="text-foreground-light font-bold opacity-20 text-[20px] mb-[10px]">
                         Select a Project
                     </h3>

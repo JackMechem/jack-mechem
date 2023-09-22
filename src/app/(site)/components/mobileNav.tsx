@@ -16,7 +16,7 @@ import Link from "next/link";
 const MobileNav = () => {
     const pathname = usePathname();
     return (
-        <div className="md:hidden fixed w-full bg-primary border-t border-border rounded-t-[30px] shadow-[rgba(234,240,239,0.5)_0_-4px_6px_3px] py-[8px] px-[15px] bottom-0 flex flex-row justify-evenly right-0 z-50">
+        <div className="md:hidden fixed w-full bg-primary  border-border/50 rounded-t-[30px] py-[8px] px-[15px] bottom-0 flex flex-row justify-evenly right-0 z-50">
             {pathname === "/" ? (
                 <div className="text-accent text-[30px] flex flex-col items-center min-w-[50px]">
                     <AiFillHome />

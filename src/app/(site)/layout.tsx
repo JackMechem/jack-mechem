@@ -1,10 +1,8 @@
 import "../globals.css";
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
 import Header from "./components/header";
 import MobileNav from "./components/mobileNav";
-
-const nunito = Nunito({ subsets: ["latin"] });
+import LayoutWrapper from "./components/layoutWrapper";
 
 export const metadata: Metadata = {
     title: "Jack Mechem",
@@ -14,12 +12,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
-            <body className={nunito.className + " h-screen w-screen bg-primary"}>
+            <LayoutWrapper>
                 <Header />
                 <MobileNav />
                 {children}
                 <div className="h-[65px] w-full"></div>
-            </body>
+            </LayoutWrapper>
         </html>
     );
 }
