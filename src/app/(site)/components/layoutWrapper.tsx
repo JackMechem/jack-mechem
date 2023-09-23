@@ -2,28 +2,36 @@
 
 import { useTheme } from "@/stores/useThemeStore";
 import { Nunito } from "next/font/google";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const nunito = Nunito({ subsets: ["latin"] });
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const theme: string = useTheme();
-    const [themeTwo, setThemeTwo] = useState(theme);
-    console.log(theme);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     useEffect(() => {
-        setThemeTwo(theme);
-    }, [theme]);
+        setIsHydrated(true);
+    }, [isHydrated]);
 
     return (
         <>
-            {themeTwo.includes("dark") ? (
-                <body className={nunito.className + " h-screen w-screen bg-primary dark-theme"}>
+            {isHydrated && theme.includes("dark") ? (
+                <body
+                    className={
+                        nunito.className +
+                        " h-screen w-screen bg-primary overflow-y-scroll dark-theme"
+                    }
+                >
                     {children}
                 </body>
             ) : (
-                themeTwo.includes("light") && (
-                    <body className={nunito.className + " h-screen w-screen bg-primary"}>
+                theme.includes("light") && (
+                    <body
+                        className={
+                            nunito.className + " h-screen w-screen overflow-y-scroll bg-primary"
+                        }
+                    >
                         {children}
                     </body>
                 )

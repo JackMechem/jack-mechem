@@ -1,21 +1,28 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { devtools, persist } from "zustand/middleware";
 
-const useStore = create(
-    persist(
-        (set: any, get: any) => ({
-            theme: "light",
-            setTheme: () =>
-                set((state: any) => ({
-                    ...state,
-                    theme: get().theme === "dark" ? "light" : "dark",
-                })),
-        }),
-        {
-            name: "theme", // name of the item in the storage (must be unique)
-        }
+interface ThemeState {
+    theme: "light" | "dark";
+    setTheme: () => void;
+}
+
+const useThemeStore = create<ThemeState>()(
+    devtools(
+        persist(
+            (set, get) => ({
+                theme: "light",
+                setTheme: () =>
+                    set((state: any) => ({
+                        ...state,
+                        theme: get().theme === "dark" ? "light" : "dark",
+                    })),
+            }),
+            {
+                name: "theme", // name of the item in the storage (must be unique)
+            }
+        )
     )
 );
 
-export const useTheme = () => useStore((state: any) => state.theme);
-export const useSetTheme = () => useStore((state: any) => state.setTheme);
+export const useTheme = () => useThemeStore((state) => state.theme);
+export const useSetTheme = () => useThemeStore((state) => state.setTheme);

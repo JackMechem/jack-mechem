@@ -6,11 +6,13 @@ import { FiArrowUpRight, FiArrowLeft } from "react-icons/fi";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindCondig from "../../../../tailwind.config.js";
 import { PortableText, PortableTextComponent, PortableTextComponents } from "@portabletext/react";
+import { IProject } from "@/types/sanity";
+import { SanityDocument } from "next-sanity";
 
 const fullConfig: any = resolveConfig(tailwindCondig);
 
 interface Props {
-    projects: any;
+    projects: SanityDocument[];
 }
 
 const BodyComponents = {
