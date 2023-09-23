@@ -1,5 +1,33 @@
 import { groq } from "next-sanity";
 
+export const landingPageQuery = groq`
+    *[_type == "page"]{
+        _id,
+        _createdAt,
+        "slug": slug.current,
+        titleText,
+        titleBio,
+        aboutTitle,
+        aboutText,
+        skillsTitle
+    }
+`;
+
+export const skillCardQuery = groq`
+    *[_type == "skillCard"]{
+        _id,
+        _createdAt,
+        name,
+        "slug": slug.current,
+        description,
+        "logo": logo.asset->url,
+        titleOne,
+        bodyOne,
+        titleTwo,
+        bodyTwo
+    }
+`;
+
 export const projectsQuery = groq`
             *[_type == "project"]|order(orderRank){
                 _id,

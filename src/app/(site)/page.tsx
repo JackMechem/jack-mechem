@@ -1,13 +1,24 @@
+import { ILandingPage, IProject, ISkillCard } from "@/types/sanity";
+import { sanityFetch } from "@/utils/sanity/client";
+import { SanityDocument } from "next-sanity";
 import { Pacifico } from "next/font/google";
-import indentArrow from "../../assets/arrows/indentArrow.svg";
-import toRightArrow from "../../assets/arrows/toRightArrow.svg";
-import smallIndentArrow from "../../assets/arrows/smallIndentArrow.svg";
+import { landingPageQuery, skillCardQuery } from "../../../sanity/queries";
 import desktopIcon from "../../assets/icons/desktop-computer.svg";
 import reactIcon from "../../assets/icons/react.svg";
 
 const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
 
-export default function Home() {
+const Home = async () => {
+    const pageQuery: ILandingPage[] = await sanityFetch<ILandingPage[]>({
+        query: landingPageQuery,
+    });
+
+    const page: ILandingPage = pageQuery[0];
+
+    const skillCards: ISkillCard[] = await sanityFetch<ISkillCard[]>({
+        query: skillCardQuery,
+    });
+
     return (
         <div>
             <div className="mt-[60px] ml-[20px] mr-[20px] md:ml-[100px] md:mr-[100px] lg:ml-[100px] lg:mr-[100px]">
@@ -34,9 +45,7 @@ export default function Home() {
                     </div>
                     <div className="mt-[37px] ml-[15px]">
                         <p className="lg:w-[60%] md:w-[80%] sm:w-[100%] text-foreground text-[20px] font-semibold leading-normal h-fit">
-                            I&apos;m a react website developer and jazz drummer living in Las Vegas.
-                            I enjoy building everything from personal to small business to e
-                            commerce websites.
+                            {page.titleBio}
                         </p>
                         <div className="text-accent font-semibold text-[20px] mt-[15px] cursor-pointer">
                             <a href="mailto:mechemjack@gmail.com">
@@ -65,7 +74,7 @@ export default function Home() {
                         " lg:text-[64px] md:text-[48px] text-[40px] text-foreground-light"
                     }
                 >
-                    About Myself
+                    {page.aboutTitle}
                 </h2>
                 <div className="flex flex-row -mt-[10px]">
                     <div className="w-[67px] mr-[17px]">
@@ -80,14 +89,7 @@ export default function Home() {
                         </svg>
                     </div>
                     <p className="lg:w-[80%] md:w-[100%] sm:w-[100%] w-full mt-[38px] text-foreground text-[20px] font-semibold leading-normal h-fit">
-                        I&apos;m a 17-year-old aspiring developer passionate about all things
-                        technology residing in the city of Las Vegas. What started as a curiosity in
-                        technology has evolved into a dedicated journey of immersing myself in the
-                        world of web development. I am committed to delivering a seamless and
-                        professional experience to each and every client, ensuring their projects
-                        are executed with utmost professionalism and attention to detail. While my
-                        expertise is mainly in react development, I can really make just about
-                        anything as long as I have the time!
+                        {page.aboutText}
                     </p>
                 </div>
             </div>
@@ -99,32 +101,37 @@ export default function Home() {
                         " lg:text-[64px] md:text-[48px] text-[40px] text-foreground-light mb-[40px]"
                     }
                 >
-                    My Skills
+                    {page.skillsTitle}
                 </h2>
                 <div className="w-full h-auto flex flex-col gap-[20%] gap-y-[20px] md:flex-col lg:flex-row md:px-[106px] lg:justify-center items-center">
-                    <div className="p-[30px] md:min-w-[403px] md:max-w-[400px] w-auto max-w-[403px] h-[520px] bg-secondary border-border/60 border rounded-[15px] drop-shadow-secondary-lg text-foreground flex flex-col items-center">
-                        <img src={desktopIcon.src} className="w-fit h-fit mb-[30px]" />
-                        <h3 className="text-foreground-light text-[22px] font-semibold leading-[0.75] mb-[20px] text-center">
-                            Design
-                        </h3>
-                        <p className="text-foreground text-center leading-snug text-[16px] mb-[50px]">
-                            I value simple content structure, clean design, and creative
-                            interactions.
-                        </p>
-                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
-                            Things I like designing:
-                        </h3>
-                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
-                            UX, UI, Web
-                        </p>
-                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
-                            Tools I use:
-                        </h3>
-                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
-                            Affinity <br /> Figma <br /> Pen & Paper <br /> Font Awesome <br />
-                            React Icons
-                        </p>
-                    </div>
+                    {skillCards.map((skillCard) => (
+                        <div
+                            key={skillCard.slug}
+                            className="p-[30px] md:min-w-[403px] md:max-w-[400px] w-auto max-w-[403px] h-[520px] bg-secondary border-border/60 border rounded-[15px] drop-shadow-secondary-lg text-foreground flex flex-col items-center"
+                        >
+                            <img src={skillCard.logo} className="w-fit h-fit mb-[30px]" />
+                            <h3 className="text-foreground-light text-[22px] font-semibold leading-[0.75] mb-[20px] text-center">
+                                {skillCard.name}
+                            </h3>
+                            <p className="text-foreground text-center leading-snug text-[16px] mb-[50px]">
+                                {skillCard.description}
+                            </p>
+                            <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
+                                {skillCard.titleOne}
+                            </h3>
+                            <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
+                                {skillCard.bodyOne}
+                            </p>
+                            <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
+                                {skillCard.titleTwo}
+                            </h3>
+                            <p className="text-foreground text-center leading-snug text-[16px] mb-[30px] whitespace-pre-line">
+                                {skillCard.bodyTwo}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+                {/* 
                     <div className="p-[30px] md:min-w-[403px] md:max-w-[400px] w-auto max-w-[403px] h-[520px] bg-secondary border-border/60 border rounded-[15px] drop-shadow-secondary-lg text-foreground flex flex-col items-center">
                         <img src={reactIcon.src} className="w-fit h-fit mb-[30px]" />
                         <h3 className="text-foreground-light text-[22px] font-semibold leading-[0.75] mb-[20px] text-center">
@@ -148,8 +155,11 @@ export default function Home() {
                             Terminal <br /> Vercel
                         </p>
                     </div>
-                </div>
+
+*/}
             </div>
         </div>
     );
-}
+};
+
+export default Home;
