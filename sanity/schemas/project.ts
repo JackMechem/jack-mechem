@@ -9,6 +9,11 @@ const Project = {
             type: "string",
         },
         {
+            name: "orderRank",
+            title: "Order Rank",
+            type: "string",
+        },
+        {
             name: "slug",
             title: "Slug",
             type: "slug",

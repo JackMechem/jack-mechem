@@ -1,7 +1,8 @@
 // ./deskStructure.js
-import { StructureBuilder } from "sanity/desk";
+import { StructureBuilder, StructureContext } from "sanity/desk";
+import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 
-export const myStructure = (S: StructureBuilder) =>
+export const myStructure = (S: StructureBuilder, context: StructureContext) =>
     S.list()
         .title("Content")
         .items([
@@ -9,6 +10,7 @@ export const myStructure = (S: StructureBuilder) =>
                 .title("Landing Page")
                 .child(S.document().schemaType("page").documentId("landingPage")),
             ...S.documentTypeListItems().filter(
-                (listItem) => !["page"].includes(listItem.getId()!)
+                (listItem) => !["page", "project"].includes(listItem.getId()!)
             ),
+            orderableDocumentListDeskItem({ type: "project", S, context }),
         ]);
