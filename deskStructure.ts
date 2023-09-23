@@ -2,7 +2,7 @@
 import { StructureBuilder, StructureContext } from "sanity/desk";
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 
-export const myStructure = (S: StructureBuilder, context: StructureContext) =>
+export const myStructure = (S: StructureBuilder, context: any) =>
     S.list()
         .title("Content")
         .items([
