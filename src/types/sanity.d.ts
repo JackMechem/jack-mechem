@@ -1,6 +1,6 @@
 import { PortableTextBlock } from "sanity";
 
-interface IProject {
+export interface IProject {
     name: string;
     date: string;
     slug: string;
@@ -8,4 +8,24 @@ interface IProject {
     logo: string;
     hero: string;
     body: PortableTextBlock[];
+}
+
+export interface ILandingPage {
+    slug: string;
+    titleText: string;
+    titleBio: string;
+    aboutTitle: string;
+    aboutText: string;
+    skillsTitle: string;
+}
+
+export interface ISkillCard {
+    name: string;
+    slug: string;
+    description: string;
+    logo: string;
+    titleOne: string;
+    bodyOne: string;
+    titleTwo: string;
+    bodyTwo: string;
 }
