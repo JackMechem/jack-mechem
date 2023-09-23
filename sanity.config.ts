@@ -4,10 +4,10 @@ import { myStructure } from "./deskStructure";
 import schemas from "./sanity/schemas";
 
 const config = defineConfig({
-    projectId: "e4i7tez4",
-    dataset: "production",
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID as string,
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET as string,
     title: "Jack Mechem",
-    apiVersion: "2023-01-01",
+    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION as string,
     basePath: "/admin",
     plugins: [
         deskTool({
