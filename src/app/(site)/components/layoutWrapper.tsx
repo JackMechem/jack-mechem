@@ -1,10 +1,10 @@
 "use client";
 
 import { useTheme } from "@/stores/useThemeStore";
-import { Nunito } from "next/font/google";
+import { Inter } from "next/font/google";
 import { useState, useEffect } from "react";
 
-const nunito = Nunito({ subsets: ["latin"] });
+const nunito = Inter({ subsets: ["latin"] });
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const theme: string = useTheme();

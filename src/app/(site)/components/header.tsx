@@ -1,6 +1,6 @@
 "use client";
 
-import { Pacifico } from "next/font/google";
+import { Inter } from "next/font/google";
 import Link from "next/link";
 import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
@@ -18,7 +18,7 @@ import { usePathname } from "next/navigation";
 import { useSetTheme, useTheme } from "@/stores/useThemeStore";
 import { BsFillMoonFill, BsSunFill } from "react-icons/bs";
 
-const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
+const pacifico = Inter({ subsets: ["latin"], weight: "500" });
 
 const Header = () => {
     const pathname = usePathname();
@@ -31,7 +31,7 @@ const Header = () => {
                 href="/"
                 className={
                     pacifico.className +
-                    " w-fit h-auto md:ml-[100px] text-foreground-light text-[32px] font-normal select-none"
+                    " w-fit h-auto md:ml-[100px] text-foreground-light text-[24px] font-normal select-none"
                 }
             >
                 Jack Mechem

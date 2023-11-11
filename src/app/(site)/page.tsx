@@ -1,12 +1,12 @@
 import { ILandingPage, IProject, ISkillCard } from "@/types/sanity";
 import { sanityFetch } from "@/utils/sanity/client";
 import { SanityDocument } from "next-sanity";
-import { Pacifico } from "next/font/google";
+import { Inter } from "next/font/google";
 import { landingPageQuery, skillCardQuery } from "../../../sanity/queries";
 import desktopIcon from "../../assets/icons/desktop-computer.svg";
 import reactIcon from "../../assets/icons/react.svg";
 
-const pacifico = Pacifico({ subsets: ["latin"], weight: "400" });
+const pacifico = Inter({ subsets: ["latin"], weight: "500" });
 
 const Home = async () => {
     const pageQuery: ILandingPage[] = await sanityFetch<ILandingPage[]>({
@@ -44,12 +44,12 @@ const Home = async () => {
                         </svg>
                     </div>
                     <div className="mt-[37px] ml-[15px]">
-                        <p className="lg:w-[60%] md:w-[80%] sm:w-[100%] text-foreground text-[20px] font-semibold leading-normal h-fit">
+                        <p className="lg:w-[60%] md:w-[80%] sm:w-[100%] text-foreground text-[20px]  leading-normal h-fit">
                             {page.titleBio}
                         </p>
                         <div className="text-accent font-semibold text-[20px] mt-[15px] cursor-pointer">
                             <a href="mailto:mechemjack@gmail.com">
-                                <span>Let&apos;s Colaborate</span>
+                                <span>Let&apos;s Collaborate</span>
                                 <span>
                                     <svg
                                         width="86"
@@ -88,7 +88,7 @@ const Home = async () => {
                             <path d="M4.7351 2.11962C4.80116 1.29383 4.18529 0.570842 3.3595 0.504777C2.53371 0.438713 1.81072 1.05459 1.74465 1.88038L4.7351 2.11962ZM2.23986 14.5L0.744615 14.3804L0.744057 14.3878L2.23986 14.5ZM19.7399 45.5L20.1163 44.048L19.7399 45.5ZM28.2399 29.5L28.5834 28.0399L28.2399 29.5ZM27.2399 50L26.2164 51.0966L27.2399 50ZM69.2344 62.1229C69.8545 61.5736 69.912 60.6256 69.3627 60.0054L60.4118 49.8995C59.8625 49.2794 58.9145 49.2219 58.2943 49.7712C57.6742 50.3205 57.6167 51.2685 58.166 51.8886L66.1224 60.8717L57.1394 68.8281C56.5192 69.3774 56.4617 70.3254 57.011 70.9455C57.5603 71.5657 58.5083 71.6231 59.1285 71.0739L69.2344 62.1229ZM1.74465 1.88038L0.744634 14.3804L3.73508 14.6196L4.7351 2.11962L1.74465 1.88038ZM0.744057 14.3878C-0.0132692 24.4856 0.961904 31.7421 4.07715 36.9568C7.23457 42.242 12.416 45.1508 19.3634 46.952L20.1163 44.048C13.5637 42.3492 9.24515 39.758 6.65257 35.4182C4.01782 31.0079 2.99299 24.5144 3.73566 14.6122L0.744057 14.3878ZM19.3634 46.952C22.8667 47.8603 25.9114 47.3565 28.3254 45.9548C30.7119 44.5691 32.3826 42.365 33.2946 40.0164C34.2019 37.68 34.4033 35.0819 33.6975 32.8502C32.9742 30.5635 31.2867 28.6759 28.5834 28.0399L27.8963 30.9601C29.4431 31.3241 30.391 32.3443 30.8371 33.7549C31.3007 35.2205 31.2053 37.109 30.4981 38.9305C29.7955 40.7397 28.5341 42.3645 26.8189 43.3604C25.1313 44.3404 22.905 44.771 20.1163 44.048L19.3634 46.952ZM28.5834 28.0399C25.5352 27.3226 22.9927 27.7629 21.2303 29.3842C19.5184 30.959 18.8798 33.3461 18.908 35.7984C18.9643 40.7004 21.6651 46.8487 26.2164 51.0966L28.2633 48.9034C24.2432 45.1513 21.9537 39.7578 21.9078 35.7639C21.8848 33.7682 22.417 32.3688 23.2614 31.5921C24.0551 30.8619 25.4542 30.3855 27.8963 30.9601L28.5834 28.0399ZM26.2164 51.0966C30.2563 54.8672 36.6932 57.4413 44.0129 59.2081C51.3797 60.9863 59.85 61.9943 68.1491 62.4973L68.3306 59.5027C60.1297 59.0057 51.85 58.0137 44.7168 56.2919C37.5364 54.5587 31.7234 52.1328 28.2633 48.9034L26.2164 51.0966Z" />
                         </svg>
                     </div>
-                    <p className="lg:w-[80%] md:w-[100%] sm:w-[100%] w-full mt-[38px] text-foreground text-[20px] font-semibold leading-normal h-fit">
+                    <p className="lg:w-[80%] md:w-[100%] sm:w-[100%] w-full mt-[38px] text-foreground text-[20px] leading-normal h-fit">
                         {page.aboutText}
                     </p>
                 </div>
@@ -131,32 +131,6 @@ const Home = async () => {
                         </div>
                     ))}
                 </div>
-                {/* 
-                    <div className="p-[30px] md:min-w-[403px] md:max-w-[400px] w-auto max-w-[403px] h-[520px] bg-secondary border-border/60 border rounded-[15px] drop-shadow-secondary-lg text-foreground flex flex-col items-center">
-                        <img src={reactIcon.src} className="w-fit h-fit mb-[30px]" />
-                        <h3 className="text-foreground-light text-[22px] font-semibold leading-[0.75] mb-[20px] text-center">
-                            Web Development
-                        </h3>
-                        <p className="text-foreground text-center leading-snug text-[16px] mb-[50px]">
-                            I like to code things from the ground up, bringing creative ideas to
-                            life in the browser.
-                        </p>
-                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
-                            Languages I speak:
-                        </h3>
-                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
-                            React, Next.js, HTML, CSS, Git
-                        </p>
-                        <h3 className="text-foreground-light text-center text-[20px] font-medium leading-[0.75] mb-[15px]">
-                            Tools I use:
-                        </h3>
-                        <p className="text-foreground text-center leading-snug text-[16px] mb-[30px]">
-                            Neovim <br /> GitHub <br /> Tailwind CSS <br /> Arch Linux <br />
-                            Terminal <br /> Vercel
-                        </p>
-                    </div>
-
-*/}
             </div>
         </div>
     );
