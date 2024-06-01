@@ -3,26 +3,88 @@
 @tailwind utilities;
 
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --foreground-rgb: 255, 255, 255;
-        --background-start-rgb: 0, 0, 0;
-        --background-end-rgb: 0, 0, 0;
-    }
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
 }
 
 @layer base {
-    * {
-        -webkit-tap-highlight-color: transparent;
-        -webkit-overflow-scrolling: touch;
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
+    transition-duration: 0.3s;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  img {
+    object-fit: cover;
+    width: auto;
+    height: auto;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 500;
+  }
+
+  h2 {
+    font-size: 23px;
+    font-weight: 600;
+    line-height: 200%;
+  }
+
+  h3 {
+    font-size: 19px;
+    font-weight: 500;
+  }
+
+  h4 {
+    letter-spacing: 4px;
+    font-weight: 600;
+  }
+
+  a {
+    @apply text-blue;
+  }
+
+  p {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 160%;
+  }
+
+  @media (min-width: 1000px) {
+    h1 {
+      font-size: 36px;
+      font-weight: 500;
     }
-    html,
-    body {
-        height: 100%;
+
+    h3 {
+      font-size: 22px;
+      line-height: 40px;
+      font-weight: 500;
     }
+
+    h4 {
+      letter-spacing: 4px;
+      font-weight: 600;
+    }
+    p {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 160%;
+    }
+  }
 }
