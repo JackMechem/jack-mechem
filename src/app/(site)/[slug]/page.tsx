@@ -8,15 +8,11 @@ import Link from "next/link";
 import Markdown from "react-markdown";
 
 export async function generateStaticParams() {
-  try {
-    const pages = await getAllPageSlugs();
+  const pages = await getAllPageSlugs();
 
-    return pages.pageCollection.items.map((page) => ({
-      slug: page.slug,
-    }));
-  } catch {
-    return 0;
-  }
+  return pages.pageCollection.items.map((page) => ({
+    slug: page.slug,
+  }));
 }
 
 export default async function Page({ params }: { params: { slug: string } }) {
