@@ -37,7 +37,7 @@ const FloatingWorkWindow = ({
     "translate(-300px, -350px)", // Starting position
   );
 
-  const [width, setWidth] = useState(window.innerWidth);
+  const [width, setWidth] = useState<number>();
 
   useEffect(() => {
     function handleResize() {
