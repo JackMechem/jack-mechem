@@ -66,7 +66,7 @@ const FloatingWorkWindow = ({
     >
       <div
         className={
-          `fixed transition-none overflow-y-scroll z-[100] hover:z-[110] py-[20px] pt-[40px] bg-primary border-2 border-green rounded-[10px] drop-shadow-bluexlr ` +
+          `fixed transition-none overflow-y-scroll z-[100] hover:z-[110] pb-[0px] pt-[40px] bg-primary border-2 border-green rounded-[10px] drop-shadow-bluexlr ` +
           (maximized
             ? "z-[999] top-[20px] bottom-[20px] left-[20px] right-[20px] pt-[0px] pb-[0px] drop-shadow-none "
             : `w-[600px] h-[700px] top-1/2 left-1/2 `) +
@@ -136,7 +136,7 @@ const FloatingWorkWindow = ({
               src={work.photo.url}
               alt={"work photo"}
               className={
-                (maximized ? "h-auto " : "md:h-[200px] ") +
+                (maximized ? "h-auto " : "md:h-auto ") +
                 "w-full rounded-[20px] mb-[10px] object-cover hover:drop-shadow-bluexlr hover:scale-[1.01] hover:cursor-pointer"
               }
             />

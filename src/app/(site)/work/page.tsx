@@ -11,12 +11,7 @@ const Work = async () => {
     <Container>
       <MediumBlock className="">
         <Command>{"./my-work"}</Command>
-        <h1 className="mb-[20px]">My Work</h1>
-        <h3>
-          This is a collection and archive of my favorite works over the years.
-          I am constantly making additions and changes to this page so be sure
-          to check in every once and a while!
-        </h3>
+        <h1 className="">My Work</h1>
       </MediumBlock>
       <MediumBlock
         className="grid lg:grid-cols-2 grid-cols-1 gap-[50px] lg:max-w-[1500px] pb-[50px]"
