@@ -42,7 +42,8 @@
   h2 {
     font-size: 23px;
     font-weight: 600;
-    line-height: 200%;
+    line-height: 250%;
+    margin-top: 10px;
   }
 
   h3 {

@@ -2,9 +2,9 @@
 
 import Container from "../components/container";
 import { IconLink } from "@tabler/icons-react";
-import WorkSideBar from "../components/workSideBar";
 import { useState } from "react";
 import useComponentVisible from "../components/useComponentVisible";
+import FloatingWorkWindow from "../components/floatingWorkWindow";
 
 interface WorkEntryProps {
   work: any;
@@ -15,7 +15,7 @@ const WorkEntry = ({ work }: WorkEntryProps) => {
 
   return (
     <Container key={work.sys.id} className="flex flex-col">
-      <WorkSideBar
+      <FloatingWorkWindow
         work={work}
         sideBarState={sidebarState}
         className={sidebarState.isComponentVisible ? "fixed" : "hidden"}
@@ -23,7 +23,7 @@ const WorkEntry = ({ work }: WorkEntryProps) => {
       <img
         src={work.photo.url}
         alt={"work photo"}
-        className="md:h-[400px] h-[300px] w-fit rounded-[30px] mb-[10px] object-cover shadow-2xl shadow-secondary hover:shadow-foreground hover:scale-[1.01] hover:cursor-pointer"
+        className="md:h-[400px] h-[300px] w-fit rounded-[30px] mb-[10px] object-cover hover:drop-shadow-bluexlr hover:scale-[1.01] hover:cursor-pointer"
         onClick={() => {
           sidebarState.setIsComponentVisible(true);
         }}
