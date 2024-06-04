@@ -23,15 +23,15 @@ const Home = async () => {
                 <>
                   <Container key={col.sys.id}>
                     {col.rowsCollection?.items.map((row) => {
-                      console.log(
-                        "Block: " +
-                          block.name +
-                          " | Col: " +
-                          col.name +
-                          " | Row: " +
-                          row.__typename,
-                      );
-                      console.log(row.outline);
+                      // console.log(
+                      //   "Block: " +
+                      //     block.name +
+                      //     " | Col: " +
+                      //     col.name +
+                      //     " | Row: " +
+                      //     row.__typename,
+                      // );
+                      // console.log(row.outline);
                       if (row.__typename === "Command") {
                         return (
                           <Command key={row.command}>{row.command}</Command>

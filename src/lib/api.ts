@@ -95,13 +95,9 @@ async function fetchGraphQL(query: string) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Switch the Bearer token depending on whether the fetch is supposed o retrieve live
-        // Contentful content or draft content
         Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({ query }),
-      // Associate all fetches for articles with an "articles" cache tag so content can
-      // be revalidated or updated from Contentful on publish
       next: { tags: ["pages"] },
     },
   ).then((response) => response.json());
@@ -117,7 +113,7 @@ export async function getAllPageSlugs(): Promise<PageSlugsResponse> {
         }
       }`,
   );
-  console.log("Page Data: " + pages.data);
+  // console.log("Page Data: " + pages.data);
   return pages.data;
 }
 
@@ -140,7 +136,7 @@ export async function getAllWorks(limit = 50): Promise<any> {
         }
       }`,
   );
-  console.log(pages);
+  // console.log(pages);
   return pages.data;
 }
 
@@ -152,7 +148,7 @@ export async function getPage(slug: string): Promise<PageResponse> {
         }
       }`,
   );
-  console.log(page);
+  // console.log(page);
   return page.data.pageCollection.items[0];
 }
 
@@ -164,6 +160,6 @@ export async function getWork(slug: string): Promise<any> {
         }
       }`,
   );
-  console.log(page);
+  // console.log(page);
   return page.data.pageCollection.items[0];
 }

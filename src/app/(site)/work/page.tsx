@@ -6,7 +6,7 @@ import Command from "../components/command";
 
 const Work = async () => {
   const works: any = await getAllWorks();
-  console.log(works.workCollection.items);
+  // console.log(works.workCollection.items);
   return (
     <Container>
       <MediumBlock className="">
