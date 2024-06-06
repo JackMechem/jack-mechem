@@ -6,6 +6,7 @@ import { LandButton } from "./components/Buttons";
 import Link from "next/link";
 import { getPage } from "../../lib/api";
 import Markdown from "react-markdown";
+import { revalidateTag } from "next/cache";
 
 const Home = async () => {
   const landingPage = await getPage("landing-page");

@@ -3,7 +3,6 @@ import {
   PageSlugsResponse,
   PagesResponse,
 } from "@/types/contentful";
-import { revalidateTag } from "next/cache";
 
 const PAGE_SLUG_QUERY_STRING = `
   items {                                                                                                                                                                                                                         
@@ -88,7 +87,6 @@ const WORK_QUERY_STRING = `
 `;
 
 async function fetchGraphQL(query: string) {
-  revalidateTag("pages");
   const resp = await fetch(
     `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
     {
@@ -98,7 +96,7 @@ async function fetchGraphQL(query: string) {
         Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({ query }),
-      next: { tags: ["pages"] },
+      next: { tags: ["pages"], revalidate: 3600 },
     },
   ).then((response) => response.json());
 

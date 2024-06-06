@@ -15,7 +15,7 @@ const Header = () => {
           <h4 className="md:block hidden">HOME</h4>
         </div>
       </Link>
-      <a href="mailto:jack@jackmechem.dev">
+      <Link href={"/contact"}>
         <div className="flex flex-row gap-[15px] items-center text-foreground-sec cursor-pointer">
           <h4 className="md:block hidden">HIRE ME</h4>
           <IconMessageCircle
@@ -24,7 +24,7 @@ const Header = () => {
             className="text-blue text-xl"
           />
         </div>
-      </a>
+      </Link>
     </div>
   );
 };
