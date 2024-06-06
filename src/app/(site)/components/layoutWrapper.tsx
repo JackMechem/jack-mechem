@@ -1,10 +1,10 @@
 "use client";
 
 import { useTheme } from "@/stores/useThemeStore";
-import { Nunito } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import { useState, useEffect } from "react";
 
-const nunito = Nunito({ subsets: ["latin"] });
+const jetbrains = JetBrains_Mono({ subsets: ["latin"] });
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const theme: string = useTheme();
@@ -19,8 +19,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
             {isHydrated && theme.includes("dark") ? (
                 <body
                     className={
-                        nunito.className +
-                        " h-screen w-screen bg-primary overflow-y-scroll dark-theme"
+                        jetbrains.className +
+                        " bg-[#0F1318] dark-theme overflow-hidden"
                     }
                 >
                     {children}
@@ -29,7 +29,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
                 theme.includes("light") && (
                     <body
                         className={
-                            nunito.className + " h-screen w-screen overflow-y-scroll bg-primary"
+                            jetbrains.className + " bg-[#ffffff] overflow-hidden"
                         }
                     >
                         {children}
