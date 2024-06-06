@@ -6,7 +6,7 @@ import MyEmail from "../../../../emails/myEmail";
 export async function POST(request: NextRequest) {
   const data = await request.json();
 
-  const resend = new Resend("re_UG559FfS_LgYQcperzH8s4kBpzjiJquj3");
+  const resend = new Resend(process.env.RESEND_KEY as string);
 
   const userEmail = await resend.emails.send({
     from: "jack@jackmechem.dev",
