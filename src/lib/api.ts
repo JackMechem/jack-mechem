@@ -3,6 +3,7 @@ import {
   PageSlugsResponse,
   PagesResponse,
 } from "@/types/contentful";
+import { revalidateTag } from "next/cache";
 
 const PAGE_SLUG_QUERY_STRING = `
   items {                                                                                                                                                                                                                         
@@ -72,17 +73,22 @@ const PAGE_QUERY_STRING = `
 
 const WORK_QUERY_STRING = `
     items {
-        sys {
+      category
+      worksCollection(limit: 10) {
+        items {
+          sys {
             id
+          }
+          title
+          slug
+          link
+          photo {
+            url
+          }
+          shortDescription
+          longDescription
         }
-        title 
-        slug
-        link
-        photo {
-                url
-        }
-        shortDescription
-        longDescription
+      }
     }
 `;
 
@@ -129,12 +135,12 @@ export async function getAllPages(limit = 10): Promise<PagesResponse> {
 export async function getAllWorks(limit = 50): Promise<any> {
   const pages = await fetchGraphQL(
     `query {
-        workCollection(where:{slug_exists: true}, limit: ${limit}, preview: false) {
+        workCategoryCollection(limit: ${limit}, preview: false) {
             ${WORK_QUERY_STRING}
         }
       }`,
   );
-  // console.log(pages);
+  console.log(pages.data.workCategoryCollection);
   return pages.data;
 }
 
