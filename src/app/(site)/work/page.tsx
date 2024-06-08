@@ -9,10 +9,6 @@ const Work = async () => {
   // console.log(works.workCollection.items);
   return (
     <Container>
-      <MediumBlock className="">
-        <Command>{"./my-work"}</Command>
-        <h1 className="">My Work</h1>
-      </MediumBlock>
       <MediumBlock
         className="lg:max-w-[1500px] flex flex-col gap-[100px]"
         parentClassName="lg:px-[25px]"
