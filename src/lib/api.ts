@@ -93,6 +93,7 @@ const WORK_QUERY_STRING = `
 `;
 
 async function fetchGraphQL(query: string) {
+  revalidateTag("pages");
   const resp = await fetch(
     `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
     {
