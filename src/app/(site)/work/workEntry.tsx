@@ -23,7 +23,7 @@ const WorkEntry = ({ work }: WorkEntryProps) => {
 			<img
 				src={work.photo.url}
 				alt={"work photo"}
-				className="md:h-[400px] h-[300px] w-fit rounded-[30px] mb-[10px] object-cover hover:shadow-bluexlr hover:scale-[1.01] hover:cursor-pointer"
+				className="md:h-[400px] h-[300px] w-full rounded-[30px] mb-[10px] object-cover hover:shadow-bluexlr hover:scale-[1.01] hover:cursor-pointer"
 				onClick={() => {
 					sidebarState.setIsComponentVisible(true);
 				}}
