@@ -1,7 +1,7 @@
 import {
-  PageResponse,
-  PageSlugsResponse,
-  PagesResponse,
+	PageResponse,
+	PageSlugsResponse,
+	PagesResponse,
 } from "@/types/contentful";
 import { revalidateTag } from "next/cache";
 
@@ -93,78 +93,78 @@ const WORK_QUERY_STRING = `
 `;
 
 async function fetchGraphQL(query: string) {
-  revalidateTag("pages");
-  const resp = await fetch(
-    `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
-      },
-      body: JSON.stringify({ query }),
-      next: { tags: ["pages"], revalidate: 3600 },
-    },
-  ).then((response) => response.json());
+	revalidateTag("pages");
+	const resp = await fetch(
+		`https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
+			},
+			body: JSON.stringify({ query }),
+			next: { tags: ["pages"], revalidate: 3600 },
+		},
+	).then((response) => response.json());
 
-  return resp;
+	return resp;
 }
 
 export async function getAllPageSlugs(): Promise<PageSlugsResponse> {
-  const pages = await fetchGraphQL(
-    `query {
+	const pages = await fetchGraphQL(
+		`query {
         pageCollection(where:{slug_exists: true}, limit: 100, preview: false) {
             ${PAGE_SLUG_QUERY_STRING}
         }
       }`,
-  );
-  // console.log("Page Data: " + pages.data);
-  return pages.data;
+	);
+	// console.log("Page Data: " + pages.data);
+	return pages.data;
 }
 
 export async function getAllPages(limit = 10): Promise<PagesResponse> {
-  const pages = await fetchGraphQL(
-    `query {
+	const pages = await fetchGraphQL(
+		`query {
         pageCollection(where:{slug_exists: true}, limit: ${limit}, preview: false) {
             ${PAGE_QUERY_STRING}
         }
       }`,
-  );
-  return pages.data;
+	);
+	return pages.data;
 }
 
 export async function getAllWorks(limit = 50): Promise<any> {
-  const pages = await fetchGraphQL(
-    `query {
+	const pages = await fetchGraphQL(
+		`query {
         workCategoryCollection(limit: ${limit}, preview: false) {
             ${WORK_QUERY_STRING}
         }
       }`,
-  );
-  console.log(pages.data.workCategoryCollection);
-  return pages.data;
+	);
+	console.log(pages.data.workCategoryCollection);
+	return pages.data;
 }
 
 export async function getPage(slug: string): Promise<PageResponse> {
-  const page = await fetchGraphQL(
-    `query {
+	const page = await fetchGraphQL(
+		`query {
         pageCollection(where:{slug: "${slug}"}, limit: 1, preview: false) {
             ${PAGE_QUERY_STRING}
         }
       }`,
-  );
-  // console.log(page);
-  return page.data.pageCollection.items[0];
+	);
+	console.log(page.data.pageCollection.items);
+	return page.data.pageCollection.items[0];
 }
 
 export async function getWork(slug: string): Promise<any> {
-  const page = await fetchGraphQL(
-    `query {
+	const page = await fetchGraphQL(
+		`query {
         workCollection(where:{slug: "${slug}"}, limit: 1, preview: false) {
             ${WORK_QUERY_STRING}
         }
       }`,
-  );
-  // console.log(page);
-  return page.data.pageCollection.items[0];
+	);
+	// console.log(page);
+	return page.data.pageCollection.items[0];
 }
