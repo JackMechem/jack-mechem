@@ -1,18 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ["@react-email/components", "@react-email/render", "resend"],
   experimental: {
-    serverComponentsExternalPackages: [
-      "@react-email/components",
-      "@react-email/render",
-      "resend/dist/index.mjs",
-      "resend",
-    ],
+    optimizePackageImports: ["@tabler/icons-react"],
   },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "cdn.sanity.io",
+        hostname: "images.ctfassets.net",
         port: "",
         pathname: "/**",
       },

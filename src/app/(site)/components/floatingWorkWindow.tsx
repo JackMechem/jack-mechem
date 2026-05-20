@@ -8,28 +8,20 @@ import {
   //IconArrowsMove,
 } from "@tabler/icons-react";
 import Markdown from "react-markdown";
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
-import resolveConfig from "tailwindcss/resolveConfig";
-import tailwindConfig from "../../../../tailwind.config.js";
 
 interface FloatingWorkWindowProps {
   work: any;
-  className?: string;
   sideBarState: any;
 }
 
 const FloatingWorkWindow = ({
   work,
-  className,
   sideBarState,
 }: FloatingWorkWindowProps) => {
-  const fullConfig: any = resolveConfig(tailwindConfig); // Types are all messed up
-
-  const medBreakPointString: string = fullConfig.theme?.screens?.md!;
-  const medBreakPointNumber: number = Number(
-    medBreakPointString.substring(0, medBreakPointString.length - 2),
-  );
+  const medBreakPointNumber = 768;
 
   const windowRef = useRef<HTMLDivElement>(null);
   const [maximized, setMaximized] = useState<boolean>(false);
@@ -69,8 +61,7 @@ const FloatingWorkWindow = ({
           `fixed transition-none overflow-y-scroll z-[100] hover:z-[110] pb-[0px] pt-[40px] bg-primary border-2 border-green rounded-[10px] drop-shadow-bluexlr ` +
           (maximized
             ? "z-[999] top-[20px] bottom-[20px] left-[20px] right-[20px] pt-[0px] pb-[0px] drop-shadow-none "
-            : `w-[600px] h-[700px] top-1/2 left-1/2 `) +
-          className
+            : `w-[600px] h-[700px] top-1/2 left-1/2 `)
         }
         ref={windowRef}
       >
@@ -132,9 +123,12 @@ const FloatingWorkWindow = ({
             </h3>
           </a>
           <a href={work.link}>
-            <img
+            <Image
               src={work.photo.url}
-              alt={"work photo"}
+              alt="work photo"
+              width={work.photo.width}
+              height={work.photo.height}
+              sizes="(min-width: 768px) 600px, 100vw"
               className={
                 (maximized ? "h-auto " : "md:h-auto ") +
                 "w-full rounded-[20px] mb-[10px] object-cover hover:drop-shadow-bluexlr hover:scale-[1.01] hover:cursor-pointer"

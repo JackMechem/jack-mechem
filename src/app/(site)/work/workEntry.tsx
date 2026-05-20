@@ -1,10 +1,15 @@
 "use client";
 
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import Container from "../components/container";
 import { IconLink } from "@tabler/icons-react";
-import { useState } from "react";
 import useComponentVisible from "../components/useComponentVisible";
-import FloatingWorkWindow from "../components/floatingWorkWindow";
+
+const FloatingWorkWindow = dynamic(
+	() => import("../components/floatingWorkWindow"),
+	{ ssr: false }
+);
 
 interface WorkEntryProps {
 	work: any;
@@ -15,14 +20,14 @@ const WorkEntry = ({ work }: WorkEntryProps) => {
 
 	return (
 		<Container key={work.sys.id} className="flex flex-col">
-			<FloatingWorkWindow
-				work={work}
-				sideBarState={sidebarState}
-				className={sidebarState.isComponentVisible ? "fixed" : "hidden"}
-			/>
-			<img
+			{sidebarState.isComponentVisible && (
+				<FloatingWorkWindow work={work} sideBarState={sidebarState} />
+			)}
+			<Image
 				src={work.photo.url}
-				alt={"work photo"}
+				alt="work photo"
+				width={work.photo.width}
+				height={work.photo.height}
 				className="md:h-[400px] h-[300px] w-full rounded-[30px] mb-[10px] object-cover hover:shadow-bluexlr hover:scale-[1.01] hover:cursor-pointer"
 				onClick={() => {
 					sidebarState.setIsComponentVisible(true);
