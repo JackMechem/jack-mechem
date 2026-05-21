@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,6 +10,10 @@ import {
 	IconExternalLink,
 	IconBriefcase,
 	IconAlertTriangle,
+	IconChevronDown,
+	IconChevronRight,
+	IconDeviceDesktop,
+	IconX,
 } from "@tabler/icons-react";
 import { Work, WorkCategory } from "@/types/contentful";
 
@@ -41,12 +46,30 @@ const DemosListView = ({ categories, initialSlug }: DemosListViewProps) => {
 
 	const initialWork = (initialSlug ? flatWorks.find((fw) => fw.work.slug === initialSlug) : null) ?? flatWorks[0];
 	const [selected, setSelectedState] = useState<FlatWork>(initialWork);
+	const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
+		() => new Set([initialWork.work.sys.id]),
+	);
+	const toggleProject = (id: string) =>
+		setExpandedProjects((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
 	const [activeTab, setActiveTab] = useState("live-demo");
+	const [mobileIframeAspect, setMobileIframeAspect] = useState("9 / 19.5");
+	const [fullscreenOpen, setFullscreenOpen] = useState(false);
+	useEffect(() => {
+		setMobileIframeAspect(`${window.innerWidth} / ${window.innerHeight}`);
+	}, []);
 
 	useEffect(() => {
 		if (!initialSlug) return;
 		const match = flatWorks.find((fw) => fw.work.slug === initialSlug);
-		if (match) setSelectedState(match);
+		if (match) {
+			setSelectedState(match);
+			setExpandedProjects((prev) => new Set([...prev, match.work.sys.id]));
+		}
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [initialSlug]);
 
@@ -55,6 +78,7 @@ const DemosListView = ({ categories, initialSlug }: DemosListViewProps) => {
 		router.replace(`/demos?project=${fw.work.slug}`, { scroll: false });
 	}, [router]);
 	const [leftPct, setLeftPct] = useState(30);
+	const [listCollapsed, setListCollapsed] = useState(false);
 	const [search, setSearch] = useState("");
 	const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
@@ -136,44 +160,60 @@ const DemosListView = ({ categories, initialSlug }: DemosListViewProps) => {
 		</div>
 	);
 
-	const listItems = filtered.length > 0 ? (
-		filtered.map(({ work, category }) => {
-			const isSelected = selected.work.sys.id === work.sys.id;
-			return (
-				<div
-					key={work.sys.id}
-					onClick={() => setSelected({ work, category })}
-					className={
-						"flex gap-[12px] p-[10px] cursor-pointer transition-colors m-[5px] rounded-xl " +
-						(isSelected ? "bg-blue/20 shadow-md shadow-blue/10" : "hover:bg-secondary/50")
-					}
-				>
-					<div className="relative w-[52px] h-[52px] shrink-0 rounded-[8px] overflow-hidden bg-secondary">
-						<Image src={work.photo.url} alt={work.title} fill className="object-cover" />
+	const folderList = (items: FlatWork[]) =>
+		items.length > 0 ? (
+			items.map(({ work, category }) => {
+				const isExpanded = expandedProjects.has(work.sys.id);
+				const isSelected = selected.work.sys.id === work.sys.id;
+				return (
+					<div key={work.sys.id} className="mx-[5px] mb-[4px]">
+						{/* Folder row */}
+						<div
+							onClick={() => toggleProject(work.sys.id)}
+							className={
+								"flex items-center gap-[10px] px-[10px] py-[8px] rounded-[12px] cursor-pointer transition-colors " +
+								(isExpanded ? "bg-secondary/40 hover:bg-secondary/60" : "hover:bg-secondary/50")
+							}
+						>
+							<IconChevronRight
+								size={14}
+								className={"shrink-0 text-foreground-sec transition-transform duration-150 " + (isExpanded ? "rotate-90" : "")}
+							/>
+							<div className="relative w-[80px] h-[54px] shrink-0 rounded-[8px] overflow-hidden">
+								<Image src={work.photo.url} alt={work.title} fill className="object-cover" />
+							</div>
+							<div className="flex flex-col gap-[6px] min-w-0 flex-1">
+								<span className="text-[11px] text-blue font-bold tracking-wider bg-blue/20 py-[2px] px-[8px] rounded-full w-fit">
+									{category}
+								</span>
+								<p className="text-[15px] font-semibold text-foreground truncate leading-tight">{work.title}</p>
+							</div>
+						</div>
+						{/* Demo children with tree line */}
+						{isExpanded && (
+							<div className="ml-[22px] mt-[2px] mb-[2px] pl-[14px] border-l-2 border-secondary">
+								<div
+									onClick={() => setSelected({ work, category })}
+									className={
+										"flex items-center gap-[8px] px-[10px] py-[8px] rounded-[8px] cursor-pointer transition-colors " +
+										(isSelected
+											? "bg-blue/20 text-blue shadow-sm shadow-blue/10"
+											: "text-foreground-sec hover:bg-secondary/50 hover:text-foreground")
+									}
+								>
+									<IconDeviceDesktop size={14} className="shrink-0" />
+									<span className="text-[13px] font-semibold">Live Demo</span>
+								</div>
+							</div>
+						)}
 					</div>
-					<div className="flex flex-col gap-[3px] overflow-hidden min-w-0 flex-1">
-						<span className="text-[11px] text-blue font-bold tracking-wider bg-blue/20 py-[2px] px-[8px] rounded-full w-fit">
-							{category}
-						</span>
-						<p className="text-[14px] font-bold text-foreground truncate">{work.title}</p>
-						<p className="text-[11px] text-foreground-sec line-clamp-1">{work.shortDescription}</p>
-					</div>
-					<Link
-						href={`/work?project=${work.slug}`}
-						onClick={(e) => e.stopPropagation()}
-						className="shrink-0 self-center p-[6px] rounded-[8px] text-foreground-sec hover:text-blue hover:bg-blue/10 transition-colors cursor-pointer"
-						title="View project details"
-					>
-						<IconExternalLink size={14} />
-					</Link>
-				</div>
-			);
-		})
-	) : (
-		<p className="text-foreground-sec text-[12px] text-center py-[20px] px-[10px]">
-			No demos match your filters.
-		</p>
-	);
+				);
+			})
+		) : (
+			<p className="text-foreground-sec text-[12px] text-center py-[20px] px-[10px]">
+				No demos match your filters.
+			</p>
+		);
 
 	return (
 		<>
@@ -186,7 +226,7 @@ const DemosListView = ({ categories, initialSlug }: DemosListViewProps) => {
 				>
 					{filterBar}
 					<div className="overflow-y-auto flex-1 min-h-0">
-						{listItems}
+						{folderList(filtered)}
 					</div>
 				</div>
 
@@ -269,70 +309,130 @@ const DemosListView = ({ categories, initialSlug }: DemosListViewProps) => {
 			</div>
 
 			{/* ── Mobile: stacked ─────────────────────────────────────── */}
-			<div className="lg:hidden flex flex-col pb-[120px] px-[10px]">
+			<div className="lg:hidden flex flex-col pb-[40px] px-[10px]">
 				{filterBar}
-				<div className="flex flex-col">
-					{filtered.length > 0 ? (
-						filtered.map(({ work, category }) => {
-							const isSelected = selected.work.sys.id === work.sys.id;
-							return (
-								<div
-									key={work.sys.id}
-									onClick={() => setSelected({ work, category })}
-									className={
-										"flex gap-[12px] p-[10px] cursor-pointer transition-colors rounded-xl " +
-										(isSelected ? "bg-blue/20 shadow-md shadow-blue/10" : "hover:bg-secondary/50")
-									}
-								>
-									<div className="relative w-[48px] h-[48px] shrink-0 rounded-[8px] overflow-hidden bg-secondary">
-										<Image src={work.photo.url} alt={work.title} fill className="object-cover" />
-									</div>
-									<div className="flex flex-col gap-[2px] overflow-hidden min-w-0 flex-1">
-										<span className="text-[10px] text-blue font-bold tracking-wider bg-blue/20 py-[2px] px-[6px] rounded-full w-fit">
-											{category}
-										</span>
-										<p className="text-[13px] font-bold text-foreground truncate">{work.title}</p>
-										<p className="text-[11px] text-foreground-sec line-clamp-1">{work.shortDescription}</p>
-									</div>
-								</div>
-							);
-						})
-					) : (
-						<p className="text-foreground-sec text-[12px] text-center py-[20px]">
-							No demos match your filters.
-						</p>
-					)}
-				</div>
+				{/* Collapse toggle */}
+				<button
+					onClick={() => setListCollapsed((c) => !c)}
+					className="flex items-center justify-between px-[5px] py-[8px] text-[11px] font-semibold text-foreground-sec hover:bg-secondary/50 transition-colors border-b border-secondary"
+				>
+					<span>{filtered.length} demo{filtered.length !== 1 ? "s" : ""}</span>
+					<IconChevronDown
+						size={14}
+						className={"transition-transform duration-200 " + (listCollapsed ? "-rotate-90" : "")}
+					/>
+				</button>
+				{/* Collapsible list */}
+				{!listCollapsed && (
+					<div className="flex flex-col py-[4px]">
+						{folderList(filtered)}
+					</div>
+				)}
 
-				{/* Selected demo card */}
-				<div className="border-t border-secondary mt-[4px]">
-					<div className="py-[12px] flex flex-col gap-[6px]">
-						<div className="flex items-center justify-between gap-[10px]">
-							<span className="text-[11px] text-blue font-bold tracking-wider bg-blue/20 py-[2px] px-[8px] rounded-full">
+				{/* Selected demo */}
+				<div className={"pt-[12px] " + (listCollapsed ? "" : "border-t border-secondary mt-[4px]")}>
+					{/* Header */}
+					<div className="flex items-center gap-[8px] flex-wrap mb-[6px]">
+						<span className="text-[11px] text-blue font-bold tracking-wider bg-blue/20 py-[2px] px-[8px] rounded-full">
+							{selected.category}
+						</span>
+						<Link
+							href={`/work?project=${selected.work.slug}`}
+							className="flex items-center gap-[5px] text-[11px] font-bold tracking-wider text-foreground-sec bg-secondary/60 hover:bg-secondary hover:text-foreground py-[2px] px-[10px] rounded-full transition-colors"
+						>
+							<IconBriefcase size={12} />
+							View Project
+						</Link>
+						<a
+							href={selected.work.link}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="ml-auto flex items-center gap-[5px] text-[11px] text-foreground-sec hover:text-blue transition-colors"
+						>
+							<IconExternalLink size={13} />
+							Open
+						</a>
+					</div>
+					<h3 className="text-[18px] font-bold text-foreground mb-[4px]">{selected.work.title}</h3>
+					<p className="text-[13px] text-foreground-sec mb-[10px]">{selected.work.shortDescription}</p>
+
+					{/* Warning banner */}
+					{DEMO_WARNINGS[selected.work.slug] && (
+						<div className="px-[12px] py-[8px] mb-[10px] bg-amber-500/10 border border-amber-500/20 rounded-[10px] flex items-center gap-[8px]">
+							<IconAlertTriangle size={14} className="text-amber-400 shrink-0" />
+							<p className="text-[12px] text-amber-400">{DEMO_WARNINGS[selected.work.slug]}</p>
+						</div>
+					)}
+
+					{/* Launch button */}
+					<button
+						onClick={() => setFullscreenOpen(true)}
+						className="w-full flex items-center justify-center gap-[8px] py-[12px] rounded-[12px] bg-blue text-primary text-[13px] font-bold hover:bg-blue/80 transition-colors cursor-pointer"
+					>
+						<IconDeviceDesktop size={16} />
+						Open Live Demo
+					</button>
+				</div>
+			</div>
+
+			{/* Fullscreen demo overlay (mobile) */}
+			{fullscreenOpen && typeof document !== "undefined" && createPortal(
+				<div className="fixed inset-0 z-[9990] bg-primary flex flex-col lg:hidden">
+					{/* Header */}
+					<div className="px-[16px] py-[12px] border-b border-secondary shrink-0">
+						<div className="flex items-center gap-[8px] flex-wrap">
+							<span className="text-[11px] text-blue font-bold tracking-wider bg-blue/20 py-[2px] px-[10px] rounded-full">
 								{selected.category}
 							</span>
+							<Link
+								href={`/work?project=${selected.work.slug}`}
+								onClick={() => setFullscreenOpen(false)}
+								className="flex items-center gap-[5px] text-[11px] font-bold tracking-wider text-foreground-sec bg-secondary/60 hover:bg-secondary hover:text-foreground py-[2px] px-[10px] rounded-full transition-colors"
+							>
+								<IconBriefcase size={12} />
+								View Project
+							</Link>
 							<a
 								href={selected.work.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-[5px] text-[11px] text-foreground-sec hover:text-blue transition-colors shrink-0"
+								className="flex items-center gap-[5px] text-[11px] text-foreground-sec hover:text-blue transition-colors"
 							>
 								<IconExternalLink size={13} />
-								Open site
+								Open
 							</a>
+							<button
+								onClick={() => setFullscreenOpen(false)}
+								className="ml-auto p-[6px] rounded-[8px] text-foreground-sec hover:bg-secondary/60 hover:text-foreground transition-colors cursor-pointer"
+							>
+								<IconX size={18} />
+							</button>
 						</div>
-						<h3 className="text-[18px] font-bold text-foreground">{selected.work.title}</h3>
-						<p className="text-[13px] text-foreground-sec">{selected.work.shortDescription}</p>
+						<h2 className="text-[17px] font-bold text-foreground mt-[6px] mb-[2px] leading-tight">{selected.work.title}</h2>
+						<p className="text-[12px] text-foreground-sec">{selected.work.shortDescription}</p>
 					</div>
-					<Link
-						href={`/work?project=${selected.work.slug}`}
-						className="flex items-center gap-[8px] py-[12px] border-t border-secondary text-[13px] font-semibold text-blue hover:bg-blue/10 transition-colors"
-					>
-						<IconExternalLink size={14} />
-						View Project Details
-					</Link>
-				</div>
-			</div>
+
+					{/* Warning banner */}
+					{DEMO_WARNINGS[selected.work.slug] && (
+						<div className="px-[16px] py-[8px] bg-amber-500/10 border-b border-amber-500/20 flex items-center gap-[8px] shrink-0">
+							<IconAlertTriangle size={14} className="text-amber-400 shrink-0" />
+							<p className="text-[12px] text-amber-400">{DEMO_WARNINGS[selected.work.slug]}</p>
+						</div>
+					)}
+
+					{/* Iframe */}
+					<div className="flex-1 min-h-0">
+						<iframe
+							key={selected.work.sys.id}
+							src={selected.work.link}
+							title={selected.work.title}
+							className="w-full h-full border-0 bg-white"
+							allow="fullscreen"
+						/>
+					</div>
+				</div>,
+				document.body,
+			)}
 		</>
 	);
 };

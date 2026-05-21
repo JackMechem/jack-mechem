@@ -97,6 +97,8 @@ const WORK_QUERY_STRING = `
           }
           shortDescription
           longDescription
+          startDate
+          endDate
         }
       }
     }

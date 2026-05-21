@@ -13,6 +13,8 @@ export interface Work {
   otherImagesCollection?: { items: ContentfulImage[] };
   shortDescription: string;
   longDescription: string;
+  startDate: string;
+  endDate: string;
 }
 
 export interface WorkCategory {

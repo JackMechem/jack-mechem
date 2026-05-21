@@ -15,6 +15,7 @@ import {
 	IconAdjustmentsHorizontal,
 	IconChevronLeft,
 	IconChevronRight,
+	IconChevronDown,
 	IconPhoto,
 	IconDeviceDesktop,
 } from "@tabler/icons-react";
@@ -285,6 +286,11 @@ const PreviewPanel = ({ selected }: { selected: FlatWork }) => {
 					Live Demo
 				</Link>
 			</div>
+			{selected.work.startDate && selected.work.endDate && (
+				<p className="text-[11px] text-foreground-sec/60 mt-[6px]">
+					{fmtDateRange(selected.work.startDate, selected.work.endDate)}
+				</p>
+			)}
 			<a href={selected.work.link}>
 				<h2 className="text-blue flex items-center gap-[8px] leading-[100%] mt-[12px] mb-[6px] text-[22px]">
 					{selected.work.title} <IconLink size={18} />
@@ -335,6 +341,19 @@ const PreviewPanel = ({ selected }: { selected: FlatWork }) => {
 	);
 };
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const yearFromIso = (d: string) => parseInt(d.slice(0, 4), 10);
+const monthFromIso = (d: string) => MONTHS[parseInt(d.slice(5, 7), 10) - 1] ?? "";
+
+const fmtDateRange = (start: string, end: string) => {
+	const sy = yearFromIso(start); const ey = yearFromIso(end);
+	const sm = monthFromIso(start); const em = monthFromIso(end);
+	if (sy === ey) return `${sm} – ${em} '${String(sy).slice(2)}`;
+	return `${sm} '${String(sy).slice(2)} – ${em} '${String(ey).slice(2)}`;
+};
+
 // ── WorkListView ─────────────────────────────────────────────────────────────
 
 const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewProps) => {
@@ -362,9 +381,18 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 	}, [router]);
 	const [leftPct, setLeftPct] = useState(38);
 	const [condensed, setCondensed] = useState(false);
+	const [listCollapsed, setListCollapsed] = useState(false);
 	const [filterOpen, setFilterOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const [activeCategory, setActiveCategory] = useState<string | null>(null);
+	const [activeYear, setActiveYear] = useState<number | null>(null);
+
+	const allYears = [...new Set(
+		flatWorks.flatMap(({ work }) => [
+			work.startDate ? yearFromIso(work.startDate) : null,
+			work.endDate ? yearFromIso(work.endDate) : null,
+		]).filter((y): y is number => y !== null && !isNaN(y)),
+	)].sort((a, b) => b - a);
 
 	const filterBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -373,8 +401,13 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 	const [showPreview, setShowPreview] = useState(false);
 	const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 	const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const isTouchDevice = useRef(false);
+	useEffect(() => {
+		isTouchDevice.current = window.matchMedia("(hover: none)").matches;
+	}, []);
 
 	const handleItemEnter = useCallback((fw: FlatWork, e: React.MouseEvent) => {
+		if (isTouchDevice.current) return;
 		setHoveredWork(fw);
 		setMousePos({ x: e.clientX, y: e.clientY });
 		hoverTimer.current = setTimeout(() => setShowPreview(true), 280);
@@ -432,7 +465,11 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 			work.title.toLowerCase().includes(q) ||
 			work.shortDescription?.toLowerCase().includes(q) ||
 			category.toLowerCase().includes(q);
-		return matchesCategory && matchesSearch;
+		const matchesYear = activeYear === null ||
+			(work.startDate && work.endDate &&
+				yearFromIso(work.startDate) <= activeYear &&
+				yearFromIso(work.endDate) >= activeYear);
+		return matchesCategory && matchesSearch && matchesYear;
 	});
 
 	// Filter flyout portal (condensed mode only)
@@ -457,36 +494,27 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 					/>
 				</div>
 				<div className="flex flex-wrap gap-[5px]">
-					<button
-						onClick={() => setActiveCategory(null)}
-						className={
-							"text-[10px] font-bold tracking-wider py-[3px] px-[10px] rounded-full transition-colors " +
-							(activeCategory === null
-								? "bg-blue text-primary"
-								: "bg-secondary text-foreground-sec hover:bg-blue/20 hover:text-blue")
-						}
-					>
-						All
-					</button>
+					<button onClick={() => setActiveCategory(null)} className={pillClass(activeCategory === null)}>All</button>
 					{categoryNames.map((cat) => (
-						<button
-							key={cat}
-							onClick={() => setActiveCategory(cat)}
-							className={
-								"text-[10px] font-bold tracking-wider py-[3px] px-[10px] rounded-full transition-colors " +
-								(activeCategory === cat
-									? "bg-blue text-primary"
-									: "bg-secondary text-foreground-sec hover:bg-blue/20 hover:text-blue")
-							}
-						>
-							{cat}
-						</button>
+						<button key={cat} onClick={() => setActiveCategory(cat)} className={pillClass(activeCategory === cat)}>{cat}</button>
 					))}
 				</div>
+				{allYears.length > 0 && (
+					<div className="flex flex-wrap gap-[5px]">
+						<button onClick={() => setActiveYear(null)} className={pillClass(activeYear === null)}>All years</button>
+						{allYears.map((yr) => (
+							<button key={yr} onClick={() => setActiveYear(yr)} className={pillClass(activeYear === yr)}>{yr}</button>
+						))}
+					</div>
+				)}
 			</div>,
 			document.body,
 		);
 	})();
+
+	const pillClass = (active: boolean) =>
+		"text-[10px] font-bold tracking-wider py-[3px] px-[10px] rounded-full transition-colors cursor-pointer " +
+		(active ? "bg-blue text-primary" : "bg-secondary text-foreground-sec hover:bg-blue/20 hover:text-blue");
 
 	// Full filter bar (expanded mode)
 	const filterBar = (
@@ -520,32 +548,19 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 				)}
 			</div>
 			<div className="flex flex-wrap gap-[5px]">
-				<button
-					onClick={() => setActiveCategory(null)}
-					className={
-						"text-[10px] font-bold tracking-wider py-[3px] px-[10px] rounded-full transition-colors " +
-						(activeCategory === null
-							? "bg-blue text-primary"
-							: "bg-secondary text-foreground-sec hover:bg-blue/20 hover:text-blue")
-					}
-				>
-					All
-				</button>
+				<button onClick={() => setActiveCategory(null)} className={pillClass(activeCategory === null)}>All</button>
 				{categoryNames.map((cat) => (
-					<button
-						key={cat}
-						onClick={() => setActiveCategory(cat)}
-						className={
-							"text-[10px] font-bold tracking-wider py-[3px] px-[10px] rounded-full transition-colors " +
-							(activeCategory === cat
-								? "bg-blue text-primary"
-								: "bg-secondary text-foreground-sec hover:bg-blue/20 hover:text-blue")
-						}
-					>
-						{cat}
-					</button>
+					<button key={cat} onClick={() => setActiveCategory(cat)} className={pillClass(activeCategory === cat)}>{cat}</button>
 				))}
 			</div>
+			{allYears.length > 0 && (
+				<div className="flex flex-wrap gap-[5px]">
+					<button onClick={() => setActiveYear(null)} className={pillClass(activeYear === null)}>All years</button>
+					{allYears.map((yr) => (
+						<button key={yr} onClick={() => setActiveYear(yr)} className={pillClass(activeYear === yr)}>{yr}</button>
+					))}
+				</div>
+			)}
 		</div>
 	);
 
@@ -605,6 +620,9 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 					<span className="text-[12px] text-blue font-bold tracking-wider bg-blue/20 py-[2px] px-[10px] rounded-full w-fit">
 						{category}
 					</span>
+					{work.startDate && work.endDate && (
+						<span className="text-[11px] text-foreground-sec/60">{fmtDateRange(work.startDate, work.endDate)}</span>
+					)}
 					<p className="text-[15px] font-bold text-foreground truncate">{work.title}</p>
 					<p className="text-[12px] text-foreground-sec line-clamp-1">{work.shortDescription}</p>
 				</div>
@@ -637,7 +655,7 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 
 				{/* Left panel */}
 				<div
-					className="h-full flex flex-col shrink-0 overflow-hidden transition-[width] duration-200"
+					className="h-full flex flex-col shrink-0 overflow-hidden"
 					style={{ width: `${leftPct}%` }}
 				>
 					{condensed ? condensedBar : filterBar}
@@ -689,13 +707,27 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 			</div>
 
 			{/* Mobile: stacked */}
-			<div className="lg:hidden flex flex-col pb-[120px]">
+			<div className="lg:hidden flex flex-col pb-[40px]">
 				{filterBar}
-				<div className="overflow-y-auto max-h-[45vh] min-h-0">
-					{listItems.length > 0 ? listItems : emptyState}
-				</div>
+				{/* Collapse toggle */}
+				<button
+					onClick={() => setListCollapsed((c) => !c)}
+					className="flex items-center justify-between px-[15px] py-[8px] text-[11px] font-semibold text-foreground-sec hover:bg-secondary/50 transition-colors border-b border-secondary"
+				>
+					<span>{filteredWorks.length} project{filteredWorks.length !== 1 ? "s" : ""}</span>
+					<IconChevronDown
+						size={14}
+						className={"transition-transform duration-200 " + (listCollapsed ? "-rotate-90" : "")}
+					/>
+				</button>
+				{/* Collapsible list */}
+				{!listCollapsed && (
+					<div className="flex flex-col">
+						{listItems.length > 0 ? listItems : emptyState}
+					</div>
+				)}
 				{/* Preview */}
-				<div className="border-t border-secondary px-[10px] pt-[12px]">
+				<div className={"px-[10px] pt-[12px] " + (listCollapsed ? "" : "border-t border-secondary")}>
 					<div className="relative w-full aspect-video rounded-[12px] overflow-hidden">
 						<Image src={selected.work.photo.url} alt={selected.work.title} fill className="object-cover" />
 					</div>
@@ -714,6 +746,26 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 							<IconLink size={14} />
 							View Project
 						</a>
+					</div>
+					{/* Full long description */}
+					<div className="border-t border-secondary pt-[14px] pb-[20px] text-foreground text-[13px] leading-relaxed">
+						<Markdown
+							components={{
+								img(props) {
+									const { node, src, alt, ...rest } = props;
+									return (
+										<img
+											src={src}
+											alt={alt ?? "project image"}
+											className="rounded-[12px] my-[16px] w-full"
+											{...rest}
+										/>
+									);
+								},
+							}}
+						>
+							{selected.work.longDescription}
+						</Markdown>
 					</div>
 				</div>
 			</div>
