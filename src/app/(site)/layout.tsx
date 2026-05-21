@@ -1,7 +1,6 @@
 import "../globals.css";
 import type { Metadata, Viewport } from "next";
-import Nav from "./components/nav";
-import Header from "./components/header";
+import SideNav from "./components/SideNav";
 import LayoutWrapper from "./components/layoutWrapper";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JetBrains_Mono } from "next/font/google";
@@ -63,9 +62,10 @@ export default function RootLayout({
       >
         <SpeedInsights />
         <LayoutWrapper>
-          <Header />
-          {children}
-          <Nav />
+          <SideNav />
+          <div className="flex-1 overflow-y-auto pt-[52px] lg:pt-0 lg:m-[10px_10px_10px_0px] lg:rounded-2xl lg:border lg:border-blue/20 min-w-0">
+            {children}
+          </div>
         </LayoutWrapper>
       </body>
     </html>

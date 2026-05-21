@@ -88,6 +88,13 @@ const WORK_QUERY_STRING = `
             width
             height
           }
+          otherImagesCollection(limit: 10) {
+            items {
+              url
+              width
+              height
+            }
+          }
           shortDescription
           longDescription
         }

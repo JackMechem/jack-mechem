@@ -14,11 +14,12 @@ const Header = () => {
   return (
     <div
       className={
-        "fixed z-50 md:top-[20px] top-[5px] md:right-[20px] right-[5px] md:left-[20px] left-[5px] px-[20px] flex flex-row justify-between items-center transition-all duration-300 " +
+        "shrink-0 z-50 px-[20px] flex flex-row justify-between lg:justify-end items-center border-b border-secondary transition-all duration-300 " +
         (condensed ? "py-[8px]" : "py-[20px]")
       }
     >
-      <Link href={"/"}>
+      {/* Logo — only shown on mobile (sidebar has it on desktop) */}
+      <Link href={"/"} className="lg:hidden">
         <div className="flex flex-row gap-[12px] items-center text-foreground-sec cursor-pointer">
           <img
             src={Logo.src}
@@ -31,6 +32,7 @@ const Header = () => {
           <h4 className={condensed ? "hidden" : "md:block hidden"}>HOME</h4>
         </div>
       </Link>
+
       <div className="flex flex-row items-center gap-[20px]">
         <Link href={"/contact"}>
           <div className="flex flex-row gap-[15px] items-center text-foreground-sec cursor-pointer">

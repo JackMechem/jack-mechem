@@ -10,6 +10,7 @@ export interface Work {
   slug: string;
   link: string;
   photo: ContentfulImage;
+  otherImagesCollection?: { items: ContentfulImage[] };
   shortDescription: string;
   longDescription: string;
 }

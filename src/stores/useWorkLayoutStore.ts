@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 
 type Layout = "grid" | "list";
 const STORAGE_KEY = "work-layout";
-const DEFAULT: Layout = "grid";
+const DEFAULT: Layout = "list";
 
 function getLayout(): Layout {
     if (typeof localStorage === "undefined") return DEFAULT;

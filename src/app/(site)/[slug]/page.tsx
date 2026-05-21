@@ -25,6 +25,7 @@ export default async function Page({
 	const { slug } = await params;
 	try {
 		const pageData = await getPage(slug);
+		const isContact = slug === "contact";
 		return (
 			<div className="w-full pb-[100px]">
 				{pageData.blocksCollection.items.map((block) => {
@@ -32,6 +33,7 @@ export default async function Page({
 						<MediumBlock
 							key={block.sys.id}
 							className="flex lg:flex-row flex-col-reverse items-center mb-[70px] lg:justify-evenly lg:gap-[50px] md:gap-[70px] gap-[20px]"
+							parentClassName={isContact ? "!lg:px-[50px] !px-[25px]" : undefined}
 						>
 							{block.columnsCollection?.items.map((col, colIndex: number) => {
 								return (

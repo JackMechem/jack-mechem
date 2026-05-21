@@ -10,12 +10,12 @@ const MediumBlock = ({
   return (
     <div
       className={
-        "lg:py-[100px] py-[50px] lg:px-[50px] px-[25px] flex justify-center" +
+        "lg:py-[100px] py-[50px] lg:px-[80px] px-[30px] flex justify-center" +
         " " +
         parentClassName
       }
     >
-      <div className={"lg:w-full lg:max-w-[1000px] w-full" + " " + className}>
+      <div className={"w-full" + " " + className}>
         {children}
       </div>
     </div>
