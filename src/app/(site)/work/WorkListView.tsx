@@ -472,6 +472,10 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 		return matchesCategory && matchesSearch && matchesYear;
 	});
 
+	const pillClass = (active: boolean) =>
+		"text-[10px] font-bold tracking-wider py-[3px] px-[10px] rounded-full transition-colors cursor-pointer " +
+		(active ? "bg-blue text-primary" : "bg-secondary text-foreground-sec hover:bg-blue/20 hover:text-blue");
+
 	// Filter flyout portal (condensed mode only)
 	const filterFlyout = (() => {
 		if (!filterOpen || !filterBtnRef.current) return null;
@@ -511,10 +515,6 @@ const WorkListView = ({ categories, initialSlug, onLayoutChange }: WorkListViewP
 			document.body,
 		);
 	})();
-
-	const pillClass = (active: boolean) =>
-		"text-[10px] font-bold tracking-wider py-[3px] px-[10px] rounded-full transition-colors cursor-pointer " +
-		(active ? "bg-blue text-primary" : "bg-secondary text-foreground-sec hover:bg-blue/20 hover:text-blue");
 
 	// Full filter bar (expanded mode)
 	const filterBar = (
