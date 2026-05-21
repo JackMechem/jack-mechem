@@ -122,7 +122,7 @@ const PreviewPanel = ({ selected }: { selected: FlatWork }) => {
 								<img
 									src={src}
 									alt={alt ?? "project image"}
-									onClick={() => src && setLightboxSrc({ src, alt: alt ?? "project image" })}
+									onClick={() => src && setLightboxSrc({ src: src as string, alt: alt ?? "project image" })}
 									className="rounded-[12px] my-[16px] cursor-zoom-in hover:scale-[1.01] transition-transform w-full"
 									{...rest}
 								/>
