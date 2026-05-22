@@ -63,8 +63,7 @@ const Home = async () => {
 						</div>
 
 						<p className="text-[14px] lg:text-[15px] text-foreground-sec leading-relaxed">
-							Building web applications end-to-end — polished interfaces
-							to solid backend architecture.
+							I&apos;m a freelance full-stack engineer based in Los Angeles, California.
 						</p>
 
 						<div className="flex items-center gap-[8px] flex-wrap">
