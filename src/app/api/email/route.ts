@@ -26,8 +26,5 @@ export async function POST(request: NextRequest) {
     }),
   });
 
-  console.log(userEmail);
-  console.log(myEmail);
-
   return NextResponse.json({ myEmail }, { status: 200 });
 }

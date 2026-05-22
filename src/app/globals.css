@@ -1,6 +1,59 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@custom-variant dark-theme (&:where(.dark-theme, .dark-theme *));
+
+@theme {
+  --color-primary: #f0f5fc;
+  --color-secondary: #d9dfe5;
+  --color-blue: #428ce2;
+  --color-green: #5dd776;
+  --color-foreground: #364f6b;
+  --color-foreground-sec: #7b899a;
+
+  --drop-shadow-bluexl: 10px 10px 0px var(--color-blue);
+  --drop-shadow-bluexlr: -10px 10px 0px var(--color-blue);
+  --drop-shadow-bluemd: 4px 4px 0px var(--color-blue);
+  --drop-shadow-secondary-lg: 0px 5px 8px var(--color-secondary);
+  --drop-shadow-secondary-right: 3px 5px 5px var(--color-secondary);
+
+  --shadow-secondary-center: 0px 0px 10px 9px var(--color-secondary);
+  --shadow-bluexlr: -10px 10px 0px var(--color-blue);
+  --shadow-bluexlrr: 10px 10px 0px var(--color-blue);
+  --shadow-bluexlrr-sm: 3px 3px 0px var(--color-blue);
+  --shadow-bluexlrr-md: 5px 5px 0px var(--color-blue);
+
+  --animate-slideInDown: slideInDown 0.1s ease-in-out 1;
+  --animate-page: page 1s ease-in-out 1;
+
+  @keyframes slideInDown {
+    0% {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+
+  @keyframes page {
+    0% {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+}
+
+.dark-theme {
+  --color-primary: #20232c;
+  --color-secondary: #232a32;
+  --color-foreground: #a1aebd;
+  --color-foreground-sec: #7a9ab2;
+}
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -20,18 +73,11 @@
   * {
     -webkit-tap-highlight-color: transparent;
     -webkit-overflow-scrolling: touch;
-    transition-duration: 0.3s;
   }
 
   html,
   body {
     height: 100%;
-  }
-
-  img {
-    object-fit: cover;
-    width: auto;
-    height: auto;
   }
 
   h1 {

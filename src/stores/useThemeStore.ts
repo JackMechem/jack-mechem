@@ -1,28 +1,43 @@
-import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+"use client";
 
-interface ThemeState {
-    theme: "light" | "dark";
-    setTheme: () => void;
+import { useSyncExternalStore } from "react";
+
+const STORAGE_KEY = "theme";
+
+function getTheme(): "light" | "dark" {
+    if (typeof document === "undefined") return "light";
+    return document.documentElement.classList.contains("dark-theme") ? "dark" : "light";
 }
 
-const useThemeStore = create<ThemeState>()(
-    devtools(
-        persist(
-            (set, get) => ({
-                theme: "light",
-                setTheme: () =>
-                    set((state: any) => ({
-                        ...state,
-                        theme: get().theme === "dark" ? "light" : "dark",
-                    })),
-            }),
-            {
-                name: "theme", // name of the item in the storage (must be unique)
-            }
-        )
-    )
-);
+function getThemeSnapshot(): "light" | "dark" {
+    return getTheme();
+}
 
-export const useTheme = () => useThemeStore((state) => state.theme);
-export const useSetTheme = () => useThemeStore((state) => state.setTheme);
+function getServerSnapshot(): "light" | "dark" {
+    return "light";
+}
+
+const listeners = new Set<() => void>();
+
+function subscribe(cb: () => void) {
+    listeners.add(cb);
+    return () => listeners.delete(cb);
+}
+
+function notifyListeners() {
+    listeners.forEach((cb) => cb());
+}
+
+export function useTheme(): "light" | "dark" {
+    return useSyncExternalStore(subscribe, getThemeSnapshot, getServerSnapshot);
+}
+
+export function useSetTheme() {
+    return function setTheme() {
+        const isDark = document.documentElement.classList.toggle("dark-theme");
+        try {
+            localStorage.setItem(STORAGE_KEY, isDark ? "dark" : "light");
+        } catch {}
+        notifyListeners();
+    };
+}

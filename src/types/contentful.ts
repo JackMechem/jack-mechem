@@ -1,3 +1,31 @@
+export interface ContentfulImage {
+  url: string;
+  width: number;
+  height: number;
+}
+
+export interface Work {
+  sys: { id: string };
+  title: string;
+  slug: string;
+  link: string;
+  photo: ContentfulImage;
+  otherImagesCollection?: { items: ContentfulImage[] };
+  shortDescription: string;
+  longDescription: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface WorkCategory {
+  category: string;
+  worksCollection: { items: Work[] };
+}
+
+export interface WorksResponse {
+  workCategoryCollection: { items: WorkCategory[] };
+}
+
 export interface PagesResponse {
   pageCollection: {
     items: {
@@ -31,9 +59,7 @@ export interface PagesResponse {
                   buttonText?: string;
                   href?: string;
                   outline?: boolean;
-                  image?: {
-                    url: string;
-                  };
+                  image?: ContentfulImage;
                 }[];
               };
             }[];
@@ -87,9 +113,7 @@ export interface PageResponse {
               buttonText?: string;
               href?: string;
               outline?: boolean;
-              image?: {
-                url: string;
-              };
+              image?: ContentfulImage;
             }[];
           };
         }[];

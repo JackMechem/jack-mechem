@@ -3,39 +3,38 @@ import {
 	PageSlugsResponse,
 	PagesResponse,
 } from "@/types/contentful";
-import { revalidateTag } from "next/cache";
 
 const PAGE_SLUG_QUERY_STRING = `
-  items {                                                                                                                                                                                                                         
-        sys {                                                                                                                                                                                                                     
-           id                                                                                                                                                                                                                      
-          }                                                                                                                                                                                                                         
-          name                                                                                                                                                                                                                      
-          slug                                                                                                                                                                                                                      
-        }      
+  items {
+        sys {
+           id
+          }
+          name
+          slug
+        }
 `;
 
 const PAGE_QUERY_STRING = `
-  items {                                                                                                                                                                                                                         
-        sys {                                                                                                                                                                                                                     
-           id                                                                                                                                                                                                                      
-          }                                                                                                                                                                                                                         
-          name                                                                                                                                                                                                                      
-          slug                                                                                                                                                                                                                      
-          blocksCollection(limit: 10) {                                                                                                                                                                                                        
-            items {                                                                                                                                                                                                                 
-             sys {                                                                                                                                                                                                                 
-               id                                                                                                                                                                                                                  
-             }                                                                                                                                                                                                                     
-             name                                                                                                                                                                                                                  
-             slug                                                                                                                                                                                                                  
-             separators                                                                                                                                                                                                            
-             columnsCollection(limit: 3) {                                                                                                                                                                                                   
-               items {                                                                                                                                                                                                             
-                 sys {                                                                                                                                                                                                             
-                   id                                                                                                                                                                                                              
-                 }                                                                                                                                                                                                                 
-                 name                                                                                                                                                                                                              
+  items {
+        sys {
+           id
+          }
+          name
+          slug
+          blocksCollection(limit: 10) {
+            items {
+             sys {
+               id
+             }
+             name
+             slug
+             separators
+             columnsCollection(limit: 3) {
+               items {
+                 sys {
+                   id
+                 }
+                 name
                  slug
                 rowsCollection(limit: 10) {
                   items {
@@ -60,15 +59,17 @@ const PAGE_QUERY_STRING = `
                       outline
                       image {
                         url
+                        width
+                        height
                       }
                     }
                   }
                 }
-               }                                                                                                                                                                                                                   
-             }                                                                                                                                                                                                                     
-            }                                                                                                                                                                                                                       
-          }                                                                                                                                                                                                                         
-        }      
+               }
+             }
+            }
+          }
+        }
 `;
 
 const WORK_QUERY_STRING = `
@@ -84,16 +85,26 @@ const WORK_QUERY_STRING = `
           link
           photo {
             url
+            width
+            height
+          }
+          otherImagesCollection(limit: 10) {
+            items {
+              url
+              width
+              height
+            }
           }
           shortDescription
           longDescription
+          startDate
+          endDate
         }
       }
     }
 `;
 
 async function fetchGraphQL(query: string) {
-	revalidateTag("pages");
 	const resp = await fetch(
 		`https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
 		{
@@ -103,7 +114,7 @@ async function fetchGraphQL(query: string) {
 				Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
 			},
 			body: JSON.stringify({ query }),
-			next: { tags: ["pages"], revalidate: 3600 },
+			next: { tags: ["pages"], revalidate: 86400 },
 		},
 	).then((response) => response.json());
 
@@ -118,7 +129,6 @@ export async function getAllPageSlugs(): Promise<PageSlugsResponse> {
         }
       }`,
 	);
-	// console.log("Page Data: " + pages.data);
 	return pages.data;
 }
 
@@ -141,7 +151,6 @@ export async function getAllWorks(limit = 50): Promise<any> {
         }
       }`,
 	);
-	console.log(pages.data.workCategoryCollection);
 	return pages.data;
 }
 
@@ -153,7 +162,6 @@ export async function getPage(slug: string): Promise<PageResponse> {
         }
       }`,
 	);
-	console.log(page.data.pageCollection.items);
 	return page.data.pageCollection.items[0];
 }
 
@@ -165,6 +173,5 @@ export async function getWork(slug: string): Promise<any> {
         }
       }`,
 	);
-	// console.log(page);
-	return page.data.pageCollection.items[0];
+	return page.data.workCollection.items[0];
 }
