@@ -1,3 +1,8 @@
+/**
+ * The database tables. Changing this file changes the types used across the
+ * site (src/lib/types.ts). After editing, run `npx convex dev` (development)
+ * and `npx convex deploy` (production) so the deployments match.
+ */
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 

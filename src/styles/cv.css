@@ -1,0 +1,51 @@
+/* ==========================================================================
+   CV page: /cv  (app/(site)/cv/page.tsx)
+   A plain document layout. The print rules at the bottom make "Print / save
+   as PDF" produce a clean black-on-white CV without the site chrome.
+   ========================================================================== */
+
+.cv { max-width: 1100px; margin: 0 auto; padding: 50px var(--pad) 80px; }
+.cv-head { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; padding-bottom: 20px; border-bottom: 3px solid var(--ink); }
+.cv-head h1 { margin: 0; font: 900 clamp(64px, 9vw, 130px)/.82 var(--display); text-transform: uppercase; }
+.cv-sub { margin: 12px 0 0; font-size: 18px; }
+.cv-contact { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 15px; }
+.cv-contact a { text-underline-offset: 3px; }
+.cv-print { margin-top: 10px; padding: 8px 12px; font-size: 15px; }
+
+/* each section: its title in a left column, entries on the right */
+.cv-section { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding: 30px 0; border-bottom: 1px solid color-mix(in srgb, var(--ink) 35%, transparent); }
+.cv-section h2 { margin: 0; font: 900 34px/1 var(--display); text-transform: uppercase; }
+.cv-entries { display: grid; gap: 22px; }
+.cv-entry { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 18px; }
+.cv-when { padding-top: 6px; line-height: 1.4; opacity: .7; }
+.cv-entry h3 { margin: 0; font: 800 24px/1.05 var(--display); text-transform: uppercase; }
+.cv-entry h3 a { text-decoration: none; }
+.cv-entry h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.cv-role { margin: 4px 0 6px; font-size: 15px; opacity: .8; }
+.cv-entry ul { margin: 0; padding-left: 18px; font-size: 15px; line-height: 1.5; }
+.cv-group + .cv-group { margin-top: 28px; }
+.cv-group-title { margin: 0 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--ink); }
+.cv-skills { display: grid; gap: 10px; margin: 0; }
+.cv-skills > div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 18px; }
+.cv-skills dt { padding-top: 3px; }
+.cv-skills dd { margin: 0; font-size: 15px; line-height: 1.5; }
+
+@media (max-width: 760px) {
+  .cv-section { grid-template-columns: 1fr; gap: 14px; }
+  .cv-entry, .cv-skills > div { grid-template-columns: 1fr; gap: 2px; }
+  .cv-when { padding-top: 0; }
+  .cv-contact { align-items: flex-start; }
+}
+
+@media print {
+  .topbar, .site-footer, .cv-print, .grain::after { display: none !important; }
+  :root, [data-theme="dark"] { --paper: #fff; --ink: #000; }
+  html, body { background: #fff !important; color: #000 !important; }
+  main { padding-top: 0 !important; }
+  a { color: #000 !important; }
+  .cv { max-width: none; padding: 0; font-size: 12px; }
+  .cv-head h1 { font-size: 54px; }
+  .cv-section { padding: 14px 0; break-inside: avoid-page; }
+  .cv-entry { break-inside: avoid; }
+  .cv-entry ul, .cv-role, .cv-skills dd { font-size: 11.5px; }
+}

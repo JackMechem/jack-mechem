@@ -1,0 +1,115 @@
+/* ==========================================================================
+   Base: design tokens, element defaults and small shared utilities.
+   Every other stylesheet builds on the variables defined here.
+   ========================================================================== */
+
+/* ---- Design tokens ------------------------------------------------------
+   Two colours only. In light mode --paper is cream and --ink is near-black;
+   dark mode (the default, set on <html data-theme>) swaps them. Use these
+   variables instead of hard-coded colours so both themes keep working.   */
+:root {
+  --paper: #ebe3d2;
+  --ink: #100f0d;
+  --display: var(--font-display), Impact, "Arial Narrow", sans-serif; /* Big Shoulders: headings */
+  --text: var(--font-text), Futura, "Century Gothic", sans-serif;     /* Jost: body copy */
+  --bar: 48px;                        /* height of the fixed top bar */
+  --pad: clamp(14px, 2.2vw, 30px);    /* page side padding */
+  color-scheme: light;
+}
+[data-theme="dark"] { --paper: #100f0d; --ink: #ebe3d2; color-scheme: dark; }
+
+/* ---- Element defaults ---------------------------------------------------- */
+* { box-sizing: border-box; }
+html {
+  background: var(--paper);
+  color: var(--ink);
+  scroll-behavior: smooth;
+  font-variation-settings: "opsz" 72; /* Big Shoulders: use the display cut at every size */
+}
+body { margin: 0; font: 400 17px/1.5 var(--text); }
+main { padding-top: var(--bar); }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+img { max-width: 100%; }
+::selection { background: var(--ink); color: var(--paper); }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+/* ---- Utilities ------------------------------------------------------------ */
+
+/* Small spaced-out caps used for labels, captions and metadata. */
+.cap { font: 600 12px/1 var(--text); letter-spacing: .14em; text-transform: uppercase; }
+
+/* Buttons: outlined by default, filled with .solid. */
+.btn {
+  display: inline-block; padding: 10px 14px; border: 1px solid var(--ink); background: none; color: var(--ink);
+  font: 800 18px/1 var(--display); letter-spacing: .05em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+}
+.btn:hover, .btn.solid { background: var(--ink); color: var(--paper); }
+.btn.solid:hover { background: none; color: var(--ink); }
+
+/* Big display titles that must fit their column (project names can be long).
+   The element's container must set `container-type: inline-size`; the
+   component sets --len to the longest word via fitStyle() in lib/format.ts,
+   and each use sets --fit-max (its normal size). Big Shoulders caps run
+   about 0.5em per character, hence 190cqi / length.                       */
+.fit {
+  font-size: min(var(--fit-max, 80px), calc(190cqi / var(--len, 8))) !important;
+  line-height: .88 !important;
+  overflow-wrap: anywhere;
+  hyphens: manual;
+}
+
+/* Equaliser bars: the little animated "now playing" meter. */
+.eq { display: flex; gap: 3px; align-items: end; height: 18px; }
+.eq i { width: 4px; height: 100%; background: currentColor; transform-origin: bottom; animation: eq .8s ease-in-out infinite alternate; }
+.eq i:nth-child(2) { animation-duration: .55s; }
+.eq i:nth-child(3) { animation-duration: .95s; }
+.eq i:nth-child(4) { animation-duration: .42s; }
+.eq i:nth-child(5) { animation-duration: .7s; }
+@keyframes eq { from { transform: scaleY(.15); } to { transform: scaleY(1); } }
+
+/* Striped box shown where an image is missing. */
+.placeholder {
+  display: grid; place-items: center; text-align: center; padding: 12px;
+  background: repeating-linear-gradient(-45deg, transparent 0 9px, color-mix(in srgb, currentColor 10%, transparent) 9px 10px);
+  font: 600 12px/1.4 var(--text); letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* ---- Textures --------------------------------------------------------------- */
+
+/* Film grain over the whole page (on <body class="grain">). */
+.grain::after {
+  content: ""; position: fixed; inset: -50%; z-index: 9999; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: .13; mix-blend-mode: multiply;
+  animation: grain-shift 1.2s steps(4) infinite;
+}
+[data-theme="dark"] .grain::after { mix-blend-mode: screen; opacity: .07; }
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(-1%, -1%); }
+}
+
+/* Printed dot-screen effect for a photo: wrap an <img> in .halftone.
+   --dot sets the dot size; --b / --bd tweak brightness (light / dark theme). */
+.halftone {
+  position: relative; overflow: hidden; isolation: isolate; background: #fff;
+  filter: grayscale(1) contrast(16); mix-blend-mode: multiply;
+}
+.halftone img { display: block; width: 100%; height: 100%; object-fit: cover; filter: brightness(var(--b, 1.05)) blur(.4px); }
+.halftone::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply;
+  background: radial-gradient(circle at center, #000 0, #fff 71%) 0 0 / var(--dot, 4px) var(--dot, 4px);
+}
+[data-theme="dark"] .halftone { filter: grayscale(1) contrast(16) invert(1); mix-blend-mode: screen; }
+[data-theme="dark"] .halftone img { filter: invert(1) brightness(var(--bd, 1.05)) blur(.4px); }
+
+/* Shared spin used by records. */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .grain::after, .eq i { animation: none !important; }
+}

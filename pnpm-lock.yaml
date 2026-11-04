@@ -8,15 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@types/node':
-        specifier: 25.9.1
-        version: 25.9.1
-      '@types/react':
-        specifier: 19.2.15
-        version: 19.2.15
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.15)
       '@vercel/blob':
         specifier: ^2.8.2
         version: 2.8.2
@@ -26,12 +17,6 @@ importers:
       convex:
         specifier: ^1.49.0
         version: 1.49.0(react@19.2.6)
-      eslint:
-        specifier: 10.4.0
-        version: 10.4.0(jiti@2.7.0)
-      eslint-config-next:
-        specifier: 16.2.6
-        version: 16.2.6(@typescript-eslint/parser@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3)
       next:
         specifier: 16.2.6
         version: 16.2.6(@babel/core@7.29.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -50,6 +35,22 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+    devDependencies:
+      '@types/node':
+        specifier: 25.9.1
+        version: 25.9.1
+      '@types/react':
+        specifier: 19.2.15
+        version: 19.2.15
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.15)
+      eslint:
+        specifier: 10.4.0
+        version: 10.4.0(jiti@2.7.0)
+      eslint-config-next:
+        specifier: 16.2.6
+        version: 16.2.6(@typescript-eslint/parser@8.59.4(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3)
       typescript:
         specifier: 6.0.3
         version: 6.0.3

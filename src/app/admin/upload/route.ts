@@ -1,9 +1,12 @@
+/**
+ * POST /admin/upload: hands the browser a short-lived token so it can upload
+ * a file straight to Vercel Blob (so there are no size limits from this
+ * server). Signed-in admins only. Called by _lib/upload.ts. Needs
+ * BLOB_READ_WRITE_TOKEN; without it, uploads fail with a clear message.
+ */
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/admin";
-
-// Hands the browser a short-lived token so it can upload straight to Vercel
-// Blob (no file size limits from our server). Only for a signed-in admin.
+import { isAdmin } from "@/lib/auth";
 export async function POST(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   const body = (await request.json()) as HandleUploadBody;

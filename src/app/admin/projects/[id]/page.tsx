@@ -1,8 +1,13 @@
+/**
+ * /admin/projects/<id>: the project editor. /admin/projects/new starts a new,
+ * unpublished project with a suggested catalogue number.
+ */
 import { notFound } from "next/navigation";
-import { api } from "../../../../../convex/_generated/api";
-import type { Id } from "../../../../../convex/_generated/dataModel";
-import { adminSecret, convex, isAdmin } from "@/lib/admin";
-import { ProjectForm } from "./project-form";
+import { api } from "@convex/_generated/api";
+import type { Id } from "@convex/_generated/dataModel";
+import { isAdmin } from "@/lib/auth";
+import { adminSecret, convex } from "@/lib/convex-admin";
+import { ProjectForm } from "../../_components/ProjectForm";
 
 export default async function EditProject({ params }: { params: Promise<{ id: string }> }) {
   if (!(await isAdmin())) return null;

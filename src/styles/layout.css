@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Layout: the fixed top bar, page sections and the footer.
+   Components: components/layout/TopBar.tsx, ThemeToggle.tsx, RecordMark.tsx,
+   components/layout/SectionHead.tsx, app/(site)/layout.tsx
+   ========================================================================== */
+
+/* ---- Top bar --------------------------------------------------------------- */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 60; height: var(--bar);
+  display: flex; background: var(--paper); border-bottom: 1px solid var(--ink);
+}
+
+/* Logo: record mark + name ("JM" on phones). The cursor in the mark blinks on hover. */
+.topbar-logo {
+  display: flex; align-items: center; gap: 10px; padding: 0 16px; background: var(--ink); color: var(--paper);
+  font: 900 24px/1 var(--display); letter-spacing: .02em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+}
+.topbar-logo .record-mark { flex: none; }
+.topbar-logo:hover .record-mark-cursor { animation: prompt-blink 1s steps(1) infinite; }
+.logo-short { display: none; }
+@keyframes prompt-blink { 50% { opacity: 0; } }
+
+/* Scrolling ticker. The items are rendered twice and the track slides by half its width, so it loops seamlessly. */
+.topbar-ticker { flex: 1; min-width: 0; display: flex; align-items: center; overflow: hidden; border-right: 1px solid var(--ink); }
+.ticker-track { display: flex; white-space: nowrap; animation: ticker 48s linear infinite; }
+.ticker-track span { padding: 0 28px; font: 500 15px/1 var(--text); } /* items and the ✳ between them */
+.ticker-track b { font-weight: 700; }
+@keyframes ticker { to { transform: translateX(-50%); } }
+
+.topbar-nav { display: flex; }
+.topbar-nav a, .topbar-nav button {
+  display: flex; align-items: center; padding: 0 16px; border: 0; border-left: 1px solid var(--ink); background: none; color: var(--ink);
+  font: 800 19px/1 var(--display); letter-spacing: .04em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+}
+.topbar-nav a:hover, .topbar-nav button:hover { background: var(--ink); color: var(--paper); }
+.theme-icon { display: none; } /* the toggle shows a word on desktop, an icon on phones */
+
+/* ---- Page sections ------------------------------------------------------------
+   <section class="section"> with a <SectionHead> on top: a huge title on the
+   left and a two-line caption on the right. .page-stop marks the sections the
+   desktop scroll pager stops at (components/home/SectionPager.tsx).          */
+.section { border-bottom: 1px solid var(--ink); scroll-margin-top: var(--bar); }
+.section-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 70px var(--pad) 18px; border-bottom: 1px solid var(--ink); }
+.section-head h2 { margin: 0; font: 900 clamp(70px, 11vw, 190px)/.8 var(--display); text-transform: uppercase; }
+.section-head .cap { min-width: 0; text-align: right; line-height: 1.6; }
+
+/* A smaller heading inside a section (e.g. "Upcoming" under "On stage"). */
+.subsection-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; padding: 14px var(--pad); border-bottom: 1px solid var(--ink); }
+.subsection-head h3 { margin: 0; font: 900 clamp(30px, 3vw, 44px)/.9 var(--display); text-transform: uppercase; }
+
+/* ---- Footer ---------------------------------------------------------------- */
+.site-footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px var(--pad) 40px; border-top: 1px solid var(--ink); }
+
+/* ---- Responsive ------------------------------------------------------------ */
+@media (min-width: 981px) {
+  .section-head h2 { white-space: nowrap; }
+}
+@media (max-width: 760px) {
+  .topbar-ticker { display: none; }
+  .topbar-logo { gap: 7px; padding: 0 10px; }
+  .logo-full { display: none; }
+  .logo-short { display: inline; }
+  .topbar-nav { flex: 1; min-width: 0; }
+  .topbar-nav a, .topbar-nav button { flex: 1 1 auto; min-width: 0; justify-content: center; padding: 0 3px; font-size: 15px; letter-spacing: .02em; }
+  .topbar-nav button { flex: 0 0 44px; }
+  .theme-label { display: none; }
+  .theme-icon { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}

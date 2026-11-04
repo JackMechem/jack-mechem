@@ -1,4 +1,8 @@
-/** A little milk crate with records standing in it. Drawn in the text colour. */
+/**
+ * A little milk crate with records standing in it, drawn in the text colour.
+ * Used on the case-study "Put it back" / "Back to crate" buttons; the
+ * records dip into the crate on hover (styles/case-study.css).
+ */
 export function CrateIcon({ size = 28 }: { size?: number }) {
   return (
     <svg className="crate-icon" width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">

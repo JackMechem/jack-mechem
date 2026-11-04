@@ -1,7 +1,12 @@
+/**
+ * Projects: the records in the crates, their case-study write-ups and
+ * screenshots. Edited at /admin/projects. Drafts (published: false) are
+ * hidden from the public queries.
+ */
 import { ConvexError, v } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
-import { assertAdmin, text, url } from "./admin";
+import { assertAdmin, direction, moveInOrder, nextOrder, text, url } from "./helpers";
 
 const fields = {
   slug: v.string(),
@@ -28,6 +33,7 @@ type Input = {
   links: { label: string; href: string }[]; body: string; published: boolean; crate?: Id<"crates">;
 };
 
+/** A list field (stack, Side A / B): trimmed, no blanks, a sensible length. */
 const list = (items: string[], field: string, max = 12) => {
   const out = items.map((s) => s.trim()).filter(Boolean);
   if (out.length > max) throw new ConvexError(`${field}: at most ${max} items`);
@@ -35,6 +41,7 @@ const list = (items: string[], field: string, max = 12) => {
   return out;
 };
 
+/** Validate and tidy a project from the editor. */
 function clean(p: Input): Input {
   const slug = p.slug.trim().toLowerCase();
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) throw new ConvexError("Slug must be lowercase letters, numbers and dashes, e.g. open-stomp");
@@ -58,6 +65,7 @@ function clean(p: Input): Input {
   };
 }
 
+/** Slugs are the /work/<slug> URL, so they must be unique. */
 async function assertSlugFree(ctx: MutationCtx, slug: string, self?: Id<"projects">) {
   const other = await ctx.db.query("projects").withIndex("by_slug", (q) => q.eq("slug", slug)).unique();
   if (other && other._id !== self) throw new ConvexError(`Another project already uses the slug "${slug}"`);
@@ -103,8 +111,7 @@ export const create = mutation({
     assertAdmin(secret);
     const p = clean(input);
     await assertSlugFree(ctx, p.slug);
-    const last = await ctx.db.query("projects").withIndex("by_order").order("desc").first();
-    return await ctx.db.insert("projects", { ...p, order: (last?.order ?? 0) + 1 });
+    return await ctx.db.insert("projects", { ...p, order: await nextOrder(ctx, "projects") });
   },
 });
 
@@ -128,24 +135,12 @@ export const remove = mutation({
   },
 });
 
-/** Swap a project with its neighbour in the same crate. */
+/** Admin: move a project up / down within its crate. */
 export const move = mutation({
-  args: { secret: v.string(), id: v.id("projects"), dir: v.union(v.literal("up"), v.literal("down")) },
+  args: { secret: v.string(), id: v.id("projects"), dir: direction },
   handler: async (ctx, { secret, id, dir }) => {
     assertAdmin(secret);
-    const p = await ctx.db.get(id);
-    if (!p) return;
-    const q = ctx.db.query("projects").withIndex("by_order", (q) => (dir === "up" ? q.lt("order", p.order) : q.gt("order", p.order)));
-    let other = null;
-    for await (const candidate of q.order(dir === "up" ? "desc" : "asc")) {
-      if (candidate.crate === p.crate) {
-        other = candidate;
-        break;
-      }
-    }
-    if (!other) return;
-    await ctx.db.patch(p._id, { order: other.order });
-    await ctx.db.patch(other._id, { order: p.order });
+    await moveInOrder(ctx, "projects", id, dir, (a, b) => a.crate === b.crate);
   },
 });
 

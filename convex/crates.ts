@@ -1,6 +1,10 @@
+/**
+ * Crates: the categories that projects are grouped into on the home page
+ * (shown as divider tabs). Managed on /admin/projects.
+ */
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { assertAdmin, text } from "./admin";
+import { assertAdmin, direction, moveInOrder, nextOrder, text } from "./helpers";
 
 const name = (s: string) => text(s, "Crate name", { required: true, max: 40 })!;
 
@@ -14,8 +18,7 @@ export const create = mutation({
   args: { secret: v.string(), name: v.string() },
   handler: async (ctx, { secret, name: n }) => {
     assertAdmin(secret);
-    const last = await ctx.db.query("crates").withIndex("by_order").order("desc").first();
-    return await ctx.db.insert("crates", { name: name(n), order: (last?.order ?? 0) + 1 });
+    return await ctx.db.insert("crates", { name: name(n), order: await nextOrder(ctx, "crates") });
   },
 });
 
@@ -38,16 +41,11 @@ export const remove = mutation({
   },
 });
 
+/** Admin: move a crate (tab) left / right, shown as up / down in the admin. */
 export const move = mutation({
-  args: { secret: v.string(), id: v.id("crates"), dir: v.union(v.literal("up"), v.literal("down")) },
+  args: { secret: v.string(), id: v.id("crates"), dir: direction },
   handler: async (ctx, { secret, id, dir }) => {
     assertAdmin(secret);
-    const c = await ctx.db.get(id);
-    if (!c) return;
-    const q = ctx.db.query("crates").withIndex("by_order", (q) => (dir === "up" ? q.lt("order", c.order) : q.gt("order", c.order)));
-    const other = await q.order(dir === "up" ? "desc" : "asc").first();
-    if (!other) return;
-    await ctx.db.patch(c._id, { order: other.order });
-    await ctx.db.patch(other._id, { order: c.order });
+    await moveInOrder(ctx, "crates", id, dir);
   },
 });

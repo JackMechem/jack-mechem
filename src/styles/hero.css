@@ -1,0 +1,101 @@
+/* ==========================================================================
+   Hero: the first screen — halftone photo with the big name on the left, the
+   three featured records on the right, and a one-line pitch strip below.
+   Components: components/home/Hero.tsx, components/home/FeaturedRecords.tsx
+   ========================================================================== */
+
+.hero {
+  display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto;
+  height: calc(100vh - var(--bar)); min-height: 560px;
+}
+
+/* ---- Photo + name ----------------------------------------------------------- */
+.hero-photo { position: relative; overflow: hidden; border-right: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.hero-photo .halftone { position: absolute; inset: 0; --dot: 6px; --bd: 1.25; }
+.hero-photo .halftone img { object-position: 30% 30%; animation: hero-drift 24s ease-in-out infinite alternate; }
+@keyframes hero-drift { from { transform: scale(1.04); } to { transform: scale(1.14) translate(-3%, 2%); } }
+/* a faint band that sweeps down the photo like a scanner */
+.hero-scanline {
+  position: absolute; left: 0; right: 0; height: 30%; pointer-events: none;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--ink) 10%, transparent), transparent);
+  animation: hero-scan 6s linear infinite;
+}
+@keyframes hero-scan { from { top: -30%; } to { top: 100%; } }
+.hero-tags { position: absolute; top: 16px; left: 16px; display: flex; gap: 8px; }
+.hero-tags span { padding: 6px 8px; background: var(--ink); color: var(--paper); }
+.hero-name { position: absolute; left: var(--pad); bottom: 8px; margin: 0; font: 900 clamp(90px, 14.5vw, 260px)/.78 var(--display); letter-spacing: -.01em; text-transform: uppercase; }
+
+/* ---- Pitch strip ------------------------------------------------------------ */
+.hero-strip { grid-column: 1 / -1; display: grid; grid-template-columns: 2fr 1fr; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.hero-strip p { margin: 0; padding: 18px var(--pad); border-right: 1px solid var(--ink); font: 400 clamp(19px, 1.7vw, 25px)/1.3 var(--text); }
+.hero-strip p span { opacity: .6; }
+.hero-strip a { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--pad); text-decoration: none; }
+.hero-strip a:hover { background: var(--ink); color: var(--paper); }
+
+/* ---- Featured records --------------------------------------------------------
+   A header strip, then three rows that share the column's height. Each row is
+   a button: sleeve art with the record peeking out (left) and details (right). */
+.featured { display: flex; flex-direction: column; min-height: 0; container-type: inline-size; }
+.featured-head { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px var(--pad); background: var(--ink); color: var(--paper); }
+.featured-title { font: 900 clamp(22px, 2vw, 30px)/1 var(--display); letter-spacing: .02em; text-transform: uppercase; }
+.featured-head a { opacity: .8; text-decoration: none; white-space: nowrap; }
+.featured-head a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+
+.featured-item {
+  all: unset; box-sizing: border-box; cursor: pointer; position: relative; flex: 1 1 0; min-height: 0;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); align-items: center; column-gap: clamp(14px, 1.6vw, 24px);
+  padding: 14px var(--pad); border-bottom: 1px solid var(--ink);
+}
+.featured-item:last-child { border-bottom: 0; }
+.featured-item:hover { background: var(--ink); color: var(--paper); }
+.featured-item:focus-visible { outline: 3px solid var(--ink); outline-offset: -3px; }
+
+/* the art: sized to fit a third of the hero height, and never wider than ~47% of the column */
+.featured-art { position: relative; align-self: center; aspect-ratio: 1.3; width: min(286px, 47cqi, calc((100vh - 200px) / 3 * 1.3 - 40px)); }
+.featured-sleeve {
+  position: absolute; left: 0; bottom: 0; height: 100%; aspect-ratio: 1; box-shadow: 6px 6px 0 -1px #0006;
+  transform: rotate(-1.5deg); transform-origin: bottom left; transition: transform .4s cubic-bezier(.2,.8,.2,1);
+}
+.featured-sleeve .cover { border: 1px solid currentColor; box-shadow: none; }
+.featured-disc {
+  position: absolute; bottom: 4%; left: 8%; height: 92%; aspect-ratio: 1; border-radius: 50%; transform: translateX(26%);
+  background: repeating-radial-gradient(circle, #111 0 1.2px, #1d1c1a 1.2px 2.4px), #111; box-shadow: 0 0 0 1px #ebe3d240;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.featured-disc::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 20deg, transparent 0 10%, #ffffff22 14%, transparent 20% 60%, #ffffff18 64%, transparent 70%); }
+.featured-label { position: absolute; inset: 34%; border-radius: 50%; background: #ebe3d2; }
+.featured-label::after { content: ""; position: absolute; inset: 44%; border-radius: 50%; background: #111; }
+/* "On now" spins; hovering any row slides its record further out */
+.featured-item.is-now .featured-disc { animation: featured-spin 3.2s linear infinite; }
+@keyframes featured-spin { to { transform: translateX(26%) rotate(360deg); } }
+.featured-item:hover .featured-disc { transform: translateX(42%); }
+.featured-item.is-now:hover .featured-disc { animation: none; transform: translateX(42%); }
+.featured-item:hover .featured-sleeve { transform: rotate(0deg) translateY(-4px); }
+
+.featured-text { display: flex; flex-direction: column; justify-content: center; align-self: stretch; min-width: 0; container-type: inline-size; }
+.featured-meta { display: flex; justify-content: space-between; align-items: center; }
+.featured-name { display: block; margin: 8px 0 6px; font: 900 clamp(48px, 5.2vw, 88px)/.86 var(--display); text-transform: uppercase; --fit-max: clamp(36px, 3.6vw, 72px); }
+.featured-item.is-later .featured-name { --fit-max: clamp(32px, 3vw, 56px); }
+.featured-kind { display: block; max-width: 34ch; font-size: 14px; line-height: 1.35; }
+
+/* tall, narrow desktop windows: art above the details */
+@media (min-width: 981px) {
+  @container (max-width: 400px) {
+    .featured-item { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; align-content: end; row-gap: 12px; }
+    .featured-text { align-self: auto; }
+    .featured-art { min-width: 110px; width: min(200px, 62cqi, calc((100vh - 200px) / 3 * 1.3 - 190px)); }
+  }
+}
+
+@media (max-width: 980px) {
+  .hero { height: auto; grid-template-columns: minmax(0, 1fr); }
+  .hero-photo { height: 72vh; border-right: 0; }
+  .hero-strip { grid-template-columns: 1fr; }
+  .hero-strip a { padding: 16px var(--pad); }
+  .featured-item { flex: none; }
+  .featured-item:last-child { border-bottom: 1px solid var(--ink); }
+  .featured-art { width: 166px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-photo .halftone img, .hero-scanline, .featured-item.is-now .featured-disc { animation: none !important; }
+}

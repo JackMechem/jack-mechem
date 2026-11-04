@@ -4,25 +4,32 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "convex": "convex dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit && tsc -p convex --noEmit",
+    "check": "pnpm typecheck && pnpm lint",
+    "icons": "scripts/brand/render.sh",
+    "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {
-    "@types/node": "25.9.1",
-    "@types/react": "19.2.15",
-    "@types/react-dom": "19.2.3",
     "@vercel/blob": "^2.8.2",
     "@vercel/speed-insights": "^2.0.0",
     "convex": "^1.49.0",
-    "eslint": "10.4.0",
-    "eslint-config-next": "16.2.6",
     "next": "16.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "server-only": "^0.0.1",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "25.9.1",
+    "@types/react": "19.2.15",
+    "@types/react-dom": "19.2.3",
+    "eslint": "10.4.0",
+    "eslint-config-next": "16.2.6",
     "typescript": "6.0.3"
   }
 }

@@ -1,0 +1,21 @@
+{
+  "summary": "A website for a Las Vegas-area real estate business: Contentful pages built from nested blocks, plus an MLS home search (Trestle API, Mapbox, Google Places) that I built and later took off the site.",
+  "stack": [
+    "Next.js 14",
+    "Contentful",
+    "Trestle API",
+    "Mapbox",
+    "Zustand"
+  ],
+  "sideA": [
+    "Contentful pages from nested blocks",
+    "One route renders any CMS page",
+    "Web3Forms contact form"
+  ],
+  "sideB": [
+    "MLS search via Trestle OData API",
+    "URL-based search filters",
+    "Map and listings synced on hover",
+    "Google Places location search"
+  ]
+}

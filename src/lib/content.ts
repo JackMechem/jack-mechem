@@ -1,14 +1,22 @@
+/**
+ * Reading the site's content from Convex (server only).
+ *
+ * Pages call these functions while rendering. Results are cached by Next.js
+ * for an hour under a tag (see TAGS); saving anything in /admin clears the
+ * matching tag so the change shows up immediately. If Convex is unreachable
+ * when a page re-renders, Next keeps serving the last good version.
+ */
 import "server-only";
 import { cache } from "react";
 import { todayInLA } from "./format";
 import type { Clip, Crate, Gig, Project, ProjectWithBody, Shelf } from "./types";
 
+/** Cache tags: the admin actions call updateTag(TAGS.x) after saving. */
 export const TAGS = { gigs: "gigs", projects: "projects", clips: "clips" } as const;
 
 /**
- * Query Convex over HTTP so Next can cache the result (an hour) under a tag
- * that /admin clears on save. Throws on failure: during revalidation Next then
- * keeps serving the last good page instead of an empty one.
+ * Run a public Convex query over plain HTTP, so Next's fetch cache can store
+ * the result. Throws on failure (see the note at the top of the file).
  */
 async function convexQuery<T>(path: string, args: Record<string, unknown>, tag: string): Promise<T> {
   const url = process.env.NEXT_PUBLIC_CONVEX_URL;
@@ -42,11 +50,13 @@ export const getShelves = cache(async () => {
   return { shelves: filled, projects: filled.flatMap((s) => s.projects) };
 });
 
+/** All published projects, in crate order. */
 export const getProjects = cache(async () => (await getShelves()).projects);
 
+/** One published project with its write-up, or null (drafts return null too). */
 export const getProject = cache((slug: string) => convexQuery<ProjectWithBody | null>("projects:bySlug", { slug }, TAGS.projects));
 
-/** Clips and gigs are extras: if Convex is down the page still renders without them. */
+/** Archive clips. Clips and gigs are extras: if Convex is down the page renders without them. */
 export const getClips = cache(async () => {
   try {
     return await convexQuery<Clip[]>("clips:list", {}, TAGS.clips);
@@ -55,6 +65,7 @@ export const getClips = cache(async () => {
   }
 });
 
+/** Gigs from today (Los Angeles time) onwards, soonest first; null if Convex is down. */
 export const getUpcomingGigs = cache(async (): Promise<Gig[] | null> => {
   try {
     const today = todayInLA();

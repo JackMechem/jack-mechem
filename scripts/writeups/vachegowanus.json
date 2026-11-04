@@ -1,0 +1,20 @@
+{
+  "kind": "Interactive drawing viewer (freelance)",
+  "summary": "A site for Zane Mechem that presents architectural drawings through a clickable plan: hover previews, full-screen plans and sections, and 360° panoramas rendered with three.js.",
+  "stack": [
+    "React",
+    "three.js",
+    "react-three-fiber",
+    "Firebase Hosting"
+  ],
+  "sideA": [
+    "Clickable SVG plan overlay",
+    "Preloaded hover previews",
+    "Full-screen plans & sections"
+  ],
+  "sideB": [
+    "360° panoramas in three.js",
+    "Embedded slide presentation",
+    "Firebase Hosting"
+  ]
+}

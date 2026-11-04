@@ -1,0 +1,12 @@
+{
+  "sideA": [
+    "3 hosts, one flake",
+    "Hyprland + DankMaterialShell",
+    "PipeWire/JACK low-latency audio"
+  ],
+  "sideB": [
+    "Caddy, Forgejo, Jellyfin, AdGuard",
+    "sslh: SSH and HTTPS on port 443",
+    "YubiKey for sudo and SSH"
+  ]
+}

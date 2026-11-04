@@ -1,0 +1,80 @@
+/* ==========================================================================
+   Records: the pieces shared by the crate, the featured list, the gatefold
+   preview and case studies — sleeve covers, the record (disc + label), the
+   sleeve-and-record "deck", and the Side A / Side B tracklist.
+   Components: components/records/*
+   ========================================================================== */
+
+/* ---- Sleeve cover (Cover.tsx) -----------------------------------------------
+   A square sleeve: name + catalogue number on top, the project type, then the
+   artwork (screenshot, or the name set large when there is none). Sizes use
+   cqw so the same cover works at any size. Covers alternate ink / paper.    */
+.cover {
+  position: absolute; inset: 0; overflow: hidden; display: flex; flex-direction: column;
+  border: 1px solid var(--ink); box-shadow: 0 -6px 20px -10px #000c; container-type: inline-size;
+}
+.cover--ink { background: var(--ink); color: var(--paper); }
+.cover--paper { background: var(--paper); color: var(--ink); }
+.cover-head { display: flex; justify-content: space-between; align-items: baseline; gap: 3cqw; padding: 4cqw 4.5cqw 0; }
+.cover-name { font: 900 min(17cqw, calc(150cqw / var(--len, 8)))/.8 var(--display); text-transform: uppercase; white-space: nowrap; }
+.cover-cat { flex: none; font: 600 2.6cqw/1.2 var(--text); letter-spacing: .12em; text-transform: uppercase; text-align: right; }
+.cover-kind { padding: 2cqw 4.5cqw; font: 500 3.4cqw/1.2 var(--text); letter-spacing: .08em; text-transform: uppercase; }
+.cover-art { position: relative; flex: 1; margin: 0 4.5cqw 4.5cqw; overflow: hidden; }
+.cover-art .cover-shot { position: absolute; inset: 0; overflow: hidden; border: 1px solid currentColor; }
+.cover-art .cover-shot img { object-fit: cover; object-position: top; }
+.cover-art .halftone { position: absolute; inset: 0; --dot: 3px; mix-blend-mode: normal; }
+/* no screenshot: the name three times, outlined then solid, plus the stack */
+.cover-type { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; font: 900 30cqw/.75 var(--display); text-transform: uppercase; }
+.cover-type span { white-space: nowrap; -webkit-text-stroke: 1.5px currentColor; color: transparent; }
+.cover-type span:last-child { color: currentColor; }
+.cover-stack { position: absolute; top: 0; right: 0; font: 600 3cqw/1.5 var(--text); letter-spacing: .1em; text-transform: uppercase; text-align: right; }
+
+/* ---- Record disc + label (Deck.tsx, RecordLabel.tsx) -------------------------- */
+
+/* The vinyl: grooves, a sheen, and the paper label in the middle. */
+.deck-disc, .gatefold-disc {
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #111 0 1.5px, #1b1b1b 1.5px 3px), #111;
+  box-shadow: inset 0 0 0 6px #0c0c0c, 0 10px 30px -10px #000c;
+}
+.deck-disc::before, .gatefold-disc::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(from 20deg, transparent 0 10%, #ffffff1c 14%, transparent 20% 60%, #ffffff14 64%, transparent 70%);
+}
+.spin { position: absolute; inset: 0; border-radius: 50%; animation: spin 1.8s linear infinite; }
+
+/* The label: name sized to fit the circle (by its longest word) and the catalogue number. */
+.record-label {
+  position: absolute; left: 50%; top: 50%; width: 36%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  display: grid; place-items: center; text-align: center; text-transform: uppercase;
+  border-radius: 50%; background: #ebe3d2; color: #100f0d; container-type: inline-size;
+}
+.record-label > div { width: 76%; font: 800 min(15cqi, calc(124cqi / var(--len, 8)))/.92 var(--display); overflow-wrap: anywhere; }
+.record-label small { display: block; margin-top: 5%; font: 500 max(6px, 6.4cqi)/1.2 var(--text); letter-spacing: .08em; white-space: nowrap; }
+.record-label::after { content: ""; position: absolute; left: 46.5%; top: 46.5%; width: 7%; height: 7%; border-radius: 50%; background: #111; } /* spindle hole */
+
+/* ---- Deck: a sleeve with the record sticking out to the right ------------------
+   --s is the sleeve size. Used on case-study pages (app/(site)/work/[slug]).     */
+.deck { --s: min(40vh, 360px, 70vw); position: relative; width: calc(var(--s) * 1.55); height: var(--s); }
+.deck-sleeve, .deck-disc { position: absolute; top: 0; left: 0; width: var(--s); height: var(--s); }
+.deck-sleeve { z-index: 2; box-shadow: 0 18px 40px -18px #000a; }
+.deck-sleeve .cover { border: 0; }
+.deck-disc { z-index: 1; transform: translateX(52%) scale(.96); }
+
+/* ---- Tracklist: Side A / Side B (Tracklist.tsx) --------------------------------- */
+.tracklist { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 680px; padding-top: 12px; border-top: 2px solid currentColor; }
+.tracklist h4 { margin: 0 0 8px; }
+.tracklist ol { margin: 0; padding: 0; list-style: none; font: 400 15px/1.35 var(--text); }
+.tracklist li { display: grid; grid-template-columns: 2.4em 1fr; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent); }
+.tracklist li span { opacity: .55; font-variant-numeric: tabular-nums; }
+
+/* ---- Small milk-crate icon (CrateIcon.tsx) -------------------------------------- */
+.crate-icon-records { transition: transform .3s; }
+
+@media (max-width: 980px) {
+  .deck { --s: min(56vw, 300px); }
+  .tracklist { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin { animation: none; }
+}

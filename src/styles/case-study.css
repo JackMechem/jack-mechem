@@ -1,0 +1,81 @@
+/* ==========================================================================
+   Case study page: /work/<slug>
+   Page: app/(site)/work/[slug]/page.tsx
+   Layout: a header (record on the left, title + facts on the right), the main
+   screenshot, an optional gallery, then the tracklist beside the write-up,
+   and previous / next record links at the bottom.
+   ========================================================================== */
+
+/* ---- Header ----------------------------------------------------------------------- */
+.case-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); border-bottom: 1px solid var(--ink); }
+
+/* Left: the record, and the "Put it back" button that returns to its crate. */
+.case-deck {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  padding: 50px var(--pad) 30px; border-right: 1px solid var(--ink);
+}
+.case-deck .deck { --s: min(38vw, 440px, 52vh); width: calc(var(--s) * 1.4); }
+.case-deck .deck-sleeve, .case-deck .deck-disc { transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+.case-deck .deck-disc { transform: translateX(40%) scale(.96); }
+/* hovering "Put it back" drops the record toward the crate */
+.case-deck:has(.case-return:hover) .deck-sleeve { transform: translateY(18px); }
+.case-deck:has(.case-return:hover) .deck-disc { transform: translateX(0) translateY(18px) scale(.96); }
+
+.case-return { display: flex; align-items: center; gap: 14px; padding: 10px 18px 10px 12px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); text-decoration: none; }
+.case-return b { display: block; font: 900 26px/1 var(--display); text-transform: uppercase; }
+.case-return .cap { display: block; margin-top: 4px; opacity: .7; }
+.case-return:hover { background: var(--ink); color: var(--paper); --crate-fill: var(--ink); }
+.case-return:hover .crate-icon-records { transform: translateY(3px); }
+
+/* Right: back link, title and facts. */
+.case-meta { display: flex; flex-direction: column; gap: 18px; padding: 40px var(--pad); container-type: inline-size; }
+.case-back { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 10px; border: 1px solid var(--ink); text-decoration: none; }
+.case-back:hover { background: var(--ink); color: var(--paper); --crate-fill: var(--ink); }
+.case-meta h1 { margin: 0; font: 900 clamp(64px, 9vw, 170px)/.8 var(--display); text-transform: uppercase; --fit-max: clamp(64px, 9vw, 170px); }
+.case-kind { margin: 0; font: 500 20px/1.3 var(--text); }
+.case-summary { margin: 0; max-width: 58ch; font: 400 19px/1.55 var(--text); }
+.case-facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 0; font-size: 15px; }
+.case-facts dt { font: 600 12px/1.6 var(--text); letter-spacing: .14em; text-transform: uppercase; opacity: .65; }
+.case-facts dd { margin: 0; }
+
+/* ---- Screenshots -------------------------------------------------------------------- */
+.case-shot { margin: 0; padding: 30px var(--pad); border-bottom: 1px solid var(--ink); }
+.case-shot img, .case-gallery img { display: block; width: 100%; height: auto; border: 1px solid var(--ink); }
+.case-shot figcaption, .case-gallery figcaption { margin-top: 8px; opacity: .6; }
+.case-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px; padding: 0 var(--pad) 30px; border-bottom: 1px solid var(--ink); }
+.case-gallery figure { margin: 0; }
+
+/* ---- Body: tracklist (sticky) + write-up ---------------------------------------------- */
+.case-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); border-bottom: 1px solid var(--ink); }
+.case-aside { padding: 30px var(--pad); border-right: 1px solid var(--ink); }
+.case-aside-inner { position: sticky; top: calc(var(--bar) + 24px); }
+.case-aside h2 { margin-top: 0; }
+
+/* The write-up (Markdown rendered by react-markdown). */
+.prose { max-width: 78ch; padding: 30px var(--pad) 70px; font: 400 18px/1.65 var(--text); }
+.prose h2 { margin: 48px 0 14px; padding-top: 14px; border-top: 2px solid var(--ink); font: 900 clamp(38px, 4vw, 60px)/.9 var(--display); text-transform: uppercase; }
+.prose h2:first-child { margin-top: 0; }
+.prose h3 { margin: 32px 0 10px; font: 800 26px/1.05 var(--display); text-transform: uppercase; }
+.prose p, .prose ul, .prose ol { margin: 0 0 16px; }
+.prose li { margin: 0 0 6px; }
+.prose a { text-underline-offset: 3px; }
+.prose code { padding: 2px 5px; background: color-mix(in srgb, var(--ink) 9%, transparent); font: 500 .88em/1 ui-monospace, "JetBrains Mono", monospace; }
+.prose pre { margin: 0 0 20px; padding: 16px 18px; overflow-x: auto; background: var(--ink); color: var(--paper); font-size: 14px; line-height: 1.5; }
+.prose pre code { padding: 0; background: none; font-size: inherit; line-height: inherit; }
+.prose blockquote { margin: 0 0 16px; padding-left: 16px; border-left: 3px solid var(--ink); font-style: italic; }
+.prose table { width: 100%; margin: 0 0 20px; border-collapse: collapse; font-size: 15px; }
+.prose th, .prose td { padding: 6px 10px 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); text-align: left; }
+
+/* ---- Previous / next record --------------------------------------------------------- */
+.case-next { display: grid; grid-template-columns: 1fr 1fr; }
+.case-next a { display: flex; flex-direction: column; gap: 10px; padding: 30px var(--pad); text-decoration: none; container-type: inline-size; }
+.case-next a + a { border-left: 1px solid var(--ink); text-align: right; }
+.case-next a:hover { background: var(--ink); color: var(--paper); }
+.case-next b { font: 900 clamp(40px, 5vw, 80px)/.85 var(--display); text-transform: uppercase; --fit-max: clamp(40px, 5vw, 80px); }
+
+@media (max-width: 980px) {
+  .case-head, .case-body { grid-template-columns: 1fr; }
+  .case-deck { border-right: 0; border-bottom: 1px solid var(--ink); }
+  .case-deck .deck { --s: min(56vw, 320px); }
+  .case-aside { border-right: 0; border-bottom: 1px solid var(--ink); }
+}

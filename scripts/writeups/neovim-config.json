@@ -1,0 +1,17 @@
+{
+  "summary": "My Neovim setup in Lua on lazy.nvim: language servers enabled only when their binary is on PATH (installed by my NixOS config), conform/nvim-lint, oil.nvim, Harpoon, and Claude Code plus a local Ollama model.",
+  "stack": [
+    "Lua",
+    "lazy.nvim"
+  ],
+  "sideA": [
+    "PATH-aware LSP setup",
+    "rustaceanvim, jdtls, VimTeX",
+    "conform + nvim-lint"
+  ],
+  "sideB": [
+    "oil.nvim, Telescope, Harpoon",
+    "Claude Code + local Ollama",
+    "Markdown preview with peek"
+  ]
+}

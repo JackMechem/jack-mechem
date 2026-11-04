@@ -1,6 +1,10 @@
+/**
+ * Gigs: upcoming shows, listed under "On stage" on the home page.
+ * Edited at /admin. Dates are local calendar dates (YYYY-MM-DD).
+ */
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { assertAdmin } from "./admin";
+import { assertAdmin, text, webLink } from "./helpers";
 
 const gigFields = {
   date: v.string(),
@@ -11,36 +15,22 @@ const gigFields = {
   url: v.optional(v.string()),
 };
 
-type GigInput = {
-  date: string;
-  time?: string;
-  act: string;
-  venue: string;
-  city: string;
-  url?: string;
-};
+type GigInput = { date: string; time?: string; act: string; venue: string; city: string; url?: string };
 
+/** Validate and tidy a gig from the admin form. */
 function clean(g: GigInput): GigInput {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(g.date)) throw new ConvexError("Date must be YYYY-MM-DD");
-  const text = (s: string | undefined, field: string, required: boolean) => {
-    const t = (s ?? "").trim();
-    if (required && !t) throw new ConvexError(`${field} is required`);
-    if (t.length > 200) throw new ConvexError(`${field} is too long`);
-    return t || undefined;
-  };
-  const url = text(g.url, "Link", false);
-  if (url && !/^https?:\/\//i.test(url)) throw new ConvexError("Link must start with http:// or https://");
   return {
     date: g.date,
-    time: text(g.time, "Time", false),
-    act: text(g.act, "Act", true)!,
-    venue: text(g.venue, "Venue", true)!,
-    city: text(g.city, "City", true)!,
-    url,
+    time: text(g.time, "Time"),
+    act: text(g.act, "Act", { required: true })!,
+    venue: text(g.venue, "Venue", { required: true })!,
+    city: text(g.city, "City", { required: true })!,
+    url: webLink(g.url, "Link"),
   };
 }
 
-/** Public: gigs from yesterday (UTC) onward. The site trims to "today in LA". */
+/** Public: gigs from yesterday (UTC) onwards, soonest first. The site then trims to "today in LA". */
 export const upcoming = query({
   args: {},
   handler: async (ctx) => {
@@ -53,6 +43,7 @@ export const upcoming = query({
   },
 });
 
+/** Admin: every gig, newest first (including past ones). */
 export const all = query({
   args: { secret: v.string() },
   handler: async (ctx, { secret }) => {

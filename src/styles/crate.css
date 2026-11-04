@@ -1,0 +1,109 @@
+/* ==========================================================================
+   Crate: the "Work" section. Notes for the front record on the left; on the
+   right, divider tabs (one per crate/category) above a milk crate of records.
+   Component: components/home/CrateBrowser.tsx
+   ========================================================================== */
+
+.crate-browser { display: grid; grid-template-columns: 1fr 2fr; min-height: 86vh; }
+
+/* ---- Left column: notes about the front record ---------------------------------- */
+.crate-notes { display: flex; flex-direction: column; gap: 14px; min-height: 0; overflow: hidden; padding: 26px var(--pad); border-right: 1px solid var(--ink); container-type: inline-size; }
+.crate-notes h3 { margin: 0; font: 900 clamp(56px, 6vw, 100px)/.82 var(--display); text-transform: uppercase; --fit-max: clamp(56px, 6vw, 100px); }
+.crate-notes p { margin: 0; max-width: 40ch; }
+.crate-notes-kind { line-height: 1.4; }
+.crate-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.crate-notes-tracks { margin-top: auto; min-height: 0; overflow: hidden; }
+.crate-notes-tracks .tracklist { grid-template-columns: 1fr; gap: 14px; max-width: none; }
+
+/* ---- Right column: tabs + the crate ----------------------------------------------- */
+.crate-column { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+/* Divider tabs, like the bins in a record shop. They wrap so every crate stays visible. */
+.crate-tabs { flex: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 14px var(--pad) 0; }
+.crate-tabs button {
+  all: unset; box-sizing: border-box; cursor: pointer; flex: none; display: flex; align-items: baseline; gap: 10px;
+  padding: 10px 14px 8px; border: 1px solid var(--ink); border-bottom-width: 4px;
+  font: 800 20px/1 var(--display); letter-spacing: .02em; text-transform: uppercase;
+}
+.crate-tabs button span { font: 600 11px/1 var(--text); letter-spacing: .12em; opacity: .65; }
+.crate-tabs button:hover { background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.crate-tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.crate-tabs button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+/* The crate itself. Everything inside is sized off --rec (the record width), so the
+   crate is always just a little wider than the records, like a real milk crate. */
+.crate {
+  position: relative; flex: 1 0 auto; overflow: hidden; perspective: 1600px; perspective-origin: 50% 0%;
+  container-type: size; --rec: min(54cqh, 80cqw, 560px);
+}
+.crate:focus-visible { outline-offset: -4px; }
+
+/* The front panel of the crate, with a hand-hold cut-out and a row of side slats. */
+.crate-front {
+  position: absolute; left: 50%; bottom: 0; z-index: 200; transform: translateX(-50%);
+  width: calc(var(--rec) * 1.1); height: calc(var(--rec) * .44); padding-bottom: calc(var(--rec) * .05);
+  display: flex; align-items: flex-end; justify-content: center;
+  background: var(--paper); border: 2px solid var(--ink); border-bottom: 0;
+}
+.crate-front span { margin-right: -.2em; font: 900 calc(var(--rec) * .07)/1 var(--display); letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+.crate-front::before { content: ""; position: absolute; left: 32%; right: 32%; top: 14%; height: 15%; border: 2px solid var(--ink); border-radius: 999px; }
+.crate-front::after {
+  content: ""; position: absolute; left: 6%; right: 6%; top: 40%; height: 18%; opacity: .5;
+  background: repeating-linear-gradient(90deg, transparent 0 4%, var(--ink) 4% 4.6%),
+    linear-gradient(var(--ink), var(--ink)) top / 100% 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom / 100% 1px no-repeat;
+}
+
+/* Each record is a button; CrateBrowser sets its transform to stack, tilt and flip it. */
+.crate-record {
+  all: unset; position: absolute; left: 50%; bottom: calc(var(--rec) * .06); width: var(--rec); aspect-ratio: 1; cursor: pointer;
+  transform-origin: 50% 100%; touch-action: none; /* swipes on a record flip the crate */
+  transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .5s, filter .5s;
+  animation: record-drop-in .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 45ms);
+}
+.crate-record:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+@keyframes record-drop-in { from { translate: 0 35%; opacity: 0; } } /* when a crate is picked */
+
+/* Prev / next buttons either side of the stack. */
+.crate-nav {
+  position: absolute; z-index: 250; bottom: calc(var(--rec) * .58); transform: translateY(50%);
+  width: clamp(56px, calc(var(--rec) * .15), 76px); aspect-ratio: 1; padding: 0;
+  display: grid; place-items: center; align-content: center; gap: 2px;
+  background: var(--paper); color: var(--ink); border: 2px solid var(--ink); cursor: pointer;
+}
+.crate-nav svg { display: block; width: 46%; height: auto; }
+.crate-nav small { font-size: 10px; letter-spacing: .16em; }
+.crate-nav:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+.crate-nav:disabled { opacity: .2; cursor: default; }
+.crate-nav.prev { left: max(10px, calc(50% - var(--rec) * .55 - 24px)); translate: -100% 0; }
+.crate-nav.next { right: max(10px, calc(50% - var(--rec) * .55 - 24px)); translate: 100% 0; }
+
+/* Position counter + one tick per record (click a tick to jump). */
+.crate-ticks { position: absolute; top: 16px; left: 50%; z-index: 250; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.crate-ticks div { display: flex; gap: 5px; }
+.crate-ticks button { all: unset; cursor: pointer; width: 22px; height: 6px; border: 1px solid var(--ink); }
+.crate-ticks button[aria-current="true"] { width: 36px; background: var(--ink); }
+.crate-ticks button:hover { background: color-mix(in srgb, var(--ink) 40%, transparent); }
+.crate-ticks button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---- Desktop: the section fills exactly one screen so the pager stops cleanly ---- */
+@media (min-width: 981px) and (min-height: 640px) {
+  #crate { display: flex; flex-direction: column; height: calc(100vh - var(--bar)); }
+  #crate .section-head { padding-top: 40px; }
+  #crate .crate-browser { flex: 1; min-height: 0; }
+}
+
+/* ---- Tablets & phones: the crate goes first, since the notes change length per record ---- */
+@media (max-width: 980px) {
+  .crate-browser { grid-template-columns: 1fr; }
+  .crate-notes { border-right: 0; border-top: 1px solid var(--ink); }
+  .crate-column { order: -1; }
+  .crate { height: min(70vh, 125vw); }
+  .crate-tabs button { flex: 1 1 auto; justify-content: space-between; padding: 9px 11px 7px; font-size: 17px; }
+}
+@media (max-width: 760px) {
+  .crate-nav { width: 46px; }
+  .crate-nav small { display: none; }
+  .crate-nav.prev { left: 4px; translate: 0 0; }
+  .crate-nav.next { right: 4px; translate: 0 0; }
+}

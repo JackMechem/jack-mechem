@@ -1,8 +1,14 @@
+/**
+ * /cv: a plain, printable CV. Experience, music, education and skills come
+ * from content/site.ts; the Projects section is built from the published
+ * projects in Convex (grouped by crate, bullets from each tracklist).
+ * "Print / save as PDF" uses the print styles in styles/cv.css.
+ */
 import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/content/site";
 import { getShelves } from "@/lib/content";
-import { PrintButton } from "@/components/PrintButton";
+import { PrintButton } from "@/components/cv/PrintButton";
 
 export const revalidate = 3600;
 
@@ -66,7 +72,7 @@ export default async function CV() {
         </div>
       </header>
 
-      <section className="cv-sec">
+      <section className="cv-section">
         <h2>Education</h2>
         <div className="cv-entries">
           <article className="cv-entry">
@@ -79,12 +85,12 @@ export default async function CV() {
         </div>
       </section>
 
-      <section className="cv-sec">
+      <section className="cv-section">
         <h2>Experience</h2>
         <Entries items={site.experience} />
       </section>
 
-      <section className="cv-sec">
+      <section className="cv-section">
         <h2>Projects</h2>
         <div>
           {shelves.map((s) => (
@@ -117,12 +123,12 @@ export default async function CV() {
         </div>
       </section>
 
-      <section className="cv-sec">
+      <section className="cv-section">
         <h2>Music</h2>
         <Entries items={site.music} />
       </section>
 
-      <section className="cv-sec">
+      <section className="cv-section">
         <h2>Skills</h2>
         <dl className="cv-skills">
           {Object.entries(site.skills).map(([k, v]) => (

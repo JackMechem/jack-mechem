@@ -1,0 +1,20 @@
+{
+  "stack": [
+    "Next.js",
+    "Stripe",
+    "Hygraph",
+    "Shippo",
+    "Resend",
+    "Zustand"
+  ],
+  "sideA": [
+    "Reusable storefront platform",
+    "Branding & catalog in Hygraph",
+    "Server-side prices at checkout"
+  ],
+  "sideB": [
+    "Orders created by Stripe webhook",
+    "Shippo orders with package weight",
+    "React Email receipts via Resend"
+  ]
+}

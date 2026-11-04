@@ -1,3 +1,11 @@
+/**
+ * Site copy and personal details that rarely change: edit this file and
+ * redeploy. Everything that changes often (projects, crates, gigs, clips)
+ * lives in Convex and is edited at /admin instead.
+ *
+ * Used by: the hero, About, Contact, the CV page, page metadata and the
+ * top-bar ticker.
+ */
 export const site = {
   name: "Jack Mechem",
   url: "https://jackmechem.dev",
@@ -5,10 +13,16 @@ export const site = {
   github: "https://github.com/JackMechem",
   linkedin: "https://www.linkedin.com/in/jackmechem",
 
+  /** shown on the hero photo */
+  location: "Northridge, CA",
+
+  /** the hero's one-line pitch (also the page description for search engines) */
   hero: "I build real-time audio software and developer tools in Rust and TypeScript.",
   heroSub: "CS student at CSUN, looking for internships. I also play drums.",
+  /** last item in the top-bar ticker */
   status: "Looking for internships",
 
+  /** About section: the first paragraph is shown larger */
   bio: [
     "I'm a computer science student at Cal State Northridge (graduating May 2028). I build audio software and developer tools, mostly in Rust and TypeScript: a DAW written from scratch, a library for a guitar pedal whose protocol I reverse engineered, and a practice platform for musicians.",
     "I've been writing software since middle school, from Linux desktop tooling and Nix configs to paid client websites. When I'm not at a keyboard I'm usually behind a drum kit, playing jazz, funk and R&B gigs around LA.",
@@ -54,8 +68,10 @@ export const site = {
     { org: "Vic's Las Vegas", role: "Jazz drummer", where: "Las Vegas, NV", when: "2022 – 2024", points: ["Regular jazz gigs with rotating musicians, where the repertoire changed on the spot."] },
   ],
 
+  /** shown on /cv */
   education: { org: "California State University, Northridge", what: "B.S. Computer Science", when: "Expected May 2028" },
 
+  /** About section and /cv: area → comma-separated list */
   skills: {
     Languages: "Rust, TypeScript, C, C++, Java, Python, SQL, Lua, Nix",
     Audio: "Real-time engines, VST3 hosting, MIDI/SysEx, JACK, PipeWire, ALSA, DSP filter fitting, NAM",

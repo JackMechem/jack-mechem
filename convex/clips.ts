@@ -1,6 +1,10 @@
+/**
+ * Clips: the videos in the Archive section (newest edits at /admin/clips).
+ * `src` / `poster` are paths in public/ (e.g. /clips/show.mp4) or Vercel Blob URLs.
+ */
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { assertAdmin, text, url } from "./admin";
+import { assertAdmin, direction, moveInOrder, nextOrder, text, url } from "./helpers";
 
 const fields = {
   src: v.string(),
@@ -12,6 +16,7 @@ const fields = {
   creditUrl: v.optional(v.string()),
 };
 
+/** Validate and tidy a clip from the admin form. */
 const clean = (c: { src: string; poster?: string; title: string; detail: string; alt: string; credit?: string; creditUrl?: string }) => ({
   src: url(c.src, "Video", true)!,
   poster: url(c.poster, "Preview image"),
@@ -32,8 +37,7 @@ export const create = mutation({
   args: { secret: v.string(), ...fields },
   handler: async (ctx, { secret, ...c }) => {
     assertAdmin(secret);
-    const last = await ctx.db.query("clips").withIndex("by_order").order("desc").first();
-    return await ctx.db.insert("clips", { ...clean(c), order: (last?.order ?? 0) + 1 });
+    return await ctx.db.insert("clips", { ...clean(c), order: await nextOrder(ctx, "clips") });
   },
 });
 
@@ -56,16 +60,11 @@ export const remove = mutation({
   },
 });
 
+/** Admin: move a clip up / down the list. */
 export const move = mutation({
-  args: { secret: v.string(), id: v.id("clips"), dir: v.union(v.literal("up"), v.literal("down")) },
+  args: { secret: v.string(), id: v.id("clips"), dir: direction },
   handler: async (ctx, { secret, id, dir }) => {
     assertAdmin(secret);
-    const c = await ctx.db.get(id);
-    if (!c) return;
-    const q = ctx.db.query("clips").withIndex("by_order", (q) => (dir === "up" ? q.lt("order", c.order) : q.gt("order", c.order)));
-    const other = await q.order(dir === "up" ? "desc" : "asc").first();
-    if (!other) return;
-    await ctx.db.patch(c._id, { order: other.order });
-    await ctx.db.patch(other._id, { order: c.order });
+    await moveInOrder(ctx, "clips", id, dir);
   },
 });

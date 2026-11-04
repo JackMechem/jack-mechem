@@ -1,0 +1,18 @@
+/* ==========================================================================
+   All site styles, imported once by app/layout.tsx.
+   One file per area of the site; the order matters only in that base.css
+   (tokens + utilities) comes first. Class names are prefixed by area
+   (.crate-…, .gatefold-…, .case-…, .admin-…) so it's easy to find where a
+   rule lives: search for the prefix.
+   ========================================================================== */
+@import "./base.css";        /* tokens, element defaults, utilities (.cap .btn .fit .halftone .grain) */
+@import "./layout.css";      /* top bar, page sections, footer */
+@import "./records.css";     /* sleeve covers, records, tracklists (shared) */
+@import "./hero.css";        /* home: hero photo + featured records */
+@import "./crate.css";       /* home: work crates */
+@import "./music.css";       /* home: gigs + archive video player */
+@import "./about.css";       /* home: about + contact */
+@import "./gatefold.css";    /* record preview overlay */
+@import "./case-study.css";  /* /work/[slug] */
+@import "./cv.css";          /* /cv (+ print) */
+@import "./admin.css";       /* /admin */

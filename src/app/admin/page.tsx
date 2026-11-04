@@ -1,8 +1,16 @@
-import { api } from "../../../convex/_generated/api";
-import { adminSecret, convex, isAdmin } from "@/lib/admin";
+/**
+ * /admin: the gigs page (the first thing you see after signing in).
+ * Add a gig with the form; upcoming gigs are listed soonest first, past
+ * ones are tucked into a "Past" drop-down. Editing uses ?edit=<id>.
+ */
+import Link from "next/link";
+import { api } from "@convex/_generated/api";
+import { isAdmin } from "@/lib/auth";
+import { adminSecret, convex } from "@/lib/convex-admin";
 import { fmtDate, todayInLA } from "@/lib/format";
-import { deleteGig } from "./actions";
-import { GigForm } from "./forms";
+import { deleteGig } from "./_actions/gigs";
+import { GigForm } from "./_components/GigForm";
+import { ConfirmDelete, Notices } from "./_components/ListControls";
 
 export default async function Admin({ searchParams }: { searchParams: Promise<{ edit?: string; saved?: string }> }) {
   if (!(await isAdmin())) return null;
@@ -22,8 +30,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
 
   return (
     <>
-      {saved && <p className="cap adm-ok">Saved. The site is updated.</p>}
-      {loadError && <p className="adm-err">{loadError}</p>}
+      <Notices saved={!!saved} error={loadError} />
 
       <h2 className="cap">{editing ? `Editing: ${editing.act}` : "Add a gig"}</h2>
       <GigForm
@@ -48,9 +55,9 @@ async function loadGigs() {
 }
 
 function GigList({ gigs }: { gigs: Awaited<ReturnType<typeof loadGigs>> }) {
-  if (!gigs.length) return <p className="adm-empty">Nothing here.</p>;
+  if (!gigs.length) return <p className="admin-empty">Nothing here.</p>;
   return (
-    <ul className="adm-list">
+    <ul className="admin-list">
       {gigs.map((g) => (
         <li key={g._id}>
           <div>
@@ -61,14 +68,11 @@ function GigList({ gigs }: { gigs: Awaited<ReturnType<typeof loadGigs>> }) {
               {g.venue}, {g.city}
             </small>
           </div>
-          <div className="adm-actions">
-            <a className="btn" href={`/admin?edit=${g._id}`}>
+          <div className="admin-actions">
+            <Link className="btn" href={`/admin?edit=${g._id}`}>
               Edit
-            </a>
-            <form action={deleteGig}>
-              <input type="hidden" name="id" value={g._id} />
-              <button className="btn">Delete</button>
-            </form>
+            </Link>
+            <ConfirmDelete action={deleteGig} id={g._id} />
           </div>
         </li>
       ))}
