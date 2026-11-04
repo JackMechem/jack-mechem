@@ -36,8 +36,11 @@ export function FeaturedRecords({ projects }: { projects: Project[] }) {
         return (
           <button key={p.slug} type="button" className={`featured-item ${modifier}`} onClick={() => openRecord(p.slug)}>
             <span className="featured-art" aria-hidden="true">
+              {/* the outer span slides out on hover; the inner one spins (kept apart so they don't fight) */}
               <span className="featured-disc">
-                <span className="featured-label" />
+                <span className="featured-vinyl">
+                  <span className="featured-label" />
+                </span>
               </span>
               <span className="featured-sleeve">
                 <Cover project={p} index={i} sizes="220px" />

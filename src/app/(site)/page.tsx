@@ -54,7 +54,7 @@ export default async function Home() {
       </section>
 
       <section className="section page-stop" id="gigs">
-        <SectionHead title="On stage" caption={["jazz · funk · soul · r&b", "around Los Angeles"]} />
+        <SectionHead title="Gigs" caption={["jazz · funk · soul · r&b", "around Los Angeles"]} />
         <div className="subsection-head">
           <h3>Upcoming</h3>
           <span className="cap">{gigs?.length ? `${plural(gigs.length, "date")} on the books` : "dates as they come in"}</span>

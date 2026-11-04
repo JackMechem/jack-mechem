@@ -1,15 +1,14 @@
 /**
  * A project's case study: /work/<slug>
  *
- * Header (record + "Put it back", title, facts), the main screenshot, an
- * optional gallery, then the Side A / B tracklist next to the Markdown
+ * Header (record + "Put it back", title, facts), the screenshots (main image
+ * + gallery, in a viewer), then the Side A / B tracklist next to the Markdown
  * write-up, and links to the previous / next record. All content is edited
  * in /admin/projects. New projects get a page without a redeploy
  * (dynamicParams); drafts 404.
  * Styles: styles/case-study.css
  */
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
@@ -19,6 +18,7 @@ import { getProject, getProjects, getShelves } from "@/lib/content";
 import { CrateIcon } from "@/components/records/CrateIcon";
 import { Deck } from "@/components/records/Deck";
 import { Tracklist } from "@/components/records/Tracklist";
+import { ScreenshotViewer, type Shot } from "@/components/case-study/ScreenshotViewer";
 
 export const dynamicParams = true;
 export const revalidate = 3600;
@@ -49,6 +49,12 @@ export default async function CaseStudy({ params }: Params) {
   const index = Math.max(0, projects.findIndex((q) => q.slug === slug));
   const prev = projects[(index - 1 + projects.length) % projects.length];
   const next = projects[(index + 1) % projects.length];
+
+  // the main screenshot first, then the gallery
+  const shots: Shot[] = [
+    ...(p.image ? [{ src: p.image, alt: `${p.name} screenshot`, caption: p.imageNote }] : []),
+    ...(p.gallery ?? []).map((g) => ({ src: g.src, alt: g.caption ?? `${p.name} screenshot`, caption: g.caption })),
+  ];
 
   return (
     <article>
@@ -101,23 +107,7 @@ export default async function CaseStudy({ params }: Params) {
         </div>
       </header>
 
-      {p.image && (
-        <figure className="case-shot">
-          <Image src={p.image} alt={`${p.name} screenshot`} width={1600} height={1000} sizes="100vw" priority />
-          {p.imageNote && <figcaption className="cap">{p.imageNote}</figcaption>}
-        </figure>
-      )}
-
-      {p.gallery && p.gallery.length > 0 && (
-        <div className="case-gallery">
-          {p.gallery.map((g) => (
-            <figure key={g.src}>
-              <Image src={g.src} alt={g.caption ?? `${p.name} screenshot`} width={1600} height={1000} sizes="(max-width: 980px) 100vw, 50vw" />
-              {g.caption && <figcaption className="cap">{g.caption}</figcaption>}
-            </figure>
-          ))}
-        </div>
-      )}
+      {shots.length > 0 && <ScreenshotViewer shots={shots} />}
 
       <div className="case-body">
         <aside className="case-aside">

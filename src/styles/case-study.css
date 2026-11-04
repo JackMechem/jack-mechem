@@ -38,12 +38,7 @@
 .case-facts dt { font: 600 12px/1.6 var(--text); letter-spacing: .14em; text-transform: uppercase; opacity: .65; }
 .case-facts dd { margin: 0; }
 
-/* ---- Screenshots -------------------------------------------------------------------- */
-.case-shot { margin: 0; padding: 30px var(--pad); border-bottom: 1px solid var(--ink); }
-.case-shot img, .case-gallery img { display: block; width: 100%; height: auto; border: 1px solid var(--ink); }
-.case-shot figcaption, .case-gallery figcaption { margin-top: 8px; opacity: .6; }
-.case-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px; padding: 0 var(--pad) 30px; border-bottom: 1px solid var(--ink); }
-.case-gallery figure { margin: 0; }
+/* Screenshots: see viewer.css */
 
 /* ---- Body: tracklist (sticky) + write-up ---------------------------------------------- */
 .case-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); border-bottom: 1px solid var(--ink); }
@@ -59,9 +54,9 @@
 .prose p, .prose ul, .prose ol { margin: 0 0 16px; }
 .prose li { margin: 0 0 6px; }
 .prose a { text-underline-offset: 3px; }
-.prose code { padding: 2px 5px; background: color-mix(in srgb, var(--ink) 9%, transparent); font: 500 .88em/1 ui-monospace, "JetBrains Mono", monospace; }
+.prose code { overflow-wrap: anywhere; padding: 2px 5px; background: color-mix(in srgb, var(--ink) 9%, transparent); font: 500 .88em/1 ui-monospace, "JetBrains Mono", monospace; }
 .prose pre { margin: 0 0 20px; padding: 16px 18px; overflow-x: auto; background: var(--ink); color: var(--paper); font-size: 14px; line-height: 1.5; }
-.prose pre code { padding: 0; background: none; font-size: inherit; line-height: inherit; }
+.prose pre code { overflow-wrap: normal; padding: 0; background: none; font-size: inherit; line-height: inherit; }
 .prose blockquote { margin: 0 0 16px; padding-left: 16px; border-left: 3px solid var(--ink); font-style: italic; }
 .prose table { width: 100%; margin: 0 0 20px; border-collapse: collapse; font-size: 15px; }
 .prose th, .prose td { padding: 6px 10px 6px 0; border-bottom: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); text-align: left; }
@@ -74,7 +69,8 @@
 .case-next b { font: 900 clamp(40px, 5vw, 80px)/.85 var(--display); text-transform: uppercase; --fit-max: clamp(40px, 5vw, 80px); }
 
 @media (max-width: 980px) {
-  .case-head, .case-body { grid-template-columns: 1fr; }
+  /* minmax(0, …) so a wide code block scrolls inside itself instead of widening the page */
+  .case-head, .case-body { grid-template-columns: minmax(0, 1fr); }
   .case-deck { border-right: 0; border-bottom: 1px solid var(--ink); }
   .case-deck .deck { --s: min(56vw, 320px); }
   .case-aside { border-right: 0; border-bottom: 1px solid var(--ink); }

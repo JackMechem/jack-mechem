@@ -1,22 +1,14 @@
 /**
  * The fixed bar across the top of every public page: logo, a scrolling
- * ticker (built in app/(site)/layout.tsx), the section links and the theme
- * toggle. Styles: styles/layout.css (.topbar-…)
+ * ticker (built in app/(site)/layout.tsx), the section links (NavLinks) and
+ * the theme toggle. Styles: styles/layout.css (.topbar-…)
  */
 import Link from "next/link";
+import { NavLinks } from "./NavLinks";
 import { RecordMark } from "./RecordMark";
 import { ThemeToggle } from "./ThemeToggle";
 
 export type TickerItem = { title: string; text: string };
-
-/** Links to the home page sections (their ids are set in components/home/*). */
-const NAV = [
-  ["/#crate", "Work"],
-  ["/#gigs", "Gigs"],
-  ["/#archive", "Archive"],
-  ["/#about", "About"],
-  ["/#contact", "Contact"],
-] as const;
 
 export function TopBar({ ticker }: { ticker: TickerItem[] }) {
   const items = ticker.map((item, i) => (
@@ -45,11 +37,7 @@ export function TopBar({ ticker }: { ticker: TickerItem[] }) {
       </div>
 
       <nav className="topbar-nav" aria-label="Main">
-        {NAV.map(([href, label]) => (
-          <Link key={href} href={href}>
-            {label}
-          </Link>
-        ))}
+        <NavLinks />
         <ThemeToggle />
       </nav>
     </header>

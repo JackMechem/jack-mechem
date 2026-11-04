@@ -6,9 +6,9 @@
   ],
   "projects": [
     {
-      "slug": "fermata",
-      "name": "Fermata",
-      "cat": "FMT-001",
+      "slug": "marbble",
+      "name": "Marbble",
+      "cat": "MRB-001",
       "years": "2026 –",
       "kind": "Digital audio workstation",
       "stack": [
@@ -18,8 +18,8 @@
         "TypeScript"
       ],
       "summary": "A Logic Pro–style DAW built from scratch. The Rust audio engine never waits on a lock, independent tracks run on a pool of real-time threads, and it hosts VST3 plug-ins.",
-      "image": "/projects/fermata.png",
-      "imageNote": "Fermata's project site (app screenshots to come)",
+      "image": "/projects/marbble.png",
+      "imageNote": "Marbble's main window: an arrangement of audio and instrument tracks",
       "sideA": [
         "Lock-free audio thread",
         "Real-time thread pool",
@@ -39,16 +39,42 @@
       "links": [
         {
           "label": "Project site",
-          "href": "https://jackmechem.github.io/fermata/"
+          "href": "https://jackmechem.github.io/marbble/"
         },
         {
           "label": "GitHub",
-          "href": "https://github.com/JackMechem/fermata"
+          "href": "https://github.com/JackMechem/marbble"
         }
       ],
-      "body": "## Overview\n\nFermata is a digital audio workstation modelled on Logic Pro's workflow and layout. The audio engine and the VST3 host are written in Rust, and the interface is Tauri 2 with React 19 and TypeScript. Logic sets the scope: the repo keeps a list of every Logic Pro feature by stage and marks which ones Fermata has.\n\nIt covers the path from recording to export: audio and MIDI recording with count-in, cycle recording into take folders and swipe comping, Logic's editing tools, a piano roll, a drum step sequencer, channel strips with an eight-band EQ, eight effect slots and eight sends, five automation modes, six built-in synths, a sampler, 16 effects and VST3 hosting.\n\nIt's alpha software. I develop and test it on Linux. The Windows and macOS builds pass the engine tests and headless checks on a silent stand-in device, but nobody has run them on a real machine yet. I built it with Claude Code, developing independent features in parallel in separate git worktrees.\n\n## Architecture\n\nThe code is a Cargo workspace: `vst3-host` for plug-in hosting, `daw-engine` for the project model, real-time graph, device I/O and rendering (no UI code), and `daw` for the Tauri app. The React frontend draws the tracks area, editors and meters on canvas.\n\nThe engine is split into two halves that never share mutable data. `Session` runs off the audio thread and owns the project, loaded audio, plug-in controllers, undo history and recorder. Every edit goes through it. `Engine` is the real-time graph, and it only hears about edits through `Cmd` messages. Each user edit is one Tauri command and one undo step.\n\n## Keeping the audio thread honest\n\nCode on the audio thread may not allocate, free, lock, block or do I/O. Buffers are sized up front, and edits arrive through a pattern the docs call Cmd in, Garbage out. The session builds whatever the engine needs (a track's DSP state, a new region list) on its own thread and sends it over a wait-free `rtrb` ring. The engine swaps it in at the start of the next callback and sends the old object back on a second ring, so the memory gets freed on the main thread.\n\nThose rings used to be `crossbeam_channel`s, and I learned the difference the hard way. A crossbeam receiver can spin while a preempted sender finishes its write. At real-time priority, the audio thread starved the sender until the kernel's `RLIMIT_RTTIME` limit killed the app with SIGXCPU. `rtrb` never waits.\n\nFailures on the audio thread are contained rather than fatal. Denormals are flushed to zero for the whole callback. If callbacks fall behind for more than 60 ms, the engine sheds load for 250 ms so the thread can sleep before the kernel kills it. Panics are caught, because unwinding into the driver's C callback would abort the process. After every plug-in, NaNs are silenced and runaway levels clamped, and a toast names the plug-in. A headless check, `rt_alloc_check`, plays a project that uses every feature through a counting allocator and fails if any block allocates once warmed up.\n\n## Multi-core without changing the sound\n\nIndependent tracks can play at the same time on a small pool of real-time threads. The requirement I set was that the output stay bit for bit the same as the serial loop's, so nothing else in the program has to care which path ran.\n\nThe hard part is the mix. Float addition isn't associative, so if threads sum into a bus in whatever order they finish, the result changes from run to run. On the pool, no strip writes into another. Each strip keeps its output and sends in its own buffers, and a bus adds up its feeders in the serial loop's exact order. That makes switching between serial and parallel at any block boundary inaudible, and lets the tests compare renders exactly.\n\nThe pool has no lock or queue. Each task is a bit in a few atomic words, and whoever clears a ready bit owns the task, so a preempted worker can only hold up the one task it took. If a worker gets stuck, the block is given up after 0.1 s and treated as an overload. The engine also checks that the task graph covers every route before using it, and plays serially until it does. A light project never engages the pool, so it pays nothing.\n\n## Hosting plug-ins safely\n\nA plug-in that crashes during scanning shouldn't take the DAW with it. Fermata runs its own binary as `fermata --scan-vst3 <bundle>` for each bundle, four at a time, and kills any child that takes more than 20 seconds.\n\n## Results\n\nMeasured on an i7-13700KF, mean block time:\n\n- 24 instances of CHOWTapeModel at a 512-frame buffer: 4822 µs on one thread, 754 µs on eight.\n- 16 Dragonfly Hall reverbs at 128 frames: 430 µs on one thread, 111 µs on eight.\n- Keeping workers on the performance cores took 24 CHOWTapeModels from 340 µs to 270 µs at 128 frames.\n\nEight threads helped wide projects only 10 to 25% more than six while tying up another performance core, so the automatic setting stops at six. A `soak_check` makes a few hundred random edits with the pool running and compares parallel renders with serial ones bit for bit, and the pool's tests ran clean under ThreadSanitizer.\n\n## What's next\n\nThe current release is 0.1.0-alpha.5. The biggest open item is running the Windows and macOS builds on real hardware. Multi-core processing is Linux-only for now, VST3 editor windows don't open on Windows yet, and the synth models haven't been tuned by ear or compared with the instruments they're modelled on.\n",
+      "body": "## Overview\n\nMarbble is a digital audio workstation modelled on Logic Pro's workflow and layout. The audio engine and the VST3 host are written in Rust, and the interface is Tauri 2 with React 19 and TypeScript. Logic sets the scope: the repo keeps a list of every Logic Pro feature by stage and marks which ones Marbble has.\n\nIt covers the path from recording to export: audio and MIDI recording with count-in, cycle recording into take folders and swipe comping, Logic's editing tools, a piano roll, a drum step sequencer, channel strips with an eight-band EQ, eight effect slots and eight sends, five automation modes, six built-in synths, a sampler, 16 effects and VST3 hosting.\n\nIt's alpha software. I develop and test it on Linux. The Windows and macOS builds pass the engine tests and headless checks on a silent stand-in device, but nobody has run them on a real machine yet. I built it with Claude Code, developing independent features in parallel in separate git worktrees.\n\n## Architecture\n\nThe code is a Cargo workspace: `vst3-host` for plug-in hosting, `daw-engine` for the project model, real-time graph, device I/O and rendering (no UI code), and `daw` for the Tauri app. The React frontend draws the tracks area, editors and meters on canvas.\n\nThe engine is split into two halves that never share mutable data. `Session` runs off the audio thread and owns the project, loaded audio, plug-in controllers, undo history and recorder. Every edit goes through it. `Engine` is the real-time graph, and it only hears about edits through `Cmd` messages. Each user edit is one Tauri command and one undo step.\n\n## Keeping the audio thread honest\n\nCode on the audio thread may not allocate, free, lock, block or do I/O. Buffers are sized up front, and edits arrive through a pattern the docs call Cmd in, Garbage out. The session builds whatever the engine needs (a track's DSP state, a new region list) on its own thread and sends it over a wait-free `rtrb` ring. The engine swaps it in at the start of the next callback and sends the old object back on a second ring, so the memory gets freed on the main thread.\n\nThose rings used to be `crossbeam_channel`s, and I learned the difference the hard way. A crossbeam receiver can spin while a preempted sender finishes its write. At real-time priority, the audio thread starved the sender until the kernel's `RLIMIT_RTTIME` limit killed the app with SIGXCPU. `rtrb` never waits.\n\nFailures on the audio thread are contained rather than fatal. Denormals are flushed to zero for the whole callback. If callbacks fall behind for more than 60 ms, the engine sheds load for 250 ms so the thread can sleep before the kernel kills it. Panics are caught, because unwinding into the driver's C callback would abort the process. After every plug-in, NaNs are silenced and runaway levels clamped, and a toast names the plug-in. A headless check, `rt_alloc_check`, plays a project that uses every feature through a counting allocator and fails if any block allocates once warmed up.\n\n## Multi-core without changing the sound\n\nIndependent tracks can play at the same time on a small pool of real-time threads. The requirement I set was that the output stay bit for bit the same as the serial loop's, so nothing else in the program has to care which path ran.\n\nThe hard part is the mix. Float addition isn't associative, so if threads sum into a bus in whatever order they finish, the result changes from run to run. On the pool, no strip writes into another. Each strip keeps its output and sends in its own buffers, and a bus adds up its feeders in the serial loop's exact order. That makes switching between serial and parallel at any block boundary inaudible, and lets the tests compare renders exactly.\n\nThe pool has no lock or queue. Each task is a bit in a few atomic words, and whoever clears a ready bit owns the task, so a preempted worker can only hold up the one task it took. If a worker gets stuck, the block is given up after 0.1 s and treated as an overload. The engine also checks that the task graph covers every route before using it, and plays serially until it does. A light project never engages the pool, so it pays nothing.\n\n## Hosting plug-ins safely\n\nA plug-in that crashes during scanning shouldn't take the DAW with it. Marbble runs its own binary as `marbble --scan-vst3 <bundle>` for each bundle, four at a time, and kills any child that takes more than 20 seconds.\n\n## Results\n\nMeasured on an i7-13700KF, mean block time:\n\n- 24 instances of CHOWTapeModel at a 512-frame buffer: 4822 µs on one thread, 754 µs on eight.\n- 16 Dragonfly Hall reverbs at 128 frames: 430 µs on one thread, 111 µs on eight.\n- Keeping workers on the performance cores took 24 CHOWTapeModels from 340 µs to 270 µs at 128 frames.\n\nEight threads helped wide projects only 10 to 25% more than six while tying up another performance core, so the automatic setting stops at six. A `soak_check` makes a few hundred random edits with the pool running and compares parallel renders with serial ones bit for bit, and the pool's tests ran clean under ThreadSanitizer.\n\n## What's next\n\nThe current release is 0.1.0-alpha.6. (It was called Fermata up to alpha.5.) The biggest open item is running the Windows and macOS builds on real hardware. Multi-core processing is Linux-only for now, VST3 editor windows don't open on Windows yet, and the synth models haven't been tuned by ear or compared with the instruments they're modelled on.\n",
       "published": true,
-      "crate": "Audio & music"
+      "crate": "Audio & music",
+      "gallery": [
+        {
+          "src": "/projects/marbble-mixer.png",
+          "caption": "The Mixer: channel strips with plug-in slots, sends and faders"
+        },
+        {
+          "src": "/projects/marbble-piano-roll.png",
+          "caption": "The Piano Roll with notes and a velocity lane"
+        },
+        {
+          "src": "/projects/marbble-take-folder.png",
+          "caption": "A take folder, with a comp swiped across its takes"
+        },
+        {
+          "src": "/projects/marbble-tre.png",
+          "caption": "Marbble Tre, a three-oscillator synth, docked in the bottom section"
+        },
+        {
+          "src": "/projects/marbble-sedici.png",
+          "caption": "Marbble Sedici, a six-operator FM synth"
+        },
+        {
+          "src": "/projects/marbble-sampler.png",
+          "caption": "Marbble Sampler with zones mapped across the keys"
+        }
+      ]
     },
     {
       "slug": "soniroll",

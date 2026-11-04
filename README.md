@@ -34,7 +34,7 @@ Most changes don't need any code: sign in at `/admin`.
 | **Edit a project / write-up** | `/admin/projects` → **Edit**. |
 | **Reorder projects or crates** | ↑ / ↓ on `/admin/projects`. The first three projects (across all crates, in order) are the hero's *Featured records*. |
 | **Add a category (crate)** | `/admin/projects` → the "New crate name" box at the bottom. Crates can only be deleted once they're empty. |
-| **Add a project screenshot** | Put the image in `public/projects/`, then type its path (e.g. `/projects/my-app.png`) into the editor. Extra screenshots go in **More screenshots** (`/projects/x.png \| caption`, one per line). Uploading straight from the editor also works if Vercel Blob is set up (see [Environment variables](#environment-variables)). |
+| **Add a project screenshot** | Put the image in `public/projects/`, then type its path (e.g. `/projects/my-app.png`) into the editor. Extra screenshots go in **More screenshots** (`/projects/x.png \| caption`, one per line); the case study shows them all in a viewer, main image first. Uploading straight from the editor also works if Vercel Blob is set up (see [Environment variables](#environment-variables)). |
 | **Add a video to the Archive** | Put the MP4 in `public/clips/` (keep it short, 720p), then on `/admin/clips` type its path (e.g. `/clips/my-gig.mp4`), title, detail and "Filmed by". Commit and push so the file reaches the live site. |
 | **Change the bio, skills, CV entries, hero text, links** | Edit `src/content/site.ts`, then push. |
 | **Change the logo / favicon / share image** | Edit the sources in `scripts/brand/`, run `pnpm icons`, then push. |
@@ -118,10 +118,12 @@ src/
     home/                     one component per home section: Hero, FeaturedRecords,
                                 CrateBrowser, GigList, ClipPlayer, About, Contact,
                                 plus SectionPager (desktop scroll paging) and CopyEmail
+    case-study/               ScreenshotViewer (screenshots + full-screen zoom)
     cv/                       PrintButton
 
   content/site.ts           copy and details that rarely change (bio, skills, CV, links)
-  hooks/useCrateGestures.ts  wheel + swipe handling for the crate
+  hooks/                    useCrateGestures (crate wheel + swipe), useActiveSection
+                              (top-bar highlight), useSwipe (screenshot viewer)
   lib/
     content.ts                reading content from Convex (cached)
     auth.ts                   admin session (password + signed cookie)
@@ -155,7 +157,7 @@ Plain CSS, no framework. Everything is in `src/styles/`, one file per area, all 
 | `records.css` | sleeve covers, records and labels, tracklists (shared) |
 | `hero.css` · `crate.css` · `music.css` · `about.css` | the home page sections |
 | `gatefold.css` | the record preview overlay |
-| `case-study.css` · `cv.css` · `admin.css` | the other pages |
+| `case-study.css` · `viewer.css` · `cv.css` · `admin.css` | the other pages (`viewer.css`: case-study screenshots) |
 
 - **Class names are prefixed by area** (`.crate-…`, `.gatefold-…`, `.case-…`, `.admin-…`). To find a rule, search for the prefix.
 - **Two colours only:** `--paper` and `--ink`. Dark mode (the default) swaps them via `<html data-theme>`. Always use the variables, never hard-coded colours, so both themes keep working.

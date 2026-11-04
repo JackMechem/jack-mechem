@@ -1,5 +1,5 @@
 /**
- * Gigs: upcoming shows, listed under "On stage" on the home page.
+ * Gigs: upcoming shows, listed under "Gigs" on the home page.
  * Edited at /admin. Dates are local calendar dates (YYYY-MM-DD).
  */
 import { ConvexError, v } from "convex/values";

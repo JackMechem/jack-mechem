@@ -1,0 +1,76 @@
+/* ==========================================================================
+   Screenshot viewer on case studies: a large image with ← / →, a caption
+   bar, a thumbnail strip, and a full-screen <dialog> with tap-to-zoom.
+   Component: components/case-study/ScreenshotViewer.tsx
+   ========================================================================== */
+
+.viewer { padding: 30px var(--pad); border-bottom: 1px solid var(--ink); }
+
+/* ---- The large image ---------------------------------------------------------------
+   A fixed 16:10 frame; each screenshot is fitted inside it (wide ones get bars). */
+.viewer-stage { position: relative; aspect-ratio: 16 / 10; max-height: 78vh; width: 100%; background: #111; border: 1px solid var(--ink); touch-action: pan-y pinch-zoom; }
+.viewer-open { all: unset; position: absolute; inset: 0; cursor: zoom-in; }
+.viewer-open img { object-fit: contain; }
+.viewer-open:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+/* ← / → : square buttons on the image edges, like the crate's */
+.viewer-nav {
+  position: absolute; top: 50%; z-index: 2; translate: 0 -50%; width: 52px; aspect-ratio: 1; padding: 0;
+  display: grid; place-items: center; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); cursor: pointer;
+}
+.viewer-nav svg { width: 46%; }
+.viewer-nav:hover { background: var(--ink); color: var(--paper); }
+.viewer-nav:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.viewer-nav.prev { left: 12px; }
+.viewer-nav.next { right: 12px; }
+
+/* ---- Caption bar + thumbnails ------------------------------------------------------ */
+.viewer-bar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-top: 12px; }
+.viewer-caption { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0; line-height: 1.5; }
+.viewer-caption .cap:not(.viewer-count) { opacity: .65; }
+.viewer-full { flex: none; }
+
+.viewer-thumbs { display: flex; gap: 8px; margin: 14px 0 0; padding: 0 0 6px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.viewer-thumbs li { flex: none; scroll-snap-align: start; }
+.viewer-thumbs button { all: unset; box-sizing: border-box; position: relative; display: block; width: 136px; aspect-ratio: 16 / 10; background: #111; border: 1px solid var(--ink); cursor: pointer; opacity: .5; transition: opacity .2s; }
+.viewer-thumbs img { object-fit: cover; object-position: left top; }
+.viewer-thumbs button:hover { opacity: .85; }
+.viewer-thumbs button[aria-current="true"] { opacity: 1; outline: 3px solid var(--ink); outline-offset: -3px; }
+.viewer-thumbs button:focus-visible { opacity: 1; outline: 3px solid var(--ink); outline-offset: 2px; }
+
+/* ---- Full screen ---------------------------------------------------------------------
+   Rows: counter / close, the image (fills the rest), caption. */
+.viewer-dialog {
+  width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0;
+  background: var(--paper); color: var(--ink);
+}
+.viewer-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.viewer-dialog::backdrop { background: #000; }
+.viewer-dialog-top { display: flex; align-items: center; gap: 16px; padding: 14px var(--pad); border-bottom: 1px solid var(--ink); }
+.viewer-hint { flex: 1; text-align: center; opacity: .55; }
+.viewer-close { border: 0; background: none; color: inherit; cursor: pointer; padding: 6px 0 6px 12px; }
+.viewer-close:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* the image area: fitted by default; zoomed, the image is wider than the area and it scrolls */
+.viewer-zoom { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); overflow: hidden; padding: 16px; touch-action: pinch-zoom; }
+.viewer-zoom img { display: block; margin: auto; max-width: 100%; max-height: 100%; cursor: zoom-in; user-select: none; -webkit-user-drag: none; }
+.viewer-zoom.is-zoomed { overflow: auto; overscroll-behavior: contain; touch-action: auto; }
+.viewer-zoom.is-zoomed img { max-width: none; max-height: none; height: auto; cursor: zoom-out; }
+.viewer-dialog .viewer-nav { top: 50%; }
+.viewer-dialog-caption { margin: 0; padding: 14px var(--pad) calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--ink); text-align: center; opacity: .75; line-height: 1.5; }
+
+/* ---- Phones ----------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .viewer { padding: 20px var(--pad); }
+  .viewer-stage { aspect-ratio: 4 / 3; }
+  .viewer-nav { width: 40px; }
+  .viewer-nav.prev { left: 6px; }
+  .viewer-nav.next { right: 6px; }
+  .viewer-full { display: none; } /* tapping the image does the same */
+  .viewer-thumbs button { width: 92px; }
+  .viewer-hint { font-size: 10px; }
+  .viewer-zoom { padding: 8px; }
+  /* full screen: buttons sit at the bottom corners, out of the way of the image */
+  .viewer-dialog .viewer-nav { top: auto; bottom: calc(10px + env(safe-area-inset-bottom)); translate: 0 0; }
+  .viewer-dialog-caption { padding-left: 60px; padding-right: 60px; }
+}

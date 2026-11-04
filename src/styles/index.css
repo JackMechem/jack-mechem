@@ -14,5 +14,6 @@
 @import "./about.css";       /* home: about + contact */
 @import "./gatefold.css";    /* record preview overlay */
 @import "./case-study.css";  /* /work/[slug] */
+@import "./viewer.css";      /* /work/[slug]: screenshot viewer */
 @import "./cv.css";          /* /cv (+ print) */
 @import "./admin.css";       /* /admin */

@@ -14,7 +14,7 @@ export const site = {
   linkedin: "https://www.linkedin.com/in/jackmechem",
 
   /** shown on the hero photo */
-  location: "Northridge, CA",
+  location: "Los Angeles, CA",
 
   /** the hero's one-line pitch (also the page description for search engines) */
   hero: "I build real-time audio software and developer tools in Rust and TypeScript.",
