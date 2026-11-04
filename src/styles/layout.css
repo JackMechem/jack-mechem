@@ -13,7 +13,7 @@
 /* Logo: record mark + name ("JM" on phones). The cursor in the mark blinks on hover. */
 .topbar-logo {
   display: flex; align-items: center; gap: 10px; padding: 0 16px; background: var(--ink); color: var(--paper);
-  font: 900 24px/1 var(--display); letter-spacing: .02em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  font: 900 24px/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .02em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
 }
 .topbar-logo .record-mark { flex: none; }
 .topbar-logo:hover .record-mark-cursor { animation: prompt-blink 1s steps(1) infinite; }
@@ -30,7 +30,7 @@
 .topbar-nav { display: flex; }
 .topbar-nav a, .topbar-nav button {
   display: flex; align-items: center; padding: 0 16px; border: 0; border-left: 1px solid var(--ink); background: none; color: var(--ink);
-  font: 800 19px/1 var(--display); letter-spacing: .04em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+  font: 800 19px/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .04em; text-transform: uppercase; text-decoration: none; cursor: pointer;
 }
 .topbar-nav a:hover, .topbar-nav button:hover { background: var(--ink); color: var(--paper); }
 /* the home-page section currently in view (hooks/useActiveSection.ts) */
@@ -39,16 +39,15 @@
 
 /* ---- Page sections ------------------------------------------------------------
    <section class="section"> with a <SectionHead> on top: a huge title on the
-   left and a two-line caption on the right. .page-stop marks the sections the
-   desktop scroll pager stops at (components/home/SectionPager.tsx).          */
+   left and a two-line caption on the right.                                   */
 .section { border-bottom: 1px solid var(--ink); scroll-margin-top: var(--bar); }
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 70px var(--pad) 18px; border-bottom: 1px solid var(--ink); }
-.section-head h2 { margin: 0; font: 900 clamp(70px, 11vw, 190px)/.8 var(--display); text-transform: uppercase; }
+.section-head h2 { margin: 0; font: 900 calc(clamp(70px, 11vw, 190px) / var(--dw))/.8 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 .section-head .cap { min-width: 0; text-align: right; line-height: 1.6; }
 
 /* A smaller heading inside a section (e.g. "Upcoming" under "Gigs"). */
 .subsection-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; padding: 14px var(--pad); border-bottom: 1px solid var(--ink); }
-.subsection-head h3 { margin: 0; font: 900 clamp(30px, 3vw, 44px)/.9 var(--display); text-transform: uppercase; }
+.subsection-head h3 { margin: 0; font: 900 calc(clamp(30px, 3vw, 44px) / var(--dw))/.9 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 
 /* ---- Footer ---------------------------------------------------------------- */
 .site-footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px var(--pad) 40px; border-top: 1px solid var(--ink); }
@@ -57,8 +56,8 @@
 @media (min-width: 981px) {
   .section-head h2 { white-space: nowrap; }
 }
-/* Below desktop there's no scroll pager, so sections run into each other. Each
-   one opens with an inverted, numbered band instead, like a crate divider card. */
+/* Below desktop the sections run into each other more, so each one opens with an
+   inverted, numbered band, like a crate divider card. */
 @media (max-width: 980px) {
   main { counter-reset: section; }
   .section-head {
@@ -66,7 +65,7 @@
     padding: 18px var(--pad) 20px; background: var(--ink); color: var(--paper);
   }
   .section-head::before { content: counter(section, decimal-leading-zero); font: 600 12px/1 var(--text); letter-spacing: .14em; }
-  .section-head h2 { font-size: clamp(60px, 17vw, 120px); }
+  .section-head h2 { font-size: calc(clamp(60px, 17vw, 120px) / var(--dw)); }
   .section-head .cap { text-align: left; opacity: .75; }
 }
 @media (max-width: 760px) {

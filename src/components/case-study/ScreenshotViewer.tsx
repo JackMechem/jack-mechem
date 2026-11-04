@@ -16,6 +16,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { pad2 } from "@/lib/format";
 import { useSwipe } from "@/hooks/useSwipe";
+import { Arrow } from "@/components/layout/Arrow";
 
 export type Shot = { src: string; alt: string; caption?: string };
 
@@ -180,7 +181,7 @@ export function ScreenshotViewer({ shots }: { shots: Shot[] }) {
               {position}
               <span className="cap viewer-hint">{zoomWidth === null ? "Tap the image to zoom" : "Drag around · tap to zoom out"}</span>
               <button type="button" className="viewer-close cap" onClick={close}>
-                Close ✕
+                Close <Arrow dir="close" />
               </button>
             </div>
 

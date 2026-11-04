@@ -2,10 +2,11 @@
  * Small buttons used in the admin lists. They're plain <form>s that call a
  * server action, so they work without client-side JavaScript.
  */
+import { Arrow } from "@/components/layout/Arrow";
 
 type Action = (form: FormData) => Promise<void>;
 
-/** ↑ / ↓ reorder buttons. The action receives `id` and `dir` ("up" | "down"). */
+/** Up / down reorder buttons. The action receives `id` and `dir` ("up" | "down"). */
 export function MoveButtons({ action, id, index, count, label }: { action: Action; id: string; index: number; count: number; label: string }) {
   return (
     <>
@@ -14,7 +15,7 @@ export function MoveButtons({ action, id, index, count, label }: { action: Actio
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="dir" value={dir} />
           <button className="btn admin-move" disabled={dir === "up" ? index === 0 : index === count - 1} aria-label={`Move ${label} ${dir}`}>
-            {dir === "up" ? "↑" : "↓"}
+            <Arrow dir={dir} />
           </button>
         </form>
       ))}

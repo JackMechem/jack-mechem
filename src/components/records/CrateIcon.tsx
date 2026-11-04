@@ -1,6 +1,6 @@
 /**
  * A little milk crate with records standing in it, drawn in the text colour.
- * Used on the case-study "Put it back" / "Back to crate" buttons; the
+ * Used on the case-study "Put it back" button; the
  * records dip into the crate on hover (styles/case-study.css).
  */
 export function CrateIcon({ size = 28 }: { size?: number }) {

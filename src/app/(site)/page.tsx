@@ -1,7 +1,6 @@
 /**
  * The home page: one long page of sections, each its own component in
- * components/home/. On desktop the SectionPager moves one section per scroll
- * gesture (sections marked `page-stop`).
+ * components/home/.
  *
  *   Hero      photo, featured records, pitch
  *   Work      #crate    the record crates
@@ -23,7 +22,6 @@ import { GigList } from "@/components/home/GigList";
 import { ClipPlayer } from "@/components/home/ClipPlayer";
 import { About } from "@/components/home/About";
 import { Contact } from "@/components/home/Contact";
-import { SectionPager } from "@/components/home/SectionPager";
 
 // Re-render at least hourly so past gigs drop off.
 export const revalidate = 3600;
@@ -37,23 +35,21 @@ export default async function Home() {
   const sleeveIndex = Object.fromEntries(shelves.flatMap((s) => s.projects.map((p, i) => [p.slug, i])));
 
   return (
-    <RecordPreview projects={projects} sleeveIndex={sleeveIndex}>
-      <SectionPager />
-
+    <RecordPreview projects={projects} sleeveIndex={sleeveIndex} crates={shelves.map((s) => s.projects.map((q) => q.slug))}>
       <Hero projects={projects} />
 
-      <section className="section page-stop" id="crate">
+      <section className="section" id="crate">
         <SectionHead
           title={shelves.length > 1 ? "The crates" : "The crate"}
           caption={[
             `${pad2(projects.length)} records${shelves.length > 1 ? ` in ${shelves.length} crates` : ""}`,
-            "scroll or use the arrows to flip · click a record to open it",
+            shelves.length > 1 ? "pick a crate · then scroll or use the arrows to flip" : "scroll or use the arrows to flip · click a record to open it",
           ]}
         />
         {shelves.length > 0 && <CrateBrowser shelves={shelves} />}
       </section>
 
-      <section className="section page-stop" id="gigs">
+      <section className="section" id="gigs">
         <SectionHead title="Gigs" caption={["jazz · funk · soul · r&b", "around Los Angeles"]} />
         <div className="subsection-head">
           <h3>Upcoming</h3>
@@ -63,16 +59,14 @@ export default async function Home() {
       </section>
 
       {clips.length > 0 && (
-        <section className="section page-stop" id="archive">
+        <section className="section" id="archive">
           <SectionHead title="Archive" caption={["recordings from past shows", plural(clips.length, "clip")]} />
           <ClipPlayer clips={clips} />
         </section>
       )}
 
-      <div className="page-stop">
-        <About />
-        <Contact />
-      </div>
+      <About />
+      <Contact />
     </RecordPreview>
   );
 }

@@ -14,7 +14,7 @@
 .preview.is-open { visibility: visible; transition-delay: 0s; }
 .preview-backdrop { position: absolute; inset: 0; background: var(--paper); opacity: 0; transition: opacity .35s; }
 .preview.is-open .preview-backdrop { opacity: .97; }
-.preview-stage { position: relative; width: 100%; max-height: 100vh; overflow: auto; display: grid; place-items: center; padding: 56px 12px 40px; }
+.preview-stage { position: relative; width: 100%; max-height: 100vh; overflow: hidden auto; /* the record slides out past the right edge */ display: grid; place-items: center; padding: 56px 12px 40px; }
 .preview-close {
   position: fixed; top: 18px; right: 22px; z-index: 20; border: 0; background: none; cursor: pointer;
   font: 600 13px/1 var(--text); letter-spacing: .12em; text-transform: uppercase;
@@ -23,7 +23,7 @@
 /* ---- The spread ------------------------------------------------------------------ */
 .gatefold {
   /* each panel is half the spread; the spread is capped so a square panel fits the screen height */
-  --gatefold-w: min(1060px, 88vw, calc((100vh - 110px) * 2));
+  --gatefold-w: min(1060px, 88vw, calc((100vh - 180px) * 2)); /* room for the prev / next row below */
   --gatefold-shadow: #000000a6;
   position: relative; width: var(--gatefold-w); display: grid; grid-template-columns: 1fr 1fr; perspective: 2600px;
   opacity: 0; transform: translateX(-25%) translateY(24px);
@@ -41,12 +41,19 @@
 /* Panels are always printed on cream card, whatever the site theme. */
 .gatefold-panel {
   --paper: #ebe3d2; --ink: #100f0d;
+  /* The binding: a narrow strip of card along the fold (half on each panel), darkest
+     at the fold, with a crease at its edge and a short, sharp shadow beyond it. */
+  --spine: max(5px, calc(var(--gatefold-w) * .006));
+  --binding: color-mix(in srgb, var(--paper) 84%, var(--ink)) 0,
+    color-mix(in srgb, var(--paper) 93%, var(--ink)) var(--spine),
+    color-mix(in srgb, var(--ink) 45%, transparent) var(--spine) calc(var(--spine) + 1px),
+    #0000001f calc(var(--spine) + 1px), #0000 calc(var(--spine) + 6px);
   height: calc(var(--gatefold-w) / 2); padding: clamp(16px, 5.5cqi, 32px);
   display: flex; flex-direction: column; gap: clamp(8px, 2.4cqi, 14px);
   overflow: hidden auto; scrollbar-width: thin; container-type: inline-size;
   background: var(--paper); color: var(--ink);
 }
-.gatefold-right { grid-column: 2; grid-row: 1; position: relative; z-index: 2; background: linear-gradient(90deg, #0000002e, #0000 7%), var(--paper); }
+.gatefold-right { grid-column: 2; grid-row: 1; position: relative; z-index: 2; background: linear-gradient(90deg, var(--binding)), var(--paper); }
 
 /* The left leaf: cover on the outside, liner notes inside; it hinges on its right edge. */
 .gatefold-leaf {
@@ -55,7 +62,7 @@
 }
 .preview.is-open .gatefold-leaf { transform: translateZ(1px) rotateY(0); }
 .gatefold-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-.gatefold-inside { height: 100%; background: linear-gradient(270deg, #00000030, #0000 7%), var(--paper); }
+.gatefold-inside { background: linear-gradient(270deg, var(--binding)), var(--paper); }
 .gatefold-cover { position: absolute; inset: 0; transform: rotateY(180deg); box-shadow: 0 14px 30px -16px var(--gatefold-shadow); }
 .gatefold-cover .cover { border: 0; }
 
@@ -66,10 +73,31 @@
   box-shadow: inset 0 0 0 6px #0c0c0c, 0 0 0 2px #ebe3d22e, 0 10px 30px -10px #000c;
 }
 .preview.is-open .gatefold-disc { transform: translate(56%, -50%); }
+.gatefold-disc { display: block; cursor: pointer; } /* a link to the case study */
+.gatefold-disc:hover { filter: brightness(1.35); }
+
+/* ---- Prev / next: the record tucks back in, the sleeve folds shut (its cover becomes the
+   next record's), then the open animation above plays again. Timings add up to SWAP_MS
+   in RecordPreview.tsx. --------------------------------------------------------------- */
+.preview-nav {
+  display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 22px; position: relative; z-index: 2;
+  opacity: 0; transition: opacity .3s;
+}
+.preview.is-open .preview-nav { opacity: 1; transition-delay: 1s; }
+.preview-nav .btn { display: inline-flex; align-items: center; gap: 8px; }
+.preview-nav .btn:disabled { opacity: .25; pointer-events: none; }
+.preview-nav .cap { min-width: 5.5em; text-align: center; }
+@media (min-width: 821px) {
+  .preview.is-swapping .gatefold-disc { transform: translateY(-50%); transition: transform .35s cubic-bezier(.5,0,.75,0); }
+  .preview.is-swapping .gatefold-leaf { transform: translateZ(1px) rotateY(180deg); transition: transform .6s cubic-bezier(.45,.05,.2,1) .2s; }
+  .preview.is-swapping .gatefold { transform: translateX(-25%); transition: transform .5s cubic-bezier(.45,.05,.2,1) .45s; }
+  .preview.is-swapping .gatefold::before { opacity: 0; transition: opacity .2s; }
+}
 
 /* ---- Inside left: liner notes ---------------------------------------------------- */
 .gatefold-top { display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 2px solid var(--ink); }
-.gatefold-inside h2 { margin: 4px 0 0; font: 900 clamp(44px, 6vw, 92px)/.88 var(--display); text-transform: uppercase; --fit-max: clamp(44px, 6vw, 92px); }
+/* long names (e.g. "Mike Mechem Real Estate") shrink by total length too, so they take two lines, not three */
+.gatefold-inside h2 { margin: 4px 0 0; font: 900 calc(clamp(44px, 6vw, 92px) / var(--dw))/.88 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; --fit-max: min(clamp(44px, 6vw, 92px), calc(330cqi / var(--chars, 8))); }
 .gatefold-kind { margin: 0; font: 500 clamp(14px, 3.3cqi, 18px)/1.3 var(--text); }
 .gatefold-summary { margin: 0; font: 400 clamp(13px, 3cqi, 16px)/1.5 var(--text); }
 .gatefold-credits { margin: 0; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); font-size: clamp(12px, 2.8cqi, 15px); line-height: 1.5; }
@@ -83,7 +111,7 @@
 .gatefold-shot figcaption { margin-top: 6px; opacity: .6; }
 /* no screenshot: the name set as large as fits on one line, and the stack */
 .gatefold-noshot { position: relative; overflow: hidden; background: var(--ink); color: var(--paper); container-type: size; }
-.gatefold-noshot-name { position: absolute; left: 5%; right: 5%; bottom: 6%; font: 900 min(40cqh, calc(170cqw / var(--len, 8)))/.8 var(--display); text-transform: uppercase; white-space: nowrap; }
+.gatefold-noshot-name { position: absolute; left: 5%; right: 5%; bottom: 6%; font: 900 calc(min(40cqh, calc(170cqw / var(--len, 8))) / var(--dw))/.8 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; white-space: nowrap; }
 .gatefold-noshot-stack { position: absolute; top: 6%; right: 5%; text-align: right; line-height: 1.6; font-size: 11px; }
 .gatefold-right .tracklist { flex: none; grid-template-columns: 1fr 1fr; gap: 16px; max-width: none; margin-top: auto; padding-top: 8px; }
 .gatefold-right .tracklist ol { font-size: clamp(11px, 2.6cqi, 15px); }
@@ -101,6 +129,8 @@
   .gatefold-noshot { aspect-ratio: 16 / 10; }
   .gatefold-cover, .gatefold-disc { display: none; }
   .gatefold-right .tracklist { grid-template-columns: 1fr; }
+  /* no fold here: the spread just fades out and back in */
+  .preview.is-swapping .gatefold { opacity: 0; transform: translateY(24px); transition: opacity .3s, transform .3s; }
 }
 @media (prefers-reduced-motion: reduce) {
   .gatefold, .gatefold-leaf, .gatefold-disc { transition-duration: .01s !important; transition-delay: 0s !important; }

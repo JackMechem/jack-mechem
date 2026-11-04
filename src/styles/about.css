@@ -11,14 +11,14 @@
 .about-lead { margin: 0 0 14px; font: 400 21px/1.45 var(--text); }
 .about-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .skills { margin: 0; }
-.skills dt { margin-top: 12px; font: 800 18px/1 var(--display); text-transform: uppercase; }
+.skills dt { margin-top: 12px; font: 800 18px/1 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 .skills dd { margin: 4px 0 0; font-size: 15px; line-height: 1.45; }
 
 /* ---- Contact: the email, huge (click to copy) ------------------------------------------ */
 .contact { padding: 70px var(--pad) 40px; scroll-margin-top: var(--bar); }
 .contact-email {
   all: unset; display: block; margin-top: 10px; cursor: pointer; word-break: break-all;
-  font: 900 clamp(40px, 8.4vw, 170px)/.8 var(--display); text-transform: uppercase;
+  font: 900 calc(clamp(40px, 8.4vw, 170px) / var(--dw))/.8 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase;
 }
 .contact-email:hover { text-decoration: underline; text-decoration-thickness: 6px; text-underline-offset: 10px; }
 .contact-email:focus-visible { outline: 3px solid var(--ink); }
@@ -31,6 +31,6 @@
   .about-links .btn { flex: 1 1 auto; text-align: center; }
 }
 @media (max-width: 760px) {
-  .contact-email { font-size: 8.4vw; word-break: normal; white-space: nowrap; }
+  .contact-email { font-size: calc(8.4vw / var(--dw)); word-break: normal; white-space: nowrap; }
   .contact-links .btn { flex: 1 1 auto; text-align: center; }
 }

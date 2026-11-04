@@ -8,7 +8,7 @@
 
 /* ---- Left column: notes about the front record ---------------------------------- */
 .crate-notes { display: flex; flex-direction: column; gap: 14px; min-height: 0; overflow: hidden; padding: 26px var(--pad); border-right: 1px solid var(--ink); container-type: inline-size; }
-.crate-notes h3 { margin: 0; font: 900 clamp(56px, 6vw, 100px)/.82 var(--display); text-transform: uppercase; --fit-max: clamp(56px, 6vw, 100px); }
+.crate-notes h3 { margin: 0; font: 900 calc(clamp(56px, 6vw, 100px) / var(--dw))/.82 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; --fit-max: clamp(56px, 6vw, 100px); }
 .crate-notes p { margin: 0; max-width: 40ch; }
 .crate-notes-kind { line-height: 1.4; }
 .crate-actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -20,15 +20,42 @@
 
 /* Divider tabs, like the bins in a record shop. They wrap so every crate stays visible. */
 .crate-tabs { flex: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 14px var(--pad) 0; }
+.crate-tabs [role="tablist"] { display: contents; }
 .crate-tabs button {
   all: unset; box-sizing: border-box; cursor: pointer; flex: none; display: flex; align-items: baseline; gap: 10px;
   padding: 10px 14px 8px; border: 1px solid var(--ink); border-bottom-width: 4px;
-  font: 800 20px/1 var(--display); letter-spacing: .02em; text-transform: uppercase;
+  font: 800 20px/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .02em; text-transform: uppercase;
 }
 .crate-tabs button span { font: 600 11px/1 var(--text); letter-spacing: .12em; opacity: .65; }
 .crate-tabs button:hover { background: color-mix(in srgb, var(--ink) 12%, transparent); }
 .crate-tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
 .crate-tabs button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.crate-tabs .crate-back { border-color: transparent; font: 600 12px/1 var(--text); letter-spacing: .14em; align-self: center; }
+.crate-tabs .crate-back:hover { border-color: var(--ink); background: none; }
+
+/* ---- The picker: every crate side by side; click one to open it -------------------- */
+.crate-picker {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-auto-rows: minmax(300px, 1fr);
+  gap: 0; min-height: 70vh;
+}
+.crate-pick {
+  all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-rows: minmax(0, 1fr) auto; align-self: stretch;
+  min-width: 0; min-height: 0; border-right: 1px solid var(--ink);
+}
+.crate-pick:last-child { border-right: 0; }
+.crate-pick .crate { display: block; height: 100%; min-height: 0; perspective-origin: 50% 20%; }
+.crate-pick .crate-record { cursor: inherit; transition: transform .7s cubic-bezier(.2,.8,.2,1), bottom .45s cubic-bezier(.2,.8,.2,1) calc(var(--i, 0) * 35ms); }
+.crate-pick:hover .crate-record, .crate-pick:focus-visible .crate-record { bottom: calc(var(--rec) * .2); } /* records rise out of the crate */
+.crate-pick-label {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px var(--pad);
+  border-top: 1px solid var(--ink); font: 800 22px/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .02em; text-transform: uppercase;
+}
+.crate-pick-label .cap { opacity: .65; white-space: nowrap; }
+.crate-pick:hover .crate-pick-label, .crate-pick:focus-visible .crate-pick-label { background: var(--ink); color: var(--paper); }
+.crate-pick:focus-visible { outline: 3px solid var(--ink); outline-offset: -3px; }
+
+/* the picked crate grows into the big one (view transition); everything else just crossfades */
+::view-transition-group(crate) { animation-duration: .55s; animation-timing-function: cubic-bezier(.3,.7,.2,1); }
 
 /* The crate itself. Everything inside is sized off --rec (the record width), so the
    crate is always just a little wider than the records, like a real milk crate. */
@@ -45,7 +72,7 @@
   display: flex; align-items: flex-end; justify-content: center;
   background: var(--paper); border: 2px solid var(--ink); border-bottom: 0;
 }
-.crate-front span { margin-right: -.2em; font: 900 calc(var(--rec) * .07)/1 var(--display); letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+.crate-front span { margin-right: -.2em; font: 900 calc(calc(var(--rec) * .07) / var(--dw))/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
 .crate-front::before { content: ""; position: absolute; left: 32%; right: 32%; top: 14%; height: 15%; border: 2px solid var(--ink); border-radius: 999px; }
 .crate-front::after {
   content: ""; position: absolute; left: 6%; right: 6%; top: 40%; height: 18%; opacity: .5;
@@ -64,10 +91,14 @@
 .crate-record:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
 @keyframes record-drop-in { from { translate: 0 35%; opacity: 0; } } /* when a crate is picked */
 
-/* Prev / next buttons either side of the stack. */
+/* Left of the stack, centred: prev, the position counter + one tick per record (click a
+   tick to jump), next. The chevrons point up/down, the way the records flip. */
+.crate-controls {
+  position: absolute; z-index: 250; top: 50%; left: var(--pad); transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
 .crate-nav {
-  position: absolute; z-index: 250; bottom: calc(var(--rec) * .58); transform: translateY(50%);
-  width: clamp(56px, calc(var(--rec) * .15), 76px); aspect-ratio: 1; padding: 0;
+  width: clamp(52px, calc(var(--rec) * .13), 68px); aspect-ratio: 1; padding: 0;
   display: grid; place-items: center; align-content: center; gap: 2px;
   background: var(--paper); color: var(--ink); border: 2px solid var(--ink); cursor: pointer;
 }
@@ -75,22 +106,22 @@
 .crate-nav small { font-size: 10px; letter-spacing: .16em; }
 .crate-nav:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
 .crate-nav:disabled { opacity: .2; cursor: default; }
-.crate-nav.prev { left: max(10px, calc(50% - var(--rec) * .55 - 24px)); translate: -100% 0; }
-.crate-nav.next { right: max(10px, calc(50% - var(--rec) * .55 - 24px)); translate: 100% 0; }
 
-/* Position counter + one tick per record (click a tick to jump). */
-.crate-ticks { position: absolute; top: 16px; left: 50%; z-index: 250; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; white-space: nowrap; }
-.crate-ticks div { display: flex; gap: 5px; }
+.crate-ticks { display: flex; flex-direction: column; align-items: center; gap: 10px; white-space: nowrap; }
+.crate-ticks div { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .crate-ticks button { all: unset; cursor: pointer; width: 22px; height: 6px; border: 1px solid var(--ink); }
 .crate-ticks button[aria-current="true"] { width: 36px; background: var(--ink); }
 .crate-ticks button:hover { background: color-mix(in srgb, var(--ink) 40%, transparent); }
 .crate-ticks button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-/* ---- Desktop: the section fills exactly one screen so the pager stops cleanly ---- */
+/* While the crate owns a wheel gesture the page can't scroll (hooks/useCrateGestures.ts). */
+html.crate-scroll-lock { overflow: hidden; }
+
+/* ---- Desktop: the section fills exactly one screen ---- */
 @media (min-width: 981px) and (min-height: 640px) {
   #crate { display: flex; flex-direction: column; height: calc(100vh - var(--bar)); }
   #crate .section-head { padding-top: 40px; }
-  #crate .crate-browser { flex: 1; min-height: 0; }
+  #crate .crate-browser, #crate .crate-picker { flex: 1; min-height: 0; }
 }
 
 /* ---- Tablets & phones: the crate goes first, since the notes change length per record ---- */
@@ -100,10 +131,19 @@
   .crate-column { order: -1; }
   .crate { height: min(70vh, 125vw); }
   .crate-tabs button { flex: 1 1 auto; justify-content: space-between; padding: 9px 11px 7px; font-size: 17px; }
+  .crate-tabs .crate-back { flex: 1 0 100%; padding: 6px 0; }
+  .crate-picker { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); grid-auto-rows: min(88vw, 420px); min-height: 0; }
+  .crate-pick { border-right: 0; border-bottom: 1px solid var(--ink); }
+  .crate-pick:last-child { border-bottom: 0; }
 }
 @media (max-width: 760px) {
-  .crate-nav { width: 46px; }
+  /* no room beside the records: the controls become a row across the top, arrows pointing left/right
+     (the crate gets taller to make room above the records) */
+  .crate { height: calc(min(70vh, 125vw) + 44px); --rec: min(calc((100cqh - 44px) * .54), 80cqw, 560px); }
+  .crate-controls { top: 10px; left: 50%; transform: translateX(-50%); flex-direction: row; gap: 12px; }
+  .crate-nav { width: 40px; }
+  .crate-nav svg { rotate: -90deg; }
   .crate-nav small { display: none; }
-  .crate-nav.prev { left: 4px; translate: 0 0; }
-  .crate-nav.next { right: 4px; translate: 0 0; }
+  .crate-ticks { flex-direction: row; }
+  .crate-ticks div { flex-direction: row; }
 }

@@ -12,6 +12,7 @@ import { adminSecret, convex } from "@/lib/convex-admin";
 import { createCrate, deleteCrate, moveCrate, renameCrate } from "../_actions/crates";
 import { deleteProject, moveProject } from "../_actions/projects";
 import { ConfirmDelete, MoveButtons, Notices } from "../_components/ListControls";
+import { Arrow } from "@/components/layout/Arrow";
 
 type Project = Doc<"projects">;
 
@@ -108,7 +109,7 @@ function ProjectList({ projects }: { projects: Project[] }) {
             </Link>
             {p.published && (
               <a className="btn" href={`/work/${p.slug}`} target="_blank">
-                View ↗
+                View <Arrow dir="out" />
               </a>
             )}
             <ConfirmDelete action={deleteProject} id={p._id} label={`Yes, delete ${p.name}`} fields={{ image: p.image ?? "" }} />

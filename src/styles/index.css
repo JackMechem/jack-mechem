@@ -7,7 +7,9 @@
    ========================================================================== */
 @import "./base.css";        /* tokens, element defaults, utilities (.cap .btn .fit .halftone .grain) */
 @import "./layout.css";      /* top bar, page sections, footer */
+@import "./loader.css";      /* loading screens */
 @import "./records.css";     /* sleeve covers, records, tracklists (shared) */
+@import "./turntable.css";   /* case studies: the record playing on a turntable */
 @import "./hero.css";        /* home: hero photo + featured records */
 @import "./crate.css";       /* home: work crates */
 @import "./music.css";       /* home: gigs + archive video player */

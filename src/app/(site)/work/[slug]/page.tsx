@@ -16,9 +16,10 @@ import remarkGfm from "remark-gfm";
 import { fitStyle } from "@/lib/format";
 import { getProject, getProjects, getShelves } from "@/lib/content";
 import { CrateIcon } from "@/components/records/CrateIcon";
-import { Deck } from "@/components/records/Deck";
+import { Turntable } from "@/components/records/Turntable";
 import { Tracklist } from "@/components/records/Tracklist";
 import { ScreenshotViewer, type Shot } from "@/components/case-study/ScreenshotViewer";
+import { Arrow } from "@/components/layout/Arrow";
 
 export const dynamicParams = true;
 export const revalidate = 3600;
@@ -60,21 +61,14 @@ export default async function CaseStudy({ params }: Params) {
     <article>
       <header className="case-head">
         <div className="case-deck">
-          <Deck project={p} index={positionInCrate} />
-          <Link href={backHref} className="case-return">
-            <CrateIcon size={44} />
-            <span>
-              <b>Put it back</b>
-              <span className="cap">{crateName}</span>
-            </span>
-          </Link>
+          <Turntable project={p} index={positionInCrate} />
         </div>
 
         <div className="case-meta">
           <Link href={backHref} className="case-back cap">
-            <span aria-hidden="true">←</span>
+            <Arrow dir="left" />
             <CrateIcon size={22} />
-            Back to {crateName}
+            Put it back in {crateName.startsWith("the ") ? crateName : `the ${crateName}`}
           </Link>
           <span className="cap">
             {p.cat} · {p.years}
@@ -96,7 +90,7 @@ export default async function CaseStudy({ params }: Params) {
                     <span key={l.href}>
                       {i > 0 && " · "}
                       <a href={l.href} target="_blank" rel="noopener noreferrer">
-                        {l.label} ↗
+                        {l.label} <Arrow dir="out" />
                       </a>
                     </span>
                   ))}
@@ -124,13 +118,17 @@ export default async function CaseStudy({ params }: Params) {
       {projects.length > 1 && prev && next && (
         <nav className="case-next" aria-label="More projects">
           <Link href={`/work/${prev.slug}`}>
-            <span className="cap">← Previous record</span>
+            <span className="cap">
+              <Arrow dir="left" /> Previous record
+            </span>
             <b className="fit" style={fitStyle(prev.name)}>
               {prev.name}
             </b>
           </Link>
           <Link href={`/work/${next.slug}`}>
-            <span className="cap">Next record →</span>
+            <span className="cap">
+              Next record <Arrow />
+            </span>
             <b className="fit" style={fitStyle(next.name)}>
               {next.name}
             </b>

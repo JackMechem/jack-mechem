@@ -24,5 +24,5 @@ export const pad2 = (n: number) => String(n).padStart(2, "0");
  */
 export function fitStyle(text: string): CSSProperties {
   const longest = Math.max(4, ...text.split(/[\s-]+/).map((w) => w.length));
-  return { "--len": longest } as CSSProperties;
+  return { "--len": longest, "--chars": text.length } as CSSProperties; // --chars: for places that cap long names by total length
 }

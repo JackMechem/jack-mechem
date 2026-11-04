@@ -6,7 +6,7 @@
 
 .admin { max-width: 860px; margin: 0 auto; padding: 28px 16px 80px; }
 .admin:has(.admin-wide) { max-width: 980px; } /* the project editor needs more room */
-.admin h1 { margin: 0 0 18px; font: 900 64px/.85 var(--display); text-transform: uppercase; }
+.admin h1 { margin: 0 0 18px; font: 900 64px/.85 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 .admin h2 { margin: 30px 0 10px; }
 .admin .btn { padding: 9px 12px; font-size: 16px; }
 .admin .btn:disabled { opacity: .5; }
@@ -18,7 +18,7 @@
 .admin-tabs { display: flex; border: 1px solid var(--ink); }
 .admin-tabs a, .admin-tabs button {
   padding: 9px 14px; border: 0; background: none; color: var(--ink); cursor: pointer;
-  font: 800 20px/1 var(--display); text-transform: uppercase; text-decoration: none;
+  font: 800 20px/1 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; text-decoration: none;
 }
 .admin-tabs > * + * { border-left: 1px solid var(--ink); }
 .admin-tabs [aria-current="page"] { background: var(--ink); color: var(--paper); }
@@ -56,7 +56,7 @@
 /* ---- Lists ------------------------------------------------------------------------------- */
 .admin-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
 .admin-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--ink); }
-.admin-list b { font: 800 20px/1 var(--display); text-transform: uppercase; }
+.admin-list b { font: 800 20px/1 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 .admin-list small { opacity: .7; }
 .admin-media { display: flex; align-items: center; gap: 12px; }
 .admin-media img, .admin-media .placeholder { flex: none; width: 120px; aspect-ratio: 16 / 9; padding: 0; object-fit: cover; }
@@ -76,7 +76,7 @@
 .admin-crate .admin-list li:last-child { border-bottom: 0; }
 .admin-crate-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-bottom: 10px; }
 .admin-rename { display: flex; gap: 8px; margin: 0; }
-.admin-rename input { width: 18ch; min-width: 0; padding: 6px 10px; border: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); font: 800 22px/1 var(--display); text-transform: uppercase; }
+.admin-rename input { width: 18ch; min-width: 0; padding: 6px 10px; border: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); font: 800 22px/1 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 
 @media (max-width: 520px) {
   .admin-row { grid-template-columns: 1fr; }

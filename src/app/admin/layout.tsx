@@ -9,6 +9,7 @@ import { isAdmin } from "@/lib/auth";
 import { logout } from "./_actions/session";
 import { AdminTabs } from "./_components/AdminTabs";
 import { LoginForm } from "./_components/LoginForm";
+import { Arrow } from "@/components/layout/Arrow";
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
 
@@ -27,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <AdminTabs />
         <div className="admin-actions">
           <a className="btn" href="/" target="_blank">
-            View site ↗
+            View site <Arrow dir="out" />
           </a>
           <form action={logout}>
             <button className="btn">Sign out</button>

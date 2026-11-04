@@ -9,6 +9,7 @@ export function CopyEmail({ email }: { email: string }) {
     <button
       type="button"
       className="contact-email"
+      title="Click to copy"
       onClick={() =>
         navigator.clipboard?.writeText(email).then(() => {
           setCopied(true);

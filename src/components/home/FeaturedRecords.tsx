@@ -11,6 +11,7 @@ import { fitStyle } from "@/lib/format";
 import type { Project } from "@/lib/types";
 import { Cover } from "@/components/records/Cover";
 import { useOpenRecord } from "@/components/records/RecordPreview";
+import { Arrow } from "@/components/layout/Arrow";
 
 const SLOTS = [
   { label: "On now", modifier: "is-now" },
@@ -27,7 +28,7 @@ export function FeaturedRecords({ projects }: { projects: Project[] }) {
       <div className="featured-head">
         <span className="featured-title">Featured records</span>
         <a className="cap" href="#crate">
-          {featured.length} of {projects.length} · All records ↓
+          {featured.length} of {projects.length} · All records <Arrow dir="down" />
         </a>
       </div>
 

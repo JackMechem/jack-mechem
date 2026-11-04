@@ -7,10 +7,11 @@ import Image from "next/image";
 import { site } from "@/content/site";
 import type { Project } from "@/lib/types";
 import { FeaturedRecords } from "./FeaturedRecords";
+import { Arrow } from "@/components/layout/Arrow";
 
 export function Hero({ projects }: { projects: Project[] }) {
   return (
-    <section className="hero page-stop">
+    <section className="hero">
       {/* always dark, whatever the site theme */}
       <div className="hero-photo" data-theme="dark">
         <div className="halftone">
@@ -35,7 +36,7 @@ export function Hero({ projects }: { projects: Project[] }) {
           {site.hero} <span>{site.heroSub}</span>
         </p>
         <a href="#crate" className="cap">
-          Dig through the crate <span aria-hidden="true">↓</span>
+          Dig through the crate <Arrow dir="down" />
         </a>
       </div>
     </section>

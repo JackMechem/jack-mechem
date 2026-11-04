@@ -1,0 +1,52 @@
+/* ==========================================================================
+   Turntable: a record playing, with its sleeve propped up behind it.
+   Component: components/records/Turntable.tsx (case-study pages)
+
+   Drawn like the milk crate (styles/crate.css): flat --paper with --ink
+   outlines, no gradients or soft shadows, so it follows the theme like the
+   rest of the site. --w is the deck's width; everything is sized off it.
+   ========================================================================== */
+
+.turntable { --w: min(40vw, 540px, 58vh); position: relative; width: var(--w); height: calc(var(--w) * .98); }
+
+/* The sleeve, standing behind the deck and leaning back a little. */
+.turntable-sleeve {
+  position: absolute; top: 0; left: 50%; width: calc(var(--w) * .58); aspect-ratio: 1;
+  translate: -64% 0; rotate: -3deg; transform-origin: 50% 100%;
+  box-shadow: 7px 7px 0 color-mix(in srgb, var(--ink) 22%, transparent); /* a hard, printed shadow */
+}
+
+/* The deck: a top tilted back toward the sleeve, over a flat front edge. */
+.turntable-deck { position: absolute; left: 0; right: 0; bottom: 0; perspective: calc(var(--w) * 4); perspective-origin: 50% 0; }
+.turntable-top {
+  position: relative; width: 100%; aspect-ratio: 1.3; transform-origin: 50% 100%; transform: rotateX(64deg);
+  background: var(--paper); border: 2px solid var(--ink);
+}
+.turntable-front {
+  height: calc(var(--w) * .065); display: flex; align-items: center; justify-content: flex-end; padding: 0 3%;
+  background: var(--paper); border: 2px solid var(--ink); border-top-width: 1px;
+}
+.turntable-front .cap { font-size: max(9px, calc(var(--w) * .018)); opacity: .7; }
+
+/* Platter: a double ring just outside the record. Centred at (52, 50) of the 130 × 100 top. */
+.turntable-platter {
+  position: absolute; left: calc(7 / 130 * 100%); top: 5%; width: calc(90 / 130 * 100%); aspect-ratio: 1; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--ink); box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4px var(--ink);
+}
+.turntable-record {
+  position: absolute; left: calc(10 / 130 * 100%); top: 8%; width: calc(84 / 130 * 100%); aspect-ratio: 1;
+  box-shadow: none; /* the shared vinyl style adds a drop shadow; flat here */
+}
+
+/* Tonearm, buttons, slider and labels (SVG, in the plane of the top). */
+.turntable-hw { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.turntable-line { fill: none; stroke: var(--ink); stroke-width: .5; }
+.turntable-key { fill: var(--paper); stroke: var(--ink); stroke-width: .9; }
+.turntable-key.is-on { fill: var(--ink); }
+.turntable-tube { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: square; stroke-linejoin: miter; }
+.turntable-print { fill: var(--ink); font: 600 3px var(--text); letter-spacing: .35px; }
+.turntable-arm { transform-box: view-box; transform-origin: 110.5px 18px; transition: transform .7s cubic-bezier(.3,.7,.2,1); }
+
+@media (max-width: 980px) {
+  .turntable { --w: min(84vw, 440px); }
+}

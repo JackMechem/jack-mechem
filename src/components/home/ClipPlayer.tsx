@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { pad2 } from "@/lib/format";
 import type { Clip } from "@/lib/types";
 import { site } from "@/content/site";
+import { Arrow } from "@/components/layout/Arrow";
 
 export function ClipPlayer({ clips }: { clips: Clip[] }) {
   const video = useRef<HTMLVideoElement>(null);
@@ -67,7 +68,7 @@ export function ClipPlayer({ clips }: { clips: Clip[] }) {
                 Filmed by{" "}
                 {clip.creditUrl ? (
                   <a href={clip.creditUrl} target="_blank" rel="noopener noreferrer">
-                    {clip.credit} ↗
+                    {clip.credit} <Arrow dir="out" />
                   </a>
                 ) : (
                   clip.credit

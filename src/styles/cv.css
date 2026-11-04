@@ -6,7 +6,7 @@
 
 .cv { max-width: 1100px; margin: 0 auto; padding: 50px var(--pad) 80px; }
 .cv-head { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; padding-bottom: 20px; border-bottom: 3px solid var(--ink); }
-.cv-head h1 { margin: 0; font: 900 clamp(64px, 9vw, 130px)/.82 var(--display); text-transform: uppercase; }
+.cv-head h1 { margin: 0; font: 900 calc(clamp(64px, 9vw, 130px) / var(--dw))/.82 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 .cv-sub { margin: 12px 0 0; font-size: 18px; }
 .cv-contact { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 15px; }
 .cv-contact a { text-underline-offset: 3px; }
@@ -14,11 +14,11 @@
 
 /* each section: its title in a left column, entries on the right */
 .cv-section { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding: 30px 0; border-bottom: 1px solid color-mix(in srgb, var(--ink) 35%, transparent); }
-.cv-section h2 { margin: 0; font: 900 34px/1 var(--display); text-transform: uppercase; }
+.cv-section h2 { margin: 0; font: 900 34px/1 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 .cv-entries { display: grid; gap: 22px; }
 .cv-entry { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 18px; }
 .cv-when { padding-top: 6px; line-height: 1.4; opacity: .7; }
-.cv-entry h3 { margin: 0; font: 800 24px/1.05 var(--display); text-transform: uppercase; }
+.cv-entry h3 { margin: 0; font: 800 24px/1.05 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; }
 .cv-entry h3 a { text-decoration: none; }
 .cv-entry h3 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .cv-role { margin: 4px 0 6px; font-size: 15px; opacity: .8; }

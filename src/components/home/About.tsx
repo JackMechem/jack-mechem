@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { site } from "@/content/site";
 import { SectionHead } from "@/components/layout/SectionHead";
+import { Arrow } from "@/components/layout/Arrow";
 
 export function About() {
   const [lead, ...rest] = site.bio;
@@ -20,13 +21,13 @@ export function About() {
           ))}
           <div className="about-links">
             <Link className="btn solid" href="/cv">
-              View CV →
+              View CV <Arrow />
             </Link>
             <a className="btn" href={site.github} target="_blank" rel="noopener noreferrer">
-              GitHub ↗
+              GitHub <Arrow dir="out" />
             </a>
             <a className="btn" href={site.linkedin} target="_blank" rel="noopener noreferrer">
-              LinkedIn ↗
+              LinkedIn <Arrow dir="out" />
             </a>
           </div>
         </div>

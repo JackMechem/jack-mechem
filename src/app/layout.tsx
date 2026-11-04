@@ -4,17 +4,18 @@
  *
  * Dark is the default theme. The inline script below runs before the page
  * paints and applies a theme saved by the toggle, so there's no flash.
+ * <BootScreen> covers the page with a loading screen until it has loaded.
  */
 import "@/styles/index.css";
 import type { Metadata, Viewport } from "next";
-import { Big_Shoulders, Jost } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/content/site";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
+import { BootScreen } from "@/components/layout/Loader";
 
-// Display face (headings) and text face; exposed as CSS variables used in styles/base.css.
-const display = Big_Shoulders({ subsets: ["latin"], axes: ["opsz"], variable: "--font-display", display: "swap", adjustFontFallback: false });
-const text = Jost({ subsets: ["latin"], variable: "--font-text", display: "swap" });
+// Instrument Sans for everything: titles use its condensed width (--display-stretch in styles/base.css).
+const sans = Instrument_Sans({ subsets: ["latin"], axes: ["wdth"], variable: "--font-sans", display: "swap" });
 
 const themeScript = `try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
@@ -35,11 +36,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="dark" className={`${display.variable} ${text.variable}`} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={sans.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="grain">
+        <BootScreen />
         {children}
         <SpeedInsights />
       </body>

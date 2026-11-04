@@ -113,11 +113,11 @@ src/
 
   components/
     layout/                   TopBar, ThemeToggle, RecordMark (logo), SectionHead
-    records/                  the record pieces: Cover (sleeve), RecordLabel, Deck,
+    records/                  the record pieces: Cover (sleeve), RecordLabel, Turntable,
                                 Tracklist, CrateIcon, RecordPreview (gatefold overlay)
     home/                     one component per home section: Hero, FeaturedRecords,
                                 CrateBrowser, GigList, ClipPlayer, About, Contact,
-                                plus SectionPager (desktop scroll paging) and CopyEmail
+                                plus CopyEmail
     case-study/               ScreenshotViewer (screenshots + full-screen zoom)
     cv/                       PrintButton
 
@@ -161,9 +161,9 @@ Plain CSS, no framework. Everything is in `src/styles/`, one file per area, all 
 
 - **Class names are prefixed by area** (`.crate-…`, `.gatefold-…`, `.case-…`, `.admin-…`). To find a rule, search for the prefix.
 - **Two colours only:** `--paper` and `--ink`. Dark mode (the default) swaps them via `<html data-theme>`. Always use the variables, never hard-coded colours, so both themes keep working.
-- **Fonts:** Big Shoulders for display text (`--display`) and Jost for body text (`--text`), loaded in `app/layout.tsx`.
+- **Fonts:** Instrument Sans everywhere, loaded in `app/layout.tsx`. Titles (`--display`) use its condensed width: every title rule sets `font-stretch: var(--display-stretch)`, so add that line to any new title style. `--dw` (in `base.css`) scales the fluid title sizes to the face's width; if you change fonts, set it to the new face's width relative to the old one.
 - **Long titles:** add `className="fit"` and `style={fitStyle(text)}` (`lib/format.ts`). The text then shrinks to fit its column. Its container needs `container-type: inline-size` and the element sets `--fit-max`.
-- **Breakpoints:** `980px` (desktop ↔ tablet/phone layout) and `760px` (phone). Desktop scroll paging (`SectionPager`) only runs above 981×640.
+- **Breakpoints:** `980px` (desktop ↔ tablet/phone layout) and `760px` (phone). The crate and archive fill exactly one screen on desktops above 981×640.
 - **Motion:** every animation respects `prefers-reduced-motion`.
 
 ---

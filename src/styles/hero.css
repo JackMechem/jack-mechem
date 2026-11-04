@@ -23,7 +23,9 @@
 @keyframes hero-scan { from { top: -30%; } to { top: 100%; } }
 .hero-tags { position: absolute; top: 16px; left: 16px; display: flex; gap: 8px; }
 .hero-tags span { padding: 6px 8px; background: var(--ink); color: var(--paper); }
-.hero-name { position: absolute; left: var(--pad); bottom: 8px; margin: 0; font: 900 clamp(90px, 14.5vw, 260px)/.78 var(--display); letter-spacing: -.01em; text-transform: uppercase; }
+/* fade the bottom of the photo to solid dark so the name stays readable over the dots */
+.hero-photo::after { content: ""; position: absolute; inset: auto 0 0; height: 48%; background: linear-gradient(to bottom, transparent, var(--paper) 62%); pointer-events: none; }
+.hero-name { position: absolute; z-index: 1; left: var(--pad); bottom: 8px; margin: 0; font: 900 calc(clamp(90px, 14.5vw, 260px) / var(--dw))/.78 var(--display); font-stretch: var(--display-stretch); letter-spacing: -.01em; text-transform: uppercase; }
 
 /* ---- Pitch strip ------------------------------------------------------------ */
 .hero-strip { grid-column: 1 / -1; display: grid; grid-template-columns: 2fr 1fr; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
@@ -37,7 +39,7 @@
    a button: sleeve art with the record peeking out (left) and details (right). */
 .featured { display: flex; flex-direction: column; min-height: 0; container-type: inline-size; }
 .featured-head { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px var(--pad); background: var(--ink); color: var(--paper); }
-.featured-title { font: 900 clamp(22px, 2vw, 30px)/1 var(--display); letter-spacing: .02em; text-transform: uppercase; }
+.featured-title { font: 900 calc(clamp(22px, 2vw, 30px) / var(--dw))/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .02em; text-transform: uppercase; }
 .featured-head a { opacity: .8; text-decoration: none; white-space: nowrap; }
 .featured-head a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
 
@@ -72,7 +74,7 @@
 
 .featured-text { display: flex; flex-direction: column; justify-content: center; align-self: stretch; min-width: 0; container-type: inline-size; }
 .featured-meta { display: flex; justify-content: space-between; align-items: center; }
-.featured-name { display: block; margin: 8px 0 6px; font: 900 clamp(48px, 5.2vw, 88px)/.86 var(--display); text-transform: uppercase; --fit-max: clamp(36px, 3.6vw, 72px); }
+.featured-name { display: block; margin: 8px 0 6px; font: 900 calc(clamp(48px, 5.2vw, 88px) / var(--dw))/.86 var(--display); font-stretch: var(--display-stretch); text-transform: uppercase; --fit-max: clamp(36px, 3.6vw, 72px); }
 .featured-item.is-later .featured-name { --fit-max: clamp(32px, 3vw, 56px); }
 .featured-kind { display: block; max-width: 34ch; font-size: 14px; line-height: 1.35; }
 
@@ -88,9 +90,6 @@
 @media (max-width: 980px) {
   .hero { height: auto; grid-template-columns: minmax(0, 1fr); }
   .hero-photo { height: 72vh; border-right: 0; }
-  /* the name covers more of the photo here, so fade the bottom to solid dark to keep it readable */
-  .hero-photo::after { content: ""; position: absolute; inset: auto 0 0; height: 48%; background: linear-gradient(to bottom, transparent, var(--paper) 62%); pointer-events: none; }
-  .hero-name { z-index: 1; }
   .hero-strip { grid-template-columns: 1fr; }
   .hero-strip a { padding: 16px var(--pad); }
   .featured-item { flex: none; }

@@ -10,8 +10,10 @@
 :root {
   --paper: #ebe3d2;
   --ink: #100f0d;
-  --display: var(--font-display), Impact, "Arial Narrow", sans-serif; /* Big Shoulders: headings */
-  --text: var(--font-text), Futura, "Century Gothic", sans-serif;     /* Jost: body copy */
+  --display: var(--font-sans), "Arial Narrow", sans-serif; /* titles: Instrument Sans, condensed (below) */
+  --display-stretch: 75%;             /* titles' width; every title rule sets font-stretch from this */
+  --dw: .96;                          /* how wide the title face is vs the original Big Shoulders; fluid title sizes divide by it */
+  --text: var(--font-sans), system-ui, sans-serif;           /* body copy: Instrument Sans at normal width */
   --bar: 48px;                        /* height of the fixed top bar */
   --pad: clamp(14px, 2.2vw, 30px);    /* page side padding */
   color-scheme: light;
@@ -24,7 +26,7 @@ html {
   background: var(--paper);
   color: var(--ink);
   scroll-behavior: smooth;
-  font-variation-settings: "opsz" 72; /* Big Shoulders: use the display cut at every size */
+  scrollbar-gutter: stable; /* no layout jump when scrolling is locked (crate, record preview) */
 }
 body { margin: 0; font: 400 17px/1.5 var(--text); }
 main { padding-top: var(--bar); }
@@ -42,18 +44,26 @@ img { max-width: 100%; }
 /* Buttons: outlined by default, filled with .solid. */
 .btn {
   display: inline-block; padding: 10px 14px; border: 1px solid var(--ink); background: none; color: var(--ink);
-  font: 800 18px/1 var(--display); letter-spacing: .05em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+  font: 800 18px/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .05em; text-transform: uppercase; text-decoration: none; cursor: pointer;
 }
 .btn:hover, .btn.solid { background: var(--ink); color: var(--paper); }
 .btn.solid:hover { background: none; color: var(--ink); }
 
+/* SVG arrows (components/layout/Arrow.tsx): sized to the text, nudging toward where they point on hover. */
+.arrow { display: inline-block; flex: none; width: max(.9em, 14px); height: max(.9em, 14px); vertical-align: -.14em; transition: translate .2s ease; } /* never tiny next to the small caps labels */
+:is(a, button):hover > .arrow--right { translate: 3px 0; }
+:is(a, button):hover > .arrow--left { translate: -3px 0; }
+:is(a, button):hover > .arrow--down { translate: 0 3px; }
+:is(a, button):hover > .arrow--up { translate: 0 -3px; }
+:is(a, button):hover > .arrow--out { translate: 2px -2px; }
+
 /* Big display titles that must fit their column (project names can be long).
    The element's container must set `container-type: inline-size`; the
    component sets --len to the longest word via fitStyle() in lib/format.ts,
-   and each use sets --fit-max (its normal size). Big Shoulders caps run
-   about 0.5em per character, hence 190cqi / length.                       */
+   and each use sets --fit-max (its normal size). The sizes were set for caps
+   about 0.5em per character (190cqi / length); --dw corrects for the face.  */
 .fit {
-  font-size: min(var(--fit-max, 80px), calc(190cqi / var(--len, 8))) !important;
+  font-size: calc(min(var(--fit-max, 80px), calc(190cqi / var(--len, 8))) / var(--dw)) !important;
   line-height: .88 !important;
   overflow-wrap: anywhere;
   hyphens: manual;
