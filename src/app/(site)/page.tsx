@@ -3,7 +3,7 @@
  * components/home/.
  *
  *   Hero      photo, featured records, pitch
- *   Work      #crate    the record crates
+ *   Work      #crate    the record crates (or the shelf layout)
  *   Gigs      #gigs     upcoming gigs
  *   Archive   #archive  video clips (hidden when there are none)
  *   About     #about    bio + skills   ┐ one page stop
@@ -18,6 +18,8 @@ import { SectionHead } from "@/components/layout/SectionHead";
 import { RecordPreview } from "@/components/records/RecordPreview";
 import { Hero } from "@/components/home/Hero";
 import { CrateBrowser } from "@/components/home/CrateBrowser";
+import { RecordShelf } from "@/components/home/RecordShelf";
+import { WorkViewSwitch } from "@/components/home/WorkViewSwitch";
 import { GigList } from "@/components/home/GigList";
 import { ClipPlayer } from "@/components/home/ClipPlayer";
 import { About } from "@/components/home/About";
@@ -38,15 +40,32 @@ export default async function Home() {
     <RecordPreview projects={projects} sleeveIndex={sleeveIndex} crates={shelves.map((s) => s.projects.map((q) => q.slug))}>
       <Hero projects={projects} />
 
+      {/* Both layouts are rendered; styles/shelf.css shows the one picked with the switch. */}
       <section className="section" id="crate">
         <SectionHead
-          title={shelves.length > 1 ? "The crates" : "The crate"}
+          title="Work"
           caption={[
-            `${pad2(projects.length)} records${shelves.length > 1 ? ` in ${shelves.length} crates` : ""}`,
-            shelves.length > 1 ? "pick a crate · then scroll or use the arrows to flip" : "scroll or use the arrows to flip · click a record to open it",
+            `${pad2(projects.length)} projects${shelves.length > 1 ? ` in ${shelves.length} crates` : ""}`,
+            <>
+              <span className="work-only-crate">
+                {shelves.length > 1 ? "pick a crate · then scroll or use the arrows to flip" : "scroll or use the arrows to flip · click a record to open it"}
+              </span>
+              <span className="work-only-shelf">click a record to open it</span>
+            </>,
           ]}
-        />
-        {shelves.length > 0 && <CrateBrowser shelves={shelves} />}
+        >
+          <WorkViewSwitch />
+        </SectionHead>
+        {shelves.length > 0 && (
+          <>
+            <div className="work-only-crate">
+              <CrateBrowser shelves={shelves} />
+            </div>
+            <div className="work-only-shelf">
+              <RecordShelf shelves={shelves} />
+            </div>
+          </>
+        )}
       </section>
 
       <section className="section" id="gigs">

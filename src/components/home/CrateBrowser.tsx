@@ -16,7 +16,7 @@
  * Styles: styles/crate.css
  */
 import Link from "next/link";
-import { useCallback, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { fitStyle, pad2 } from "@/lib/format";
 import type { Shelf } from "@/lib/types";
@@ -27,11 +27,30 @@ import { useOpenRecord } from "@/components/records/RecordPreview";
 import { Arrow } from "@/components/layout/Arrow";
 
 /**
+ * How the crate looks:
+ * - "classic": records stepped up and back behind the front one; records
+ *   flipped past fold down out of view. (styles/crate.css)
+ * - "real": a 3D milk crate seen from above, sleeves packed upright inside;
+ *   flipping tips one record forward at a time, opening a gap onto the next
+ *   one's cover, like flipping through a crate in a shop. (styles/crate-real.css)
+ */
+const CRATE_LOOK: "classic" | "real" = "real";
+/** "real" look: short crates are padded out with blank sleeves at the back so they look full. */
+const CRATE_FILL = 12;
+/** "real" look: shades of the blank sleeves (% ink mixed into paper), so their edges have rhythm. */
+const FILLER_TONES = ["14%", "72%", "30%", "90%", "48%", "8%", "62%", "22%"];
+
+/** The records shown in a crate on the picker: classic shows the first five, real shows them all. */
+const pickerRecords = (s: Shelf) => (CRATE_LOOK === "real" ? s.projects : s.projects.slice(0, 5));
+/** How many sleeves a crate of `records` records holds (records + blank fillers). */
+const sleeveCount = (records: number) => (CRATE_LOOK === "real" ? Math.max(records, CRATE_FILL) : records);
+
+/**
  * Where record `i` sits when record `front` is at the front: records behind it
  * step up and back; records already flipped past fold down out of view.
  * `lifted` raises a record behind the front one a little, one corner first, when hovered.
  */
-function recordPosition(i: number, front: number, lifted: boolean): CSSProperties {
+function classicPosition(i: number, front: number, lifted: boolean): CSSProperties {
   const depth = i - front;
   if (depth < 0)
     return {
@@ -51,6 +70,69 @@ function recordPosition(i: number, front: number, lifted: boolean): CSSPropertie
     pointerEvents: depth > 4 ? "none" : undefined,
     filter: `brightness(${1 - depth * 0.1})`,
   };
+}
+
+/**
+ * The same for the "real" crate, in record widths from the middle of the crate
+ * floor (the crate runs from z = +.5, the front wall, to -.5, the back wall).
+ * Records from `front` on are packed against the back wall, leaning back on
+ * it; records flipped past are packed against the front wall, tipped forward
+ * over it. Each record's spot depends only on which side of the gap it is on,
+ * so a flip moves just the one record across.
+ */
+function realPosition(i: number, front: number, total: number, lifted: boolean): CSSProperties {
+  const gap = Math.min(0.04, 0.5 / total); // sleeve spacing
+  const past = i < front;
+  const z = past ? 0.18 - i * gap : -0.42 + (total - 1 - i) * gap;
+  const lean = past ? -38 : 10; // 38°: the frontmost record rests on the front wall's top edge
+  // hovered: slide up out of the stack, one corner first (in the record's own plane, so it never cuts its neighbours)
+  const lift = lifted && i > front ? 8 : 0;
+  const twist = lift ? (i % 2 ? 3 : -3) : 0;
+  return {
+    transform: `translateX(-50%) translateZ(calc(var(--rec) * ${z})) rotateX(${lean}deg) translateY(${-lift}%) rotateZ(${twist}deg)`,
+    filter: `brightness(${past ? 0.62 : Math.max(0.45, 1 - (i - front) * 0.07)})`,
+  };
+}
+
+const recordPosition = (i: number, front: number, total: number, lifted: boolean) =>
+  CRATE_LOOK === "real" ? realPosition(i, front, total, lifted) : classicPosition(i, front, lifted);
+
+/**
+ * What the records sit in. Classic: the front panel. Real: a 3D box (floor,
+ * walls, the front panel) with blank sleeves packed in behind the records.
+ */
+function CrateBox({ name, records, front, children }: { name: string; records: number; front: number; children: ReactNode }) {
+  const panel = (
+    <span className="crate-front" aria-hidden="true">
+      <span>{name}</span>
+    </span>
+  );
+  if (CRATE_LOOK === "classic")
+    return (
+      <>
+        {panel}
+        {children}
+      </>
+    );
+  const total = sleeveCount(records);
+  return (
+    <span className="crate-scene">
+      <span className="crate-wall is-floor" aria-hidden="true" />
+      <span className="crate-wall is-back" aria-hidden="true" />
+      <span className="crate-wall is-left" aria-hidden="true" />
+      <span className="crate-wall is-right" aria-hidden="true" />
+      {children}
+      {Array.from({ length: total - records }, (_, k) => (
+        <span
+          key={k}
+          className="crate-record crate-filler"
+          aria-hidden="true"
+          style={{ ...recordPosition(records + k, front, total, false), "--i": 5, "--tone": FILLER_TONES[k % FILLER_TONES.length] } as CSSProperties}
+        />
+      ))}
+      {panel}
+    </span>
+  );
 }
 
 // The page's query string (?crate=…&record=…), read on the client only.
@@ -130,15 +212,14 @@ export function CrateBrowser({ shelves }: { shelves: Shelf[] }) {
       <div className="crate-picker">
         {shelves.map((s, i) => (
           <button key={s.id} type="button" className="crate-pick" onClick={() => openShelf(i)} aria-label={`Open the ${s.name} crate, ${s.projects.length} records`}>
-            <span className="crate" style={i === morphing ? { viewTransitionName: "crate" } : undefined} aria-hidden="true">
-              {s.projects.slice(0, 5).map((q, k) => (
-                <span key={q.slug} className="crate-record" style={{ ...recordPosition(k, 0, false), "--i": k } as CSSProperties}>
-                  <Cover project={q} index={k} sizes="260px" />
-                </span>
-              ))}
-              <span className="crate-front">
-                <span>{s.name}</span>
-              </span>
+            <span className={`crate crate--${CRATE_LOOK}`} style={i === morphing ? { viewTransitionName: "crate" } : undefined} aria-hidden="true">
+              <CrateBox name={s.name} records={pickerRecords(s).length} front={0}>
+                {pickerRecords(s).map((q, k) => (
+                  <span key={q.slug} className="crate-record" style={{ ...recordPosition(k, 0, sleeveCount(s.projects.length), false), "--i": k } as CSSProperties}>
+                    <Cover project={q} index={k} sizes="260px" />
+                  </span>
+                ))}
+              </CrateBox>
             </span>
             <span className="crate-pick-label">
               {s.name}
@@ -195,7 +276,7 @@ export function CrateBrowser({ shelves }: { shelves: Shelf[] }) {
         )}
 
         <div
-          className="crate"
+          className={`crate crate--${CRATE_LOOK}`}
           key={shelf.id}
           ref={crateRef}
           style={{ viewTransitionName: "crate" }}
@@ -237,32 +318,30 @@ export function CrateBrowser({ shelves }: { shelves: Shelf[] }) {
             </button>
           </div>
 
-          <div className="crate-front" aria-hidden="true">
-            <span>{shelf.name}</span>
-          </div>
-
-          {projects.map((q, i) => (
-            <button
-              key={q.slug}
-              type="button"
-              className="crate-record"
-              style={{ ...recordPosition(i, front, hovered === i), "--i": Math.min(i, 5) } as CSSProperties}
-              tabIndex={-1}
-              aria-label={i === front ? `${q.name}: open record` : `Flip to ${q.name}`}
-              onClick={() => {
-                if (justSwiped.current) {
-                  justSwiped.current = false;
-                  return;
-                }
-                if (i === front) openRecord(q.slug);
-                else go(i);
-              }}
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              <Cover project={q} index={i} />
-            </button>
-          ))}
+          <CrateBox name={shelf.name} records={projects.length} front={front}>
+            {projects.map((q, i) => (
+              <button
+                key={q.slug}
+                type="button"
+                className="crate-record"
+                style={{ ...recordPosition(i, front, sleeveCount(projects.length), hovered === i), "--i": Math.min(i, 5) } as CSSProperties}
+                tabIndex={-1}
+                aria-label={i === front ? `${q.name}: open record` : `Flip to ${q.name}`}
+                onClick={() => {
+                  if (justSwiped.current) {
+                    justSwiped.current = false;
+                    return;
+                  }
+                  if (i === front) openRecord(q.slug);
+                  else go(i);
+                }}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                <Cover project={q} index={i} />
+              </button>
+            ))}
+          </CrateBox>
         </div>
       </div>
     </div>

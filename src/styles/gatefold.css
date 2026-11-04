@@ -14,9 +14,12 @@
 .preview.is-open { visibility: visible; transition-delay: 0s; }
 .preview-backdrop { position: absolute; inset: 0; background: var(--paper); opacity: 0; transition: opacity .35s; }
 .preview.is-open .preview-backdrop { opacity: .97; }
-.preview-stage { position: relative; width: 100%; max-height: 100vh; overflow: hidden auto; /* the record slides out past the right edge */ display: grid; place-items: center; padding: 56px 12px 40px; }
+/* dvh: on phones 100vh is the height with the address bar hidden, so with it showing the
+   stage would be taller than the screen and centring would push its top up under "close" */
+.preview-stage { position: relative; z-index: 0; width: 100%; max-height: 100vh; max-height: 100dvh; overflow: hidden auto; /* the record slides out past the right edge */ display: grid; place-items: center; padding: 56px 12px 40px; }
+/* on a backing of its own, so it stays readable when the light sleeve scrolls under it */
 .preview-close {
-  position: fixed; top: 18px; right: 22px; z-index: 20; border: 0; background: none; cursor: pointer;
+  position: fixed; top: 12px; right: 14px; z-index: 20; padding: 8px 10px; border: 1px solid currentColor; background: var(--paper); color: var(--ink); cursor: pointer;
   font: 600 13px/1 var(--text); letter-spacing: .12em; text-transform: uppercase;
 }
 

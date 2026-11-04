@@ -9,7 +9,9 @@
  *   first/last record. The crate keeps the gesture until it ends (momentum
  *   included), even if the pointer drifts off as records move under it.
  *   A gesture that starts while the page is scrolling (in the last STILL_MS)
- *   belongs to the page, so scrolling past the crate never gets caught on it.
+ *   belongs to the page, so scrolling past the crate never gets caught on it,
+ *   unless the pointer has really moved onto the crate (AIM pixels): then the
+ *   visitor is aiming at it, and it takes the gesture straight away.
  *   Gestures come from wheelGesture (lib/wheel.ts).
  *   Blocking wheel events isn't enough in every browser (Firefox scrolls
  *   trackpad momentum off the main thread), so while the crate owns a
@@ -25,6 +27,7 @@ import { wheelGesture, wheelPixels } from "@/lib/wheel";
 const HOT = ".crate-record, .crate-front"; // the parts of the crate that capture scrolling
 const STEP = 180; // wheel pixels per record after the first
 const STILL_MS = 300; // the page must have stopped scrolling this long before the crate takes a gesture
+const AIM = 8; // pixels the pointer must travel over the crate to claim a gesture while the page is moving
 const UNLOCK_AFTER = 300; // ms of wheel quiet before the page can scroll again
 const SWIPE = 45; // touch pixels per record
 
@@ -74,6 +77,19 @@ export function useCrateGestures({ crate, front, last, setFront, resetKey }: Opt
     const onScroll = () => {
       lastPageScroll = performance.now();
     };
+    // How far the pointer has really moved over the crate. Browsers send pointer
+    // events when the page scrolls under a still pointer too; those don't move it.
+    let aimed = 0;
+    let lastX = NaN;
+    let lastY = NaN;
+    const onPointerMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return;
+      const moved = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+      lastX = e.clientX;
+      lastY = e.clientY;
+      if (!el.contains(e.target as Node) || !onHot(e.target)) aimed = 0;
+      else if (moved) aimed += moved; // NaN-safe: the first event has nothing to compare to
+    };
     // keep the page locked until the owned gesture has gone quiet
     const unlockLater = () => {
       clearTimeout(unlockTimer);
@@ -87,9 +103,11 @@ export function useCrateGestures({ crate, front, last, setFront, resetKey }: Opt
       const gesture = wheelGesture(e);
       if (e.ctrlKey) return;
       const now = performance.now();
+      const overCrate = el.contains(e.target as Node) && onHot(e.target);
+      if (!overCrate) aimed = 0; // (Firefox sends no pointer event when the page scrolls the crate away)
       if (gesture.id !== owned) {
-        const startsHere = gesture.start && el.contains(e.target as Node) && onHot(e.target);
-        if (!startsHere || now - lastPageScroll < STILL_MS) return; // the page's
+        const pageMoving = now - lastPageScroll < STILL_MS;
+        if (!gesture.start || !overCrate || (pageMoving && aimed < AIM)) return; // the page's
         owned = gesture.id;
         flipped = false;
         distance = 0;
@@ -136,10 +154,12 @@ export function useCrateGestures({ crate, front, last, setFront, resetKey }: Opt
     el.addEventListener("touchstart", onTouchStart, { passive: true });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("pointermove", onPointerMove, { passive: true });
     return () => {
       clearTimeout(unlockTimer);
       root.classList.remove("crate-scroll-lock");
       removeEventListener("scroll", onScroll);
+      removeEventListener("pointermove", onPointerMove);
       removeEventListener("wheel", onWheel, { capture: true });
       el.removeEventListener("touchstart", onTouchStart);
       el.removeEventListener("touchmove", onTouchMove);

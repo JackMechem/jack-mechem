@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Crate, "real" look: a 3D milk crate seen from above, the sleeves packed
+   upright inside. Only applies when CRATE_LOOK = "real" in
+   components/home/CrateBrowser.tsx (which also places every record: see
+   realPosition there). Everything is sized off --rec, the record width.
+   ========================================================================== */
+
+.crate--real { perspective: calc(var(--rec) * 3.4); perspective-origin: 50% 25%; --rec: min(56cqh, 58cqw, 580px); }
+
+/* The crate's floor, centre: every wall and sleeve is placed in 3D from here.
+   Tipped toward you so you look down into the crate. */
+.crate-scene {
+  position: absolute; left: 50%; bottom: calc(var(--rec) * .44);
+  transform-style: preserve-3d; transform: rotateX(-24deg);
+}
+.crate--real .crate-record { bottom: 0; }
+
+/* ---- The box: floor, back, sides (mesh between two rails), front ---- */
+.crate-wall, .crate--real .crate-front {
+  position: absolute; left: 50%; bottom: 0; box-sizing: border-box;
+  width: calc(var(--rec) * 1.12); height: calc(var(--rec) * .4); transform-origin: 50% 100%;
+  border: 2px solid var(--ink); background: var(--paper);
+}
+.crate-wall.is-floor { height: var(--rec); transform: translateX(-50%) translateY(50%) rotateX(90deg); transform-origin: 50% 50%; }
+.crate-wall.is-back { transform: translateX(-50%) translateZ(calc(var(--rec) * -.5)); }
+.crate-wall.is-left, .crate-wall.is-right { width: var(--rec); }
+.crate-wall.is-left { transform: translateX(-50%) translateX(calc(var(--rec) * -.56)) rotateY(90deg); }
+.crate-wall.is-right { transform: translateX(-50%) translateX(calc(var(--rec) * .56)) rotateY(90deg); }
+/* the sides are see-through mesh between a top and bottom rail */
+.crate-wall.is-left, .crate-wall.is-right, .crate--real .crate-front {
+  --mesh: color-mix(in srgb, var(--ink) 45%, transparent);
+  background:
+    linear-gradient(var(--ink), var(--ink)) 0 24% / 100% 2px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) 0 82% / 100% 2px no-repeat,
+    linear-gradient(var(--paper), var(--paper)) top / 100% 24% no-repeat,
+    linear-gradient(var(--paper), var(--paper)) bottom / 100% 18% no-repeat,
+    repeating-linear-gradient(45deg, transparent 0 calc(var(--rec) * .028), var(--mesh) 0 calc(var(--rec) * .028 + 1px)),
+    repeating-linear-gradient(-45deg, transparent 0 calc(var(--rec) * .028), var(--mesh) 0 calc(var(--rec) * .028 + 1px));
+}
+/* hand-holds cut into the sides' top rail */
+.crate-wall.is-left::before, .crate-wall.is-right::before {
+  content: ""; position: absolute; left: 36%; right: 36%; top: 5%; height: 12%; border: 2px solid var(--ink); border-radius: 999px;
+}
+
+/* the front: the same mesh, with the crate's name on a plate on the top rail */
+.crate--real .crate-front {
+  z-index: auto; padding: 0; align-items: flex-start;
+  transform: translateX(-50%) translateZ(calc(var(--rec) * .5));
+}
+.crate--real .crate-front::before, .crate--real .crate-front::after { content: none; }
+.crate--real .crate-front span {
+  margin: calc(var(--rec) * .018) 0 0; padding: calc(var(--rec) * .01) calc(var(--rec) * .03);
+  border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+  font-size: calc(calc(var(--rec) * .034) / var(--dw)); letter-spacing: .24em;
+}
+
+/* ---- Blank sleeves packed in behind the records, so a short crate still looks full ---- */
+.crate-filler {
+  box-sizing: border-box; cursor: default;
+  background: color-mix(in srgb, var(--ink) var(--tone), var(--paper));
+  border: 1px solid color-mix(in srgb, var(--ink) 40%, var(--paper));
+}
+
+/* the picker: the records rise a little less, since they're already standing up */
+.crate-pick .crate--real { perspective-origin: 50% 10%; }
+.crate-pick:hover .crate--real .crate-record, .crate-pick:focus-visible .crate--real .crate-record { bottom: calc(var(--rec) * .14); }
+.crate-pick:hover .crate--real .crate-filler, .crate-pick:focus-visible .crate--real .crate-filler { bottom: 0; }
+
+/* phones: the open crate is as wide as the screen allows, so make its frame only as tall as it needs
+   (the picker's crates fill their grid cells instead) */
+@media (max-width: 760px) {
+  .crate-browser .crate--real { height: calc(100vw + 44px); }
+}

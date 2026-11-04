@@ -19,7 +19,6 @@ export function Hero({ projects }: { projects: Project[] }) {
         </div>
         <div className="hero-scanline" />
         <div className="hero-tags cap">
-          <span>● Live</span>
           <span>{site.location}</span>
         </div>
         <h1 className="hero-name">

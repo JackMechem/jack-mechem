@@ -12,6 +12,8 @@
 @import "./turntable.css";   /* case studies: the record playing on a turntable */
 @import "./hero.css";        /* home: hero photo + featured records */
 @import "./crate.css";       /* home: work crates */
+@import "./crate-real.css";  /* home: work crates, "real" 3D look (CRATE_LOOK in CrateBrowser.tsx) */
+@import "./shelf.css";       /* home: work, "shelf" layout + the Crate / Shelf switch */
 @import "./music.css";       /* home: gigs + archive video player */
 @import "./about.css";       /* home: about + contact */
 @import "./gatefold.css";    /* record preview overlay */

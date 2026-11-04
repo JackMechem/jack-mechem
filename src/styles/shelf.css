@@ -1,0 +1,59 @@
+/* ==========================================================================
+   Work section, "shelf" layout: every record face-out on a ledge, one shelf
+   per crate. Also the Crate / Shelf switch, and the rules that show only the
+   chosen layout (both are on the page).
+   Components: components/home/RecordShelf.tsx, components/home/WorkViewSwitch.tsx
+   ========================================================================== */
+
+/* <html data-work-view="shelf"> (set by the switch) shows the shelf; anything else, the crate */
+.work-only-crate, .work-only-shelf { display: contents; }
+html[data-work-view="shelf"] .work-only-crate, html:not([data-work-view="shelf"]) .work-only-shelf { display: none; }
+html[data-work-view="shelf"] #crate { height: auto; } /* the crate fills one screen; the shelf is as tall as it needs */
+
+/* ---- The switch, above the section caption ---- */
+.section-head-side { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; min-width: 0; }
+.work-switch { display: flex; border: 1px solid currentColor; }
+.work-switch button {
+  all: unset; cursor: pointer; padding: 9px 16px 7px;
+  font: 800 18px/1 var(--display); font-stretch: var(--display-stretch); letter-spacing: .04em; text-transform: uppercase;
+}
+.work-switch button + button { border-left: 1px solid currentColor; }
+.work-switch button:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
+.work-switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.work-switch button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* ---- The shelves: the crate's name on the left, its records on a ledge ---- */
+.shelf-row { display: grid; grid-template-columns: minmax(200px, 18%) 1fr; border-bottom: 1px solid var(--ink); }
+.shelf-row:last-child { border-bottom: 0; }
+.shelf-name {
+  display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 30px var(--pad); border-right: 1px solid var(--ink);
+  font: 800 calc(clamp(24px, 2.2vw, 34px) / var(--dw))/.95 var(--display); font-stretch: var(--display-stretch); letter-spacing: .02em; text-transform: uppercase;
+}
+.shelf-name .cap { opacity: .65; }
+.shelf-records { display: flex; flex-wrap: wrap; row-gap: 34px; margin: 0; padding: 34px var(--pad) 40px; list-style: none; }
+/* each record brings its own stretch of ledge (the thick line under it), so a row of them makes one shelf */
+.shelf-records li { flex: none; padding: 0 12px; border-bottom: 5px solid var(--ink); box-shadow: 0 14px 18px -14px #000a; }
+.shelf-record {
+  all: unset; cursor: pointer; position: relative; display: block; width: clamp(130px, 10.5vw, 210px); aspect-ratio: 1;
+  transform-origin: 50% 100%; transition: transform .35s cubic-bezier(.2,.8,.2,1);
+}
+/* hovered: tips forward off the ledge a little, like reaching for it */
+.shelf-record:hover { transform: translateY(-10px) rotate(-1.5deg); }
+.shelf-record:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+
+@media (max-width: 980px) {
+  .section-head-side { align-items: flex-start; }
+  /* the header band is inverted here */
+  .work-switch button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+}
+@media (max-width: 760px) {
+  .shelf-row { grid-template-columns: 1fr; }
+  .shelf-name { flex-direction: row; justify-content: space-between; align-items: baseline; padding: 18px var(--pad) 0; border-right: 0; }
+  /* one long shelf per crate that scrolls sideways */
+  .shelf-records {
+    flex-wrap: nowrap; overflow-x: auto; padding: 22px var(--pad) 30px;
+    scroll-snap-type: x proximity; scroll-padding-inline: var(--pad); scrollbar-width: none;
+  }
+  .shelf-records li { scroll-snap-align: start; padding: 0 8px; }
+  .shelf-record { width: 46vw; }
+}

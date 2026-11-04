@@ -44,7 +44,7 @@
 }
 .crate-pick:last-child { border-right: 0; }
 .crate-pick .crate { display: block; height: 100%; min-height: 0; perspective-origin: 50% 20%; }
-.crate-pick .crate-record { cursor: inherit; transition: transform .7s cubic-bezier(.2,.8,.2,1), bottom .45s cubic-bezier(.2,.8,.2,1) calc(var(--i, 0) * 35ms); }
+.crate-pick .crate-record { cursor: inherit; touch-action: auto; /* swipes on the picker scroll the page */ transition: transform .7s cubic-bezier(.2,.8,.2,1), bottom .45s cubic-bezier(.2,.8,.2,1) calc(var(--i, 0) * 35ms); }
 .crate-pick:hover .crate-record, .crate-pick:focus-visible .crate-record { bottom: calc(var(--rec) * .2); } /* records rise out of the crate */
 .crate-pick-label {
   display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px var(--pad);
@@ -120,6 +120,10 @@ html.crate-scroll-lock { overflow: hidden; }
 /* ---- Desktop: the section fills exactly one screen ---- */
 @media (min-width: 981px) and (min-height: 640px) {
   #crate { display: flex; flex-direction: column; height: calc(100vh - var(--bar)); }
+  /* ...but no taller than the crates need: they're sized by the window's width as well as
+     its height, so in a tall, narrow window they'd sit at the bottom of a lot of empty space */
+  #crate:has(.crate-picker) { height: min(calc(100vh - var(--bar)), calc(31vw + 360px)); }
+  #crate:has(.crate-browser) { height: min(calc(100vh - var(--bar)), calc(52vw + 300px)); }
   #crate .section-head { padding-top: 40px; }
   #crate .crate-browser, #crate .crate-picker { flex: 1; min-height: 0; }
 }
@@ -132,7 +136,7 @@ html.crate-scroll-lock { overflow: hidden; }
   .crate { height: min(70vh, 125vw); }
   .crate-tabs button { flex: 1 1 auto; justify-content: space-between; padding: 9px 11px 7px; font-size: 17px; }
   .crate-tabs .crate-back { flex: 1 0 100%; padding: 6px 0; }
-  .crate-picker { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); grid-auto-rows: min(88vw, 420px); min-height: 0; }
+  .crate-picker { grid-template-columns: 1fr; grid-auto-rows: min(88vw, 420px); min-height: 0; } /* one crate per row: side by side they end up uneven */
   .crate-pick { border-right: 0; border-bottom: 1px solid var(--ink); }
   .crate-pick:last-child { border-bottom: 0; }
 }

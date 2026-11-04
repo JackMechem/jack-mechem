@@ -5,6 +5,7 @@
  * Styles: styles/records.css (.cover-…)
  */
 import Image from "next/image";
+import { fitStyle } from "@/lib/format";
 import type { Project } from "@/lib/types";
 
 /** Sleeve screenshots: true = full colour, false = black-and-white halftone print. */
@@ -44,7 +45,7 @@ export function Cover({ project: p, index, sizes = "420px" }: Props) {
                 <div key={s}>{s}</div>
               ))}
             </div>
-            <div className="cover-type" aria-hidden="true">
+            <div className="cover-type" style={fitStyle(p.name)} aria-hidden="true">
               <span>{p.name}</span>
               <span>{p.name}</span>
               <span>{p.name}</span>
