@@ -48,6 +48,9 @@
 .player-list img, .player-list video { display: block; width: 104px; aspect-ratio: 16 / 9; object-fit: cover; background: #000; pointer-events: none; }
 .player-list b { display: block; font: 800 20px/1 var(--display); text-transform: uppercase; }
 .player-list small { display: block; margin-top: 4px; opacity: .7; }
+/* the "more coming soon" card: same shape as a clip card, dashed and not clickable */
+.player-soon { display: grid; grid-template-columns: 104px 1fr; align-items: center; gap: 12px; padding: 8px; border: 1px dashed var(--ink); opacity: .75; }
+.player-soon-tape { width: 104px; aspect-ratio: 16 / 9; border: 1px dashed var(--ink); background: repeating-linear-gradient(-45deg, transparent 0 6px, color-mix(in srgb, var(--ink) 14%, transparent) 6px 7px); }
 
 /* ---- Desktop: the archive fills one screen; the video takes the leftover height ---- */
 @media (min-width: 981px) and (min-height: 640px) {

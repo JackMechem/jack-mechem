@@ -3,6 +3,7 @@
 /**
  * The Archive video player: the current clip with its title, venue/date and
  * "Filmed by" credit printed over it, and a row of cards to switch clips.
+ * The list ends with a "more coming soon" card (site.archiveSoon).
  * Clips (edited in /admin/clips) autoplay muted while on screen — browsers
  * block autoplay with sound — and the Sound on button unmutes.
  * Styles: styles/music.css (.player-…)
@@ -10,6 +11,7 @@
 import { useEffect, useRef, useState } from "react";
 import { pad2 } from "@/lib/format";
 import type { Clip } from "@/lib/types";
+import { site } from "@/content/site";
 
 export function ClipPlayer({ clips }: { clips: Clip[] }) {
   const video = useRef<HTMLVideoElement>(null);
@@ -98,6 +100,16 @@ export function ClipPlayer({ clips }: { clips: Clip[] }) {
             </button>
           </li>
         ))}
+        {site.archiveSoon && (
+          <li className="player-soon">
+            <span className="player-soon-tape" aria-hidden="true" />
+            <span>
+              <span className="cap">{pad2(clips.length + 1)}</span>
+              <b>{site.archiveSoon.title}</b>
+              <small>{site.archiveSoon.text}</small>
+            </span>
+          </li>
+        )}
       </ul>
     </div>
   );

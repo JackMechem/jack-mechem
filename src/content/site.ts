@@ -21,6 +21,8 @@ export const site = {
   heroSub: "CS student at CSUN, looking for internships. I also play drums.",
   /** last item in the top-bar ticker */
   status: "Looking for internships",
+  /** a card after the Archive clips; set to null to hide it */
+  archiveSoon: { title: "More coming soon", text: "Clips from recent shows are on the way." } as { title: string; text: string } | null,
 
   /** About section: the first paragraph is shown larger */
   bio: [
