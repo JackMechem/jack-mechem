@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- a record whose label is a terminal prompt: >_  (the label is cut out, so it shows whatever is behind it)
+       Flips with the browser theme so it shows on any tab bar. -->
+  <style>
+    .f { fill: #100f0d; } .s { fill: none; stroke: #100f0d; }
+    @media (prefers-color-scheme: dark) { .f { fill: #ebe3d2; } .s { stroke: #ebe3d2; } }
+  </style>
+  <path class="f" fill-rule="evenodd" d="M1 32a31 31 0 1 0 62 0a31 31 0 1 0 -62 0Z M15 32a17 17 0 1 0 34 0a17 17 0 1 0 -34 0Z"/>
+  <path class="s" stroke-width="3.8" stroke-linecap="square" d="M22 25 L28 31 L22 37 M31 39 H42"/>
+</svg>

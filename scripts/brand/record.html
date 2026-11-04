@@ -1,0 +1,14 @@
+<!doctype html>
+<!-- App icon: the record + prompt mark, cream on an ink square. ?size=180 ; ?pad=0.12 -->
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #100f0d; }
+  .icon { width: var(--s); height: var(--s); display: grid; place-items: center; background: #100f0d; }
+  svg { width: calc(var(--s) * (1 - 2 * var(--pad))); height: auto; display: block; }
+</style></head>
+<body><div class="icon"><svg viewBox="0 0 64 64"><path fill="#ebe3d2" fill-rule="evenodd" d="M1 32a31 31 0 1 0 62 0a31 31 0 1 0 -62 0Z M15 32a17 17 0 1 0 34 0a17 17 0 1 0 -34 0Z"/><path fill="none" stroke="#ebe3d2" stroke-width="3.8" stroke-linecap="square" d="M22 25 L28 31 L22 37 M31 39 H42"/></svg></div>
+<script>
+  const q = new URLSearchParams(location.search);
+  document.documentElement.style.setProperty("--s", (q.get("size") || 180) + "px");
+  document.documentElement.style.setProperty("--pad", q.get("pad") || 0.12);
+</script></body></html>

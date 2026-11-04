@@ -1,0 +1,25 @@
+<!doctype html>
+<!-- Link preview card, 1200×630 -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,900&family=Jost:wght@400;600&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; }
+  .card { width: 1200px; height: 630px; position: relative; overflow: hidden; background: #100f0d; color: #ebe3d2; font-family: Jost, sans-serif; }
+  .card::after { content: ""; position: absolute; inset: 0; opacity: .1; mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .bar { position: absolute; top: 0; left: 0; right: 0; height: 58px; border-bottom: 2px solid #ebe3d2; display: flex; align-items: center; }
+  .bar .on { height: 100%; display: flex; align-items: center; gap: 10px; padding: 0 22px; border-right: 2px solid #ebe3d2; font: 600 16px/1 Jost; letter-spacing: .16em; }
+  .bar .on i { width: 12px; height: 12px; border-radius: 50%; background: #ebe3d2; }
+  .bar span { padding: 0 24px; font: 400 19px/1 Jost; opacity: .85; }
+  .bar span b { font-weight: 600; }
+  h1 { position: absolute; left: 52px; bottom: 150px; margin: 0; font: 900 196px/.8 "Big Shoulders"; font-variation-settings: "opsz" 72; text-transform: uppercase; letter-spacing: -.005em; }
+  p { position: absolute; left: 56px; bottom: 58px; margin: 0; width: 640px; font: 400 27px/1.3 Jost; }
+  p span { opacity: .6; }
+  .mark { position: absolute; right: -120px; top: 75px; width: 600px; height: 600px; }
+</style></head>
+<body><div class="card">
+  <div class="bar"><div class="on"><i></i>ON AIR</div><span><b>Fermata</b>: a DAW written from scratch in Rust</span><span><b>Soniroll</b>: free practice tools</span></div>
+  <svg class="mark" viewBox="0 0 64 64"><path fill="#ebe3d2" fill-rule="evenodd" d="M1 32a31 31 0 1 0 62 0a31 31 0 1 0 -62 0Z M15 32a17 17 0 1 0 34 0a17 17 0 1 0 -34 0Z"/><path fill="none" stroke="#ebe3d2" stroke-width="3.8" stroke-linecap="square" d="M22 25 L28 31 L22 37 M31 39 H42"/></svg>
+  <h1>Jack<br>Mechem</h1>
+  <p>Real-time audio software and developer tools in Rust and TypeScript. <span>CS at CSUN · drummer</span></p>
+</div></body></html>

@@ -1,0 +1,540 @@
+{
+  "crates": [
+    "Audio & music",
+    "Linux & systems",
+    "Web & client work"
+  ],
+  "projects": [
+    {
+      "slug": "fermata",
+      "name": "Fermata",
+      "cat": "FMT-001",
+      "years": "2026 –",
+      "kind": "Digital audio workstation",
+      "stack": [
+        "Rust",
+        "Tauri 2",
+        "React",
+        "TypeScript"
+      ],
+      "summary": "A Logic Pro–style DAW built from scratch. The Rust audio engine never waits on a lock, independent tracks run on a pool of real-time threads, and it hosts VST3 plug-ins.",
+      "image": "/projects/fermata.png",
+      "imageNote": "Fermata's project site (app screenshots to come)",
+      "sideA": [
+        "Lock-free audio thread",
+        "Real-time thread pool",
+        "VST3 host, scanned out of process",
+        "Take-folder comping",
+        "Piano roll with 8 tools",
+        "Drum step sequencer"
+      ],
+      "sideB": [
+        "8-band channel EQ, 8 sends",
+        "5 automation modes",
+        "6 synths, 32 FM algorithms",
+        "16 effects",
+        "Linux, Windows & macOS builds",
+        "Crash-safe takes, atomic saves"
+      ],
+      "links": [
+        {
+          "label": "Project site",
+          "href": "https://jackmechem.github.io/fermata/"
+        },
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/fermata"
+        }
+      ],
+      "body": "## Overview\n\nFermata is a digital audio workstation modelled on Logic Pro's workflow and layout. The audio engine and the VST3 host are written in Rust, and the interface is Tauri 2 with React 19 and TypeScript. Logic sets the scope: the repo keeps a list of every Logic Pro feature by stage and marks which ones Fermata has.\n\nIt covers the path from recording to export: audio and MIDI recording with count-in, cycle recording into take folders and swipe comping, Logic's editing tools, a piano roll, a drum step sequencer, channel strips with an eight-band EQ, eight effect slots and eight sends, five automation modes, six built-in synths, a sampler, 16 effects and VST3 hosting.\n\nIt's alpha software. I develop and test it on Linux. The Windows and macOS builds pass the engine tests and headless checks on a silent stand-in device, but nobody has run them on a real machine yet. I built it with Claude Code, developing independent features in parallel in separate git worktrees.\n\n## Architecture\n\nThe code is a Cargo workspace: `vst3-host` for plug-in hosting, `daw-engine` for the project model, real-time graph, device I/O and rendering (no UI code), and `daw` for the Tauri app. The React frontend draws the tracks area, editors and meters on canvas.\n\nThe engine is split into two halves that never share mutable data. `Session` runs off the audio thread and owns the project, loaded audio, plug-in controllers, undo history and recorder. Every edit goes through it. `Engine` is the real-time graph, and it only hears about edits through `Cmd` messages. Each user edit is one Tauri command and one undo step.\n\n## Keeping the audio thread honest\n\nCode on the audio thread may not allocate, free, lock, block or do I/O. Buffers are sized up front, and edits arrive through a pattern the docs call Cmd in, Garbage out. The session builds whatever the engine needs (a track's DSP state, a new region list) on its own thread and sends it over a wait-free `rtrb` ring. The engine swaps it in at the start of the next callback and sends the old object back on a second ring, so the memory gets freed on the main thread.\n\nThose rings used to be `crossbeam_channel`s, and I learned the difference the hard way. A crossbeam receiver can spin while a preempted sender finishes its write. At real-time priority, the audio thread starved the sender until the kernel's `RLIMIT_RTTIME` limit killed the app with SIGXCPU. `rtrb` never waits.\n\nFailures on the audio thread are contained rather than fatal. Denormals are flushed to zero for the whole callback. If callbacks fall behind for more than 60 ms, the engine sheds load for 250 ms so the thread can sleep before the kernel kills it. Panics are caught, because unwinding into the driver's C callback would abort the process. After every plug-in, NaNs are silenced and runaway levels clamped, and a toast names the plug-in. A headless check, `rt_alloc_check`, plays a project that uses every feature through a counting allocator and fails if any block allocates once warmed up.\n\n## Multi-core without changing the sound\n\nIndependent tracks can play at the same time on a small pool of real-time threads. The requirement I set was that the output stay bit for bit the same as the serial loop's, so nothing else in the program has to care which path ran.\n\nThe hard part is the mix. Float addition isn't associative, so if threads sum into a bus in whatever order they finish, the result changes from run to run. On the pool, no strip writes into another. Each strip keeps its output and sends in its own buffers, and a bus adds up its feeders in the serial loop's exact order. That makes switching between serial and parallel at any block boundary inaudible, and lets the tests compare renders exactly.\n\nThe pool has no lock or queue. Each task is a bit in a few atomic words, and whoever clears a ready bit owns the task, so a preempted worker can only hold up the one task it took. If a worker gets stuck, the block is given up after 0.1 s and treated as an overload. The engine also checks that the task graph covers every route before using it, and plays serially until it does. A light project never engages the pool, so it pays nothing.\n\n## Hosting plug-ins safely\n\nA plug-in that crashes during scanning shouldn't take the DAW with it. Fermata runs its own binary as `fermata --scan-vst3 <bundle>` for each bundle, four at a time, and kills any child that takes more than 20 seconds.\n\n## Results\n\nMeasured on an i7-13700KF, mean block time:\n\n- 24 instances of CHOWTapeModel at a 512-frame buffer: 4822 µs on one thread, 754 µs on eight.\n- 16 Dragonfly Hall reverbs at 128 frames: 430 µs on one thread, 111 µs on eight.\n- Keeping workers on the performance cores took 24 CHOWTapeModels from 340 µs to 270 µs at 128 frames.\n\nEight threads helped wide projects only 10 to 25% more than six while tying up another performance core, so the automatic setting stops at six. A `soak_check` makes a few hundred random edits with the pool running and compares parallel renders with serial ones bit for bit, and the pool's tests ran clean under ThreadSanitizer.\n\n## What's next\n\nThe current release is 0.1.0-alpha.5. The biggest open item is running the Windows and macOS builds on real hardware. Multi-core processing is Linux-only for now, VST3 editor windows don't open on Windows yet, and the synth models haven't been tuned by ear or compared with the instruments they're modelled on.\n",
+      "published": true,
+      "crate": "Audio & music"
+    },
+    {
+      "slug": "soniroll",
+      "name": "Soniroll",
+      "cat": "SNR-002",
+      "years": "2026 –",
+      "kind": "Music practice platform",
+      "stack": [
+        "Next.js",
+        "Convex",
+        "Tauri / Rust",
+        "Expo"
+      ],
+      "summary": "Free practice tools for musicians in the browser, with no account needed: a metronome with odd meters and polyrhythms, a tuner, ear training, chord charts and a practice log that tracks streaks.",
+      "image": "/projects/soniroll.png",
+      "imageNote": "soniroll.com",
+      "sideA": [
+        "Metronome: odd & changing meters",
+        "Polyrhythms",
+        "Tuner",
+        "Ear training with levelled paths",
+        "Chord charts + iReal Pro import",
+        "Slow-downer / looper"
+      ],
+      "sideB": [
+        "Shed Log: calendar, streaks, goals",
+        "Notes workspace with Vim keys",
+        "Setlists & lead-sheet storage",
+        "Teacher / student features",
+        "Tauri app with native Rust audio",
+        "pnpm monorepo, Convex sync"
+      ],
+      "links": [
+        {
+          "label": "soniroll.com",
+          "href": "https://soniroll.com"
+        },
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/soniroll"
+        }
+      ],
+      "body": "## Overview\n\nSoniroll is a free set of practice tools for musicians at [soniroll.com](https://soniroll.com). It started as tools for my own practice and is now used by friends, family and other musicians. It has about 25 tools: a metronome with odd and changing meters and polyrhythm modulation, a tuner, ear training with levelled learning paths, note, scale and interval trainers, chord charts with iReal Pro import, a jam-practice tune picker, a bass-line and drum generator to play along with, a slow-downer and looper, and a recorder.\n\nAround the tools there's a practice log (the Shed Log) with a calendar, streaks and goals, a Markdown notes workspace with Vim keybindings and `[[links]]`, setlists, file storage for PDFs, recordings and lead sheets with share links, a community, and lessons for teachers and students.\n\nThere are no ads and no paywalls, and every tool works without an account. Signing in syncs your data between devices. It's in beta (v0.10.3 at the time of writing).\n\n## How it's put together\n\nIt's a pnpm monorepo:\n\n- `apps/web` is the main product, a Next.js App Router app with Tailwind v4.\n- `apps/desktop` is a Tauri app that reuses the website's components and plays sound through a native Rust audio engine.\n- `apps/mobile` is an Expo app for iOS and Android. Development on it is paused, but it still has to type-check against any shared change.\n- `packages/core` holds shared pure TypeScript: music theory, parsers, generators and the practice-log logic.\n- `packages/convex` is the backend, with auth (email and password with emailed codes, plus Google), synced settings, the chart library, community, files and lessons.\n\nData is local-first with an optional account. Signed out, settings live in localStorage and audio files in IndexedDB. Signed in, the same hooks read and write the account instead, through a debounced, race-safe cache. There's no merge between the two: signing in just switches which store is read.\n\nConvex's limits shaped the data model. A document can be at most 1 MiB, and a function can read about 4,096 documents. So the chord-chart library stores one row per song with its bars in a separate table, imports go in chunks of 150, and big deletes are batched through the scheduler. Every account gets 100 MB of storage, and every upload path checks the quota.\n\n## Keeping clicks in time\n\nAll sound is made on the device. On the web, clicks are synthesized and scheduled ahead on the Web Audio clock, so each click lands on its exact sample even if the page's JavaScript timers are late.\n\nThe subtle part is tools that play two click streams at once, like the polyrhythm metronome's reference click. Each stream is sample-accurate on its own, but two separate schedulers each get their own timer, and browser timer jitter can nudge one and not the other, so they slowly drift apart. So the click engine takes an array of tracks and schedules all of them off one shared tick.\n\n## Native audio on the desktop\n\nThe desktop app exists for lower-latency audio, and it doesn't copy any website component. Vite aliases point at the web app's source, and small stand-ins replace `next/link`, `next/navigation`, `next/image` and the font loaders.\n\nThe interesting part is the Web Audio bridge. In the desktop app, `window.AudioContext` is a JavaScript stand-in that forwards the audio graph to the Rust crate `web-audio-api`, an implementation of the Web Audio spec. Every tool's own sound now runs on native audio (PipeWire on Linux) without changing a single website file. The one exception is the slow-downer's playback, which goes through WebKit's media player. JavaScript owns the node ids and batches each tick's operations into one call to Rust. A few things needed care:\n\n- Synchronous reads like `currentTime` and `param.value` can't wait for IPC, so JavaScript keeps mirrors: an extrapolated clock that Rust re-anchors every 20 ms, and each parameter's automation timeline, evaluated by the spec's rules.\n- `web-audio-api` doesn't ignore a repeated `connect()`, so a duplicate connect would double the signal. Rust tracks connections itself.\n- Changing the output device or buffer size opens a fresh context with an empty graph. Every reply carries a generation number, and when it changes, JavaScript replays its live nodes, parameter values and connections. An offset keeps the clock from jumping backwards.\n\nThe tuner's input runs YIN pitch detection in Rust, ported line for line from the shared TypeScript version. The recorder starts a take on the exact input sample where the first beat after the count-in was heard, using the output's reported delay.\n\n## iReal Pro import\n\nThe first version of the iReal Pro importer stopped at the first end marker, which dropped codas and every section after \"Fine\". It also forced four bars to a line and ignored alternate chords and time changes. I rewrote it to model iReal's 16-cell line grid, where each chord, space or repeat sign takes a fixed number of cells, so second endings and short lines lay out the way iReal draws them. All the new fields are optional, so charts saved before the rewrite still render.\n\n## Results\n\n- I tested the importer against my own 1,460-song iReal playlist. It ran with no exceptions and no line overflows, and the four songs I compared by hand matched iReal line for line.\n- Desktop metronome timing, recorded from a PipeWire null sink at 100 BPM: every gap between clicks was exactly 28,800 samples at 48 kHz, with zero timing error. The output reported 5.3 ms of device delay and 11 ms in total at a 256-sample buffer.\n- The bridge's output matched the browser's own Web Audio: the same tones peaked within about 1%, and Rust's decode of a piano sample correlated 0.9999 with WebKit's.\n\n## What's next\n\nThe desktop app is an early test. CI builds and tests it on Linux, macOS and Windows and publishes installers for all three, but the macOS and Windows builds haven't been tried on real machines yet. The mobile app is paused. Day-to-day work happens on a `preview` branch with its own Vercel deployment, backend and demo data, and only checked releases get merged into `main` and the live site.\n",
+      "published": true,
+      "crate": "Audio & music"
+    },
+    {
+      "slug": "open-stomp",
+      "name": "Open Stomp",
+      "cat": "OST-003",
+      "years": "2026 –",
+      "kind": "Reverse-engineered pedal library & editor",
+      "stack": [
+        "Rust",
+        "Python",
+        "Tauri",
+        "React"
+      ],
+      "summary": "I reverse engineered the USB-MIDI and Bluetooth LE protocol of the SORAN Dual Stomp Lite pedal, then built a Rust library, Python bindings and a desktop editor, adding the Linux support the vendor never shipped.",
+      "image": "/projects/open-stomp.png",
+      "imageNote": "Open Stomp Manager",
+      "sideA": [
+        "Traffic captures + static analysis",
+        "9 protocol spec docs",
+        "Zero-dependency protocol layer",
+        "USB + BLE hotplug & sync",
+        "All 99 presets, looper, tuner"
+      ],
+      "sideB": [
+        "Typed Python bindings",
+        "Session replay for offline dev",
+        "NAM → 512-tap filter fitting",
+        "2.1 dB RMS error (vendor: 9.4)",
+        "Editor for Linux, macOS, Windows"
+      ],
+      "links": [
+        {
+          "label": "open-stomp-lib",
+          "href": "https://github.com/JackMechem/open-stomp-lib"
+        },
+        {
+          "label": "open-stomp-manager",
+          "href": "https://github.com/JackMechem/open-stomp-manager"
+        }
+      ],
+      "body": "## Overview\n\nThe SORAN Dual Stomp Lite is an amp-modelling guitar pedal. The vendor's editor, Stomp Manager, has no Linux version, and the pedal's protocol isn't documented. Open Stomp is my open-source replacement, in two repos:\n\n- **open-stomp-lib** is a Rust crate with Python bindings. It speaks the pedal's protocol over USB-MIDI and Bluetooth LE MIDI, tracks its full state, and converts NAM amp models and cab IRs for its user slots. It also holds the protocol documentation.\n- **Open Stomp Manager** is a desktop editor for Linux, macOS and Windows, built on the library with Tauri and a React and TypeScript interface.\n\nEverything is tested on a Dual Stomp Lite running firmware V1.1.1. I built it with Claude Code.\n\n## Recovering the protocol\n\n**Static analysis.** Stomp Manager is a Flutter app compiled ahead of time from obfuscated Dart. I dumped its object pool with a patched build of blutter and annotated the disassembly, which turned up the SysEx frame layout, a command table and the BLE-MIDI service. It also showed that a library called `imagelib` is a disguised copy of NeuralAmpModelerCore.\n\n**Live captures.** On Apple Silicon you can't capture USB at the bus level without disabling System Integrity Protection. Every byte the editor exchanges with the pedal goes through CoreMIDI, though, so I hooked CoreMIDI inside the app. A small dylib interposes `MIDISend`, `MIDIReceived` and related calls and logs every packet. A script copies the app and re-signs the copy without the hardened runtime so `DYLD_INSERT_LIBRARIES` works, leaving the original untouched. Then I did one action at a time and marked each in the log.\n\nWhere the two disagreed, the captures won. The binary suggested a packet-fragmentation prefix that never appears on the wire, for example.\n\n## The protocol\n\nLive parameter changes use plain MIDI CCs. Everything else (presets, names, settings, looper, drum machine, tuner, uploads) uses vendor SysEx in one frame shape:\n\n```\nF0  00 21 7A  70  <cmd>  <dir>  <payload ...>  F7\n    \\_mfr__/  uid  msgId  direction\n```\n\n`dir` is 0 for a read, 1 for a write, 2 for the pedal's reply and 3 for a write acknowledgement. Big records are 8-bit structs packed into a 7-bit, LSB-first bitstream, so a preset is 126 MIDI bytes that unpack to 110. I worked out the preset layout by correlating all 99 preset records with CC dumps of the same presets.\n\nOver Bluetooth, messages have to go out at least 15 ms apart, because an unpaced burst froze the pedal, and replies take about 95 ms, so a startup sync takes about 19 seconds instead of under one over USB. All of it is written up in nine spec docs.\n\n## The library\n\nThe protocol layer parses and builds every message the official app sends, with no I/O and no dependencies, so it works with any MIDI transport. On top of it:\n\n- `DeviceState` follows all 99 presets, the live sound, looper, drum machine, tuner and settings, and describes each message in plain English, like `AMP · Mar J800 · GAIN = 64`.\n- A connection engine finds the pedal, follows hotplug, runs the startup sync and paces requests, keeping one SysEx in flight with a 1-second timeout.\n- Fully typed Python bindings wrap the same Rust code with PyO3.\n- Recorded sessions replay through the real engine, so you can develop without a pedal, and they double as test vectors.\n\n## Converting NAM models and cab IRs\n\nThe pedal can load a NAM amp model into a user slot, but it can't run a neural network. By uploading files with test patterns in them and re-amping through the pedal, I found what it actually runs: two 512-tap FIR filters with a fixed saturation curve between them (a Wiener–Hammerstein model). For cab IRs it plays only the first 384 samples, 8 ms at 48 kHz. Every import is an approximation, and the converter decides how good it is.\n\nThe official app measures the model twice and turns each measurement into a minimum-phase filter, without checking whether the result sounds like the model on the pedal. My conversion starts from the same measurements, then fits the filters:\n\n1. Simulate the pedal: both filters around a saturation curve fitted from re-amp recordings. The simulator predicts the hardware within about 0.5 dB.\n2. Compare the simulated pedal with the model on sweeps, tones and pink noise at several levels, using a multi-resolution spectral loss.\n3. Adjust the filters with hand-written gradients and Adam for about a minute, keeping them smooth and minimum-phase.\n\nFor IRs, it designs a 384-tap minimum-phase filter that matches the whole IR, not just its first 8 ms, because many cab IRs start late or ring longer than that.\n\n## Results\n\nMeasured on hardware, comparing the pedal's USB audio output with the original running in software:\n\n- A 3-minute bass DI through an Ampeg SVT model and cab: overall tone error (40 Hz to 10 kHz) of 2.1 dB RMS, against 9.4 dB for the official app. Mine was closest to the original in 87% of 100 ms windows, the official app in 8%.\n- The low end (40 to 160 Hz) is the one place it doesn't win, at 3.3 dB against 3.0. A deep low resonance needs longer filters than the pedal has.\n- Cab IRs: 2.1 to 5.2 dB RMS from the full IR, against 5.3 to 16.1 dB for the official upload. One IR starts with 21 ms of silence, so the official upload plays almost none of the cab.\n\n## The editor and status\n\nOpen Stomp Manager connects by itself and syncs both ways: changes made on the pedal show up immediately. A hub thread owns the engine and the pedal state, and at most every 16 ms it sends the UI only the data sections that changed, so a knob sweep doesn't resend all 99 presets.\n\nLive control, state tracking and imports are verified on hardware over USB and Bluetooth. Preset saving and settings writes send byte-identical messages to the official app but haven't been run on hardware yet, and LSTM and ConvNet NAM models aren't supported yet.\n",
+      "published": true,
+      "crate": "Audio & music"
+    },
+    {
+      "slug": "midirun",
+      "name": "Midirun",
+      "cat": "MDR-006",
+      "years": "2024 – 2025",
+      "kind": "MIDI controller → macro pad daemon",
+      "stack": [
+        "C++",
+        "RtMidi",
+        "JACK",
+        "gtkmm 4"
+      ],
+      "summary": "A daemon that turns any MIDI controller into a macro pad on Linux (Wayland and X11), plus a GTK config app. Both are published on the AUR.",
+      "sideA": [
+        "Works on Wayland & X11",
+        "JACK / RtMidi input",
+        "Key combos from one pad"
+      ],
+      "sideB": [
+        "GTK4 mapping editor",
+        "MIDI monitor + keycode capture",
+        "Published on the AUR"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/midirun"
+        }
+      ],
+      "body": "## Overview\n\nMidirun turns any MIDI controller into a macro pad on Linux. Press a pad or key on the controller and Midirun types a key or a key combination, which any application can bind to whatever it wants. It runs as a daemon, works under both Wayland and X11, and is published on the AUR along with its GUI companion, Midirun Config.\n\n## How it works\n\nMidirun reads MIDI input through RtMidi and compares the first two bytes of each message with the mappings in its config. For a note-on message, those are the status byte and the note number. When a message matches, it sends the mapped key codes.\n\nKeys are sent through `/dev/uinput`, the kernel's interface for virtual input devices, which is why it doesn't care which display server you run: to Wayland or X11 the controller looks like another keyboard. Midirun presses every key in a mapping in order and then releases them all, so one pad can send a shortcut like Ctrl+Shift+T. Writing to `/dev/uinput` needs permission, so the project ships a script that installs a udev rule giving the `input` group access.\n\nMappings live in a TOML file:\n\n```toml\n[config]\ninputPort = 2 # The port of your input device\n\n[[mapping]]\nname = \"Top Left Button\"\nbyte0 = 144\nbyte1 = 38\nkey = [2, 3, 4] # Key codes can be found with showkey --keycode\n```\n\nIt's meant to run as a systemd user service. Sending it SIGHUP (which `systemctl --user reload` does) reloads the config without restarting the daemon, and SIGINT or SIGTERM shut it down cleanly.\n\n## Midirun Config\n\nMidirun Config is a GUI for building that file, written in C++ with gtkmm 4. It has a console that listens to a MIDI port and shows the incoming data, an editor for adding and removing mappings, and a keycode capture that reads the next key you press through libevdev, so you don't have to look codes up with `showkey`. It then generates the TOML file for the daemon. If it can't read `/dev/input`, it still works, and you enter key codes by hand.\n\n## Packaging\n\nBoth programs build with Meson and are packaged on the AUR, so on Arch installing is one `yay` command plus adding yourself to the `input` group. The daemon ships with its systemd user unit, and the READMEs cover building from source on Arch, Fedora and Debian. The daemon also has a CLI for setup: `--list-io` lists MIDI ports, and `--listen` prints raw messages from a port so you can find the bytes a pad sends.\n",
+      "published": true,
+      "crate": "Audio & music"
+    },
+    {
+      "published": true,
+      "slug": "midirun-config",
+      "name": "midirun-config",
+      "cat": "MDC-014",
+      "years": "2025",
+      "kind": "GUI for Midirun",
+      "stack": [
+        "C++",
+        "gtkmm 4",
+        "libevdev"
+      ],
+      "summary": "A GUI for Midirun: a MIDI monitor, a mapping editor, keycode capture and TOML config generation. Published on the AUR.",
+      "sideA": [
+        "MIDI monitor",
+        "Mapping editor"
+      ],
+      "sideB": [
+        "Keycode capture",
+        "TOML config generation",
+        "Published on the AUR"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/midirun-config"
+        }
+      ],
+      "body": "## Overview\n\nMidirun is a small daemon I wrote that turns any MIDI controller into a macro pad on Linux. You hit a pad, it matches the MIDI message against a TOML config, and it types a key combination through `/dev/uinput`. Configuring it was the hard part. You read raw bytes off the controller with `midirun --listen`, looked up Linux keycodes with `sudo showkey --keycode`, and wrote `[[mapping]]` tables by hand.\n\nmidirun-config is the GTK 4 app that replaces that loop. Midirun and midirun-config are both on the AUR.\n\n## What I built\n\nIt's written in C++ with gtkmm 4 and built with Meson. RtMidi handles MIDI, toml++ the config, and libevdev and libudev keyboard input.\n\n- **MIDI monitor.** Pick a device, press Listen, and incoming messages stream into a pane with every byte and a timestamp. While listening, the window switches to a resizable split so you can watch the controller and edit mappings side by side.\n- **Mapping editor.** Each row holds a name, byte 0, byte 1 and the keycodes. On launch the app parses the existing `~/.config/midirun/config.toml` into rows, so it edits your current setup.\n- **Keycode capture.** Focus the Keys field and press the combination.\n- **Apply.** Writes the TOML and tells the running daemon to reload it.\n\n## Capturing kernel keycodes\n\nGTK key events report keyvals for the current layout, but Midirun needs the kernel `KEY_*` codes that uinput emits. So capture reads evdev directly. It walks `/dev/input/event*` and uses libudev to keep only keyboards, skipping mice and USB receivers. It opens those nodes non-blocking with libevdev and `poll()`s them until a key-down arrives.\n\nThat loop runs on a worker thread that starts when the field gains focus and stops when it loses focus. Results reach the UI through `Glib::signal_idle()`, since GTK widgets may only be touched from the main thread.\n\nReading `/dev/input` needs permission, so the project ships a udev rule that gives the `input` group access. If no keyboard can be opened, the field falls back to plain text entry.\n\n## Reloading without a restart\n\nI didn't want Apply to mean restarting a service. On startup the daemon writes its PID to `/tmp/midirun.pid` and installs a SIGHUP handler that only sets an atomic flag. The main loop sees the flag, leaves its listen loop and re-reads the config.\n\nThe GUI writes the TOML, reads the PID file and sends SIGHUP. The daemon's systemd user unit uses the same signal for `ExecReload`.\n\n## What I learned\n\n- Keyvals and kernel keycodes are different layers. A tool that injects input through uinput has to work at the kernel's level.\n- Keep signal handlers tiny, and do the real work in the main loop.\n- GTK's threading rule shaped the design. Blocking I/O lives on worker threads, and the UI only changes from idle callbacks.\n",
+      "crate": "Audio & music"
+    },
+    {
+      "slug": "server-dash",
+      "name": "server-dash",
+      "cat": "SRV-004",
+      "years": "2026",
+      "kind": "Self-hosted home server dashboard",
+      "stack": [
+        "Rust / Axum",
+        "Next.js 16",
+        "NixOS"
+      ],
+      "summary": "A dashboard for my NixOS home server: live system stats, systemd service control, smart plugs and ESP32 buttons, with passkey login.",
+      "sideA": [
+        "Live system stats",
+        "systemd service control",
+        "TP-Link Tapo smart plugs"
+      ],
+      "sideB": [
+        "ESP32 smart buttons",
+        "WebAuthn passkeys + TOTP",
+        "Deployed via NixOS modules"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/server-dash"
+        }
+      ],
+      "body": "## Overview\n\nserver-dash is the control panel for my NixOS home server. It shows live system stats, starts, stops and restarts systemd services, controls TP-Link Tapo smart plugs, and manages ESP32 smart buttons I built (JMIoT). It began as two repos, a Next.js frontend and a Rust API, which I later merged into one pnpm monorepo.\n\n## The API\n\nThe backend is a Rust service on Axum and Tokio.\n\n- **Stats** come from `sysinfo`: CPU, memory, root disk, network counters, load average, temperature and uptime.\n- **Services** are controlled over D-Bus with `zbus`, calling systemd's `StartUnit`, `StopUnit` and `RestartUnit` directly instead of shelling out to `systemctl`. Only services on an allowlist can be touched, and the last 100 lines of a unit's journal can be read from the dashboard.\n- **Smart plugs:** the API finds Tapo plugs by scanning the local subnet, polls their power draw live, streams it to the frontend, and keeps a power history on disk.\n- **Smart buttons:** the ESP32 buttons register with the API and report presses to a callback endpoint, and presses can trigger automations such as switching a plug. The API registers itself as the buttons' callback URL, and automations run in the background so the button gets its response right away.\n\n## Login\n\nThe dashboard can restart services and power off the machine, so login is more than a password. After the password check, the API asks for a WebAuthn passkey (I use a YubiKey) or a TOTP code, then issues a JWT. Accounts are the app's own by default; logging in with a system account through `/etc/shadow` is off unless I turn it on. The enrollment flow, which lets you register a passkey on first login, can be closed once setup is done.\n\n## Deployment\n\nThe flake exports two NixOS modules, one for the frontend and one for the API. Each runs as a systemd service under its own system user. Rather than running the API as root, the module adds a polkit rule that lets that one user manage systemd units and reboot or power off the machine, and nothing else.\n\n## Keeping privileges narrow\n\nA web page that can restart services and shut the machine down needs each permission scoped on its own: an allowlist for services, a narrow polkit rule instead of root, and a second factor at login. Because it's all NixOS configuration, the service users, the polkit rule and both services are declared together in the flake, next to the code they run.\n",
+      "published": true,
+      "crate": "Linux & systems"
+    },
+    {
+      "published": true,
+      "slug": "nixos-config",
+      "name": "nixos-config",
+      "cat": "NIX-011",
+      "years": "2026",
+      "kind": "NixOS configuration",
+      "stack": [
+        "Nix",
+        "home-manager"
+      ],
+      "summary": "One flake for three machines (desktop, ThinkPad T480, and a Dell home server running Jellyfin and File Browser), with YubiKey PAM login, Syncthing and home-manager modules.",
+      "sideA": [
+        "3 hosts, one flake",
+        "Hyprland + DankMaterialShell",
+        "PipeWire/JACK low-latency audio"
+      ],
+      "sideB": [
+        "Caddy, Forgejo, Jellyfin, AdGuard",
+        "sslh: SSH and HTTPS on port 443",
+        "YubiKey for sudo and SSH"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/nixos-config"
+        }
+      ],
+      "body": "## Overview\n\nOne Nix flake builds all three of my machines: `desktop`, a three-monitor workstation; `t480`, a ThinkPad T480; and `dellserv`, a Dell XPS that runs headless as my home server. Each host is a `nixosConfiguration` with home-manager as a NixOS module, so system and user setup rebuild together with `nixos-rebuild switch --flake .#<host>`.\n\n## Layout\n\nEach host has a `configuration.nix`, its `hardware-configuration.nix` and a `home.nix`. Everything else is a small module that a host opts into:\n\n- `modules/nixos/`: desktop, sound, printing, Bluetooth, Steam, Syncthing, Ollama, fonts, YubiKey, user account.\n- `modules/home-manager/`: Hyprland, DankMaterialShell, zsh, tmux, Ghostty, theme, packages.\n\nSome of my own projects, such as gtkbar, gtkapps and rust-app-menu, come in as flake inputs. They're pinned in the same `flake.lock` as everything else.\n\n## Desktop\n\nHyprland is configured entirely in Nix through home-manager, using Hyprland's Lua config format. DankMaterialShell provides the bar, launcher, notifications and lock screen. It's pinned to a release tag and runs as a systemd user service bound to `hyprland-session.target`, so it stays out of the Plasma 6 fallback session. The generated Hyprland config loads the fragments that DMS's settings GUI writes, except monitors: the 10-bit, three-output layout stays in Nix.\n\nAudio is set up for recording. PipeWire runs with its ALSA, PulseAudio and JACK interfaces, rtkit is on, and the `audio` group gets real-time priority and unlimited memlock. Ardour comes with LV2 plugins, including x42, LSP, Calf, Guitarix and Neural Amp Modeler.\n\n## Home server\n\n`dellserv` runs Jellyfin, FileBrowser Quantum, Forgejo, Syncthing and AdGuard Home behind Caddy. Caddy gets its certificates through the Cloudflare DNS plugin, and cloudflare-dyndns keeps the domain pointed at my home IP. Two parts took more than enabling a module:\n\n- **SSH and HTTPS on one port.** To reach Forgejo over SSH without opening port 22 on the router, sslh listens on 443 and splits traffic between sshd and Caddy. I wrote that systemd unit by hand, because the NixOS sslh module added extra IPv4/IPv6 listen entries that failed with duplicate binds.\n- **FileBrowser Quantum.** nixpkgs has the package but no NixOS module, so the service is hand-rolled. The admin password isn't in the config, where it would end up world-readable in the Nix store. A pre-start script generates it once into the state directory. The media directories are setgid to the `jellyfin` group and the service runs with `UMask=0027`, so uploads stay readable by Jellyfin. The unit also turns on systemd's sandboxing options.\n\n## Hardware keys\n\nOn the T480, `pam_u2f` requires a YubiKey touch for `sudo`, console login and hyprlock. On the server, sshd accepts only FIDO2-backed keys (`sk-ssh-ed25519` and `sk-ecdsa`) and password login is off, so every SSH session needs the physical key.\n\n## Notes\n\nhome-manager installs Neovim's language servers and formatters, but the Neovim config itself lives in its own hand-managed repo. The primary git remote is Forgejo on the server, and GitHub is a public mirror.\n",
+      "crate": "Linux & systems"
+    },
+    {
+      "published": true,
+      "slug": "neovim-config",
+      "name": "neovim-config",
+      "cat": "NVM-012",
+      "years": "2026",
+      "kind": "Neovim configuration",
+      "stack": [
+        "Lua",
+        "lazy.nvim"
+      ],
+      "summary": "My Neovim setup in Lua on lazy.nvim: language servers enabled only when their binary is on PATH (installed by my NixOS config), conform/nvim-lint, oil.nvim, Harpoon, and Claude Code plus a local Ollama model.",
+      "sideA": [
+        "PATH-aware LSP setup",
+        "rustaceanvim, jdtls, VimTeX",
+        "conform + nvim-lint"
+      ],
+      "sideB": [
+        "oil.nvim, Telescope, Harpoon",
+        "Claude Code + local Ollama",
+        "Markdown preview with peek"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/neovim-config"
+        }
+      ],
+      "body": "## Overview\n\nThis is the Neovim setup I use for everything: Rust, C and C++, TypeScript, Java, Nix, Lua and Markdown notes. The repo dates back to 2023 and credits Josean Martinez's config tutorials. It's a small Lua config on lazy.nvim. `init.lua` loads the editor settings, the plugin manager and global keymaps, and each plugin lives in its own spec file under `lua/plugins/`.\n\n## Language servers\n\nThe language-server setup is the most distinctive part. Rather than relying on Mason to install language servers, the config keeps a table that maps each server to the binary it needs, and at startup it enables only the servers whose binary is on `PATH`:\n\n```lua\nfor server, binary in pairs(LSP_BINARIES) do\n\tif vim.fn.executable(binary) == 1 then\n\t\tlocal config = LSP_SERVERS[server] or {}\n\t\tvim.lsp.config(server, {\n\t\t\tsettings = config.settings or {},\n\t\t\tinit_options = config.init_options or {},\n\t\t})\n\t\tvim.lsp.enable(server)\n\tend\nend\n```\n\nThat fits NixOS. My nixos-config installs the servers and formatters through home-manager but leaves the Neovim config alone. The same config also works on a machine with half the toolchains, without errors about missing servers. Per-server settings keep 4-space formatting consistent across nil (with `nixfmt`), lua_ls, ts_ls and clangd.\n\nSome languages get dedicated plugins: rustaceanvim for Rust, nvim-jdtls for Java (with the Lombok agent), and VimTeX for LaTeX.\n\n## Formatting and linting\n\n- conform.nvim runs Prettier (with tabs), stylua, black and isort, and clang-format with an LLVM-based style that uses tabs. Format-on-save is wired up but off by default. `<leader>ft` formats on demand.\n- nvim-lint runs eslint_d for JS/TS/Svelte and pylint for Python on enter, save and leaving insert mode.\n\n## Navigation\n\noil.nvim replaces netrw as the file explorer, so directories are editable buffers. Telescope handles search, and Harpoon marks the few files I'm bouncing between (`<leader>hx` to mark, `<leader>hn`/`<leader>hp` to cycle). vim-tmux-navigator moves across Neovim splits and tmux panes with the same keys, and global-note keeps one scratch note on `` <leader>` ``.\n\n## AI tools\n\nclaudecode.nvim is bound under `<leader>a`. It toggles, resumes or continues a Claude Code session, sends a selection or the current buffer, and accepts or rejects proposed diffs. opencode.nvim is bound under `<leader>o` and points at a local Ollama model (`qwen2.5-coder:32b`), so I can use an assistant offline.\n\n## Markdown\n\nMarkdown buffers turn on soft wrap and line breaks and map `j`/`k` to `gj`/`gk`. peek.nvim opens a live preview in the browser.\n",
+      "crate": "Linux & systems"
+    },
+    {
+      "slug": "fcr-inc",
+      "name": "FCR Inc.",
+      "cat": "FCR-005",
+      "years": "2026",
+      "kind": "Car rental platform, project lead",
+      "stack": [
+        "Java / Javalin",
+        "Hibernate",
+        "Next.js",
+        "Stripe",
+        "AWS RDS"
+      ],
+      "summary": "Led a team of 4 through a full rental platform for COMP 380: booking, Stripe payments, staff workflows and a tmux-style tiling admin dashboard.",
+      "sideA": [
+        "Led a team of 4",
+        "Jira, Figma, code review",
+        "Booking + Stripe payments"
+      ],
+      "sideB": [
+        "Javalin REST + OpenAPI",
+        "Tiling-window admin dashboard",
+        "NixOS dev environments"
+      ],
+      "links": [
+        {
+          "label": "fcr-inc.org",
+          "href": "https://fcr-inc.org"
+        },
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/fcr-inc"
+        }
+      ],
+      "body": "## Overview\n\nFCR Inc. is a car rental platform my team built for COMP 380, the software engineering course at CSUN, between January and May 2026. The site is at [fcr-inc.org](https://fcr-inc.org).\n\nThe platform serves three kinds of user:\n\n- **Customers** search for cars, book them, pay with Stripe and manage their rentals.\n- **Staff** handle pickups and returns.\n- **Managers** get sales reports.\n\n## My role\n\nI was the project lead for a team of four, with Andrew Goldman, Jenny Ventura and Roark Wanner-Ruffalo. Along with writing code, I ran the process: Agile sprint planning, the Jira board, our Figma files, the Git workflow and code reviews.\n\n## How it's built\n\nThe backend is a REST API in Java on Javalin, with Hibernate for persistence and the database on AWS RDS. The API is documented with OpenAPI, so every endpoint can be browsed in Swagger.\n\nThe frontend is a separate Next.js app styled with Tailwind, using Zustand for client state. It's deployed separately from the API and talks to it over REST.\n\n## The admin dashboard\n\nThe admin side is built around a tiling window system inspired by tmux. Instead of switching between separate pages, data views and analytics open as panes that sit side by side, so you can compare them on one screen.\n\n## Dev environments\n\nThe team's development environments were managed with NixOS. Everyone on the team got the same toolchain from the same configuration, so builds were reproducible from one machine to the next.\n",
+      "published": true,
+      "crate": "Web & client work",
+      "image": "/projects/fcr-inc-browse.png",
+      "imageNote": "Browsing cars: list, detail panel, cart and bookmarks",
+      "gallery": [
+        {
+          "src": "/projects/fcr-inc-admin.png",
+          "caption": "Admin dashboard: tiling panels with tables, charts and filters"
+        },
+        {
+          "src": "/projects/fcr-inc-cars.png",
+          "caption": "Cars database with live preview (light theme)"
+        },
+        {
+          "src": "/projects/fcr-inc-home.png",
+          "caption": "Landing page and search"
+        }
+      ]
+    },
+    {
+      "published": true,
+      "slug": "doem",
+      "name": "Doem",
+      "cat": "DOE-015",
+      "years": "2024",
+      "kind": "E-commerce platform (contract)",
+      "stack": [
+        "Next.js",
+        "Stripe",
+        "Hygraph",
+        "Shippo",
+        "Resend",
+        "Zustand"
+      ],
+      "summary": "Contract full-stack work for Doem in Los Angeles: a candle shop built as a reusable e-commerce platform with configurable branding and product catalogs, so it could be redeployed for future clients.",
+      "sideA": [
+        "Reusable storefront platform",
+        "Branding & catalog in Hygraph",
+        "Server-side prices at checkout"
+      ],
+      "sideB": [
+        "Orders created by Stripe webhook",
+        "Shippo orders with package weight",
+        "React Email receipts via Resend"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/doem-front"
+        }
+      ],
+      "body": "## Overview\n\nDoem is a candle shop in Los Angeles. I was contracted to build its online store, frontend and backend. I built it as a reusable platform: branding and the product catalog live in a CMS, not in the code, so the same platform could be redeployed for future clients.\n\n## What I built\n\nThe site is built on the Next.js App Router. Hygraph (a GraphQL CMS) holds all the content, Stripe handles payments, Shippo handles shipping, and Resend sends email.\n\n- **Content model.** The shop page is driven by product categories, each with its own video and mobile GIF. Each product has variations, and each variation has its own price, weight, images and color. Variation button sets drive the picker on the product page. Logos, the company description and landing-page colors come from Hygraph as well, so another shop means new content, not new code.\n- **Cart.** A Zustand store persisted to `localStorage`, so the cart survives reloads.\n\n## Checkout: never trust the cart's prices\n\nThe cart lives in the browser, so the checkout route ignores any prices it sends. It takes the variation slugs and queries Hygraph for the real names, prices and images. It mirrors each variation into Stripe as a product whose ID is the slug, then creates a Checkout session from those products. The session takes cards and Cash App, collects a US shipping address, applies a flat ground rate and allows promotion codes.\n\n## Orders are created after payment\n\nNo order exists until Stripe calls the webhook. The handler takes only the session ID from the event and retrieves the session from Stripe itself, with line items and customer details expanded. From that data it:\n\n1. creates the order in Hygraph, with the address and line items linked back to the product variations;\n2. creates a Shippo order with both addresses, the line items and a package weight summed from the variations' weights;\n3. sends a React Email receipt through Resend to the customer and the shop owners.\n\nAfter Checkout, Stripe sends the customer to `/shop?id=<session>`. That page looks up the order by its Stripe checkout ID and shows a confirmation with the order number.\n\nShipping changed along the way. My first webhook used EasyPost to buy the cheapest label automatically. I switched to Shippo, where the webhook creates an order and the label is bought against it.\n\n## Performance\n\nThe shop leans on video and product photography. I moved images to `next/image` with sharp, preloaded product images on the shop page, and kept Stripe.js from blocking the first render.\n\n## What I'd change\n\n- Verify the `Stripe-Signature` header with `constructEvent` and check `payment_status`, on top of re-fetching the session.\n- Create a new Stripe Price whenever a variation's price changes in Hygraph. Right now the Stripe product is created only once, so later price edits don't carry over.\n",
+      "crate": "Web & client work"
+    },
+    {
+      "published": true,
+      "slug": "freelandbuck",
+      "name": "FreelandBuck",
+      "cat": "FLB-016",
+      "years": "2023",
+      "kind": "Website migration (contract)",
+      "stack": [
+        "Next.js",
+        "Contentful",
+        "Azure SQL"
+      ],
+      "summary": "Contract frontend work: I moved an architecture firm's WordPress site to Next.js and wrote a script that migrated all of its content from Azure SQL to Contentful, delivering the production site in two months.",
+      "sideA": [
+        "WordPress → Next.js",
+        "Production site in 2 months"
+      ],
+      "sideB": [
+        "Automated Azure SQL → Contentful migration"
+      ],
+      "links": [
+        {
+          "label": "freelandbuck.com",
+          "href": "https://freelandbuck.com"
+        }
+      ],
+      "body": "## Overview\n\nFreelandBuck is an architecture firm whose website ran on WordPress. They wanted to move it to Next.js with Contentful as the CMS. The plan in the repo's roadmap was to migrate the data into Contentful, launch a copy of the old site for side-by-side review, and then adjust it until it matched the original's content and behavior.\n\nWhen I joined as a contract frontend engineer, the repo had a Next.js scaffold that could pull project entries from Contentful. I built the site out from there, wrote the content migration, and delivered the production site with all of its content migrated within two months.\n\n## What I built\n\n- **Content migration.** I wrote a script that moved all of the existing content from Azure SQL into Contentful, so nobody had to re-enter projects by hand.\n- **Pages.** Landing page, project pages, office page, header, footer, a desktop navigation menu and a mobile hamburger menu, with Framer Motion animations and loading states.\n- **Contentful layer.** A small content service over the Contentful SDK, TypeScript types generated from the content model with `contentful-typescript-codegen`, and statically generated pages through `getStaticProps` and `getStaticPaths`. The production build is a static export.\n- **Images.** The site is mostly photography, so I moved images to `next/image` with sharp and did a pass to make them display properly on high-DPI screens.\n\n## Rendering migrated content\n\nMigrated project pages are long rich-text documents that mix copy, photos, video and 3D tours. I wrote custom Contentful rich-text renderers to handle them:\n\n- Matterport tours and Vimeo videos pasted into the text as plain links render as full-width embedded players. Video entries embedded in the rich text get the same treatment, with their captions.\n- Embedded images are requested from Contentful's image API as WebP and rendered with `next/image`, using the width and height stored on the asset so the layout doesn't shift as photos load.\n\n## Letting the firm control the landing page\n\nThe landing page has two horizontally scrolling sections, Architecture and Public Art. The firm needed to choose which projects appear there and in what order, without asking a developer. Each section reads its order from a `projectOrder` entry in Contentful, which holds an ordered list of project references. Reordering the landing page is a content edit, and the project menu on every project page follows the same lists.\n\n## After launch\n\nI kept maintaining the site. In 2024 I changed the content model to replace the separate location and year fields with a multi-line subtitle, and in 2025 I made the site skip projects that have no category.\n",
+      "crate": "Web & client work",
+      "image": "/projects/freelandbuck.png",
+      "imageNote": "freelandbuck.com"
+    },
+    {
+      "published": true,
+      "slug": "mike-mechem-real-estate",
+      "name": "Mike Mechem Real Estate",
+      "cat": "MMR-017",
+      "years": "2024",
+      "kind": "Real estate website (freelance)",
+      "stack": [
+        "Next.js 14",
+        "Contentful",
+        "Trestle API",
+        "Mapbox",
+        "Zustand"
+      ],
+      "summary": "A website for a Las Vegas-area real estate business: Contentful pages built from nested blocks, plus an MLS home search (Trestle API, Mapbox, Google Places) that I built and later took off the site.",
+      "sideA": [
+        "Contentful pages from nested blocks",
+        "One route renders any CMS page",
+        "Web3Forms contact form"
+      ],
+      "sideB": [
+        "MLS search via Trestle OData API",
+        "URL-based search filters",
+        "Map and listings synced on hover",
+        "Google Places location search"
+      ],
+      "links": [
+        {
+          "label": "Live site",
+          "href": "https://mike-mechem-real-estate.vercel.app"
+        }
+      ],
+      "body": "## Overview\n\nMike Mechem Real Estate is a freelance website for a real estate business in the Las Vegas area. It has two parts, both built on Next.js 14 with the App Router. The first is the main site: a landing page and About and Info pages that the client edits himself, plus a contact form. The second is a home search over live MLS listings.\n\n## Pages the client can build\n\nAll the regular pages come from Contentful through its GraphQL API. Instead of fixed page templates, I modeled a page as a stack of blocks. Each block holds columns, and each column holds rows that are a button, an image, a text section or a video. Blocks have flags for full-bleed layout and card layout.\n\nOne `[slug]` route renders any page from that structure, so the client can add or rearrange pages without me. The contact page posts to Web3Forms, so the site needs no backend for email.\n\n## MLS home search\n\nFor listings I worked directly against the Trestle MLS API (CoreLogic), an OData service:\n\n- **Auth.** Trestle uses OAuth client credentials. The token is cached through Next's `fetch` under an `auth` tag and revalidated once it expires. It all runs in server actions, so the secret stays on the server.\n- **Queries.** Filters live in the URL's search params: price range, property type, beds, baths, garage, pool and senior communities. Searches are shareable and work with the back button. The server turns those params into an OData `$filter`, `$select`s about fifty fields, expands each listing's photos in order and pages through results 12 at a time.\n- **Location search.** Typing an address or neighborhood calls Google Places Autocomplete, restricted to a rectangle around southern Nevada so results stay local. The chosen place is geocoded, and its viewport becomes a latitude and longitude bounding box in the Trestle query.\n- **Map and list.** Results appear on a Mapbox map next to a listing column. A small Zustand store holds the hovered listing for each side, so hovering a card highlights its marker, and hovering a marker scrolls the list to that card.\n\n## How it ended\n\nThe search got as far as working filters, location search, the synced map, listing pages and mobile layouts. In the end I took it off the site's routes, and the site as it stands is the Contentful-driven pages plus the contact form. The last changes were content edits I made with the client during a meeting.\n\n## What I learned\n\n- Modeling a page as nested blocks costs more up front than templates, but it's what lets the client add and rearrange pages himself.\n- A real MLS feed meant handling token lifetimes, OData query building and gaps in the data, such as missing lot sizes and an on-market date that was always null.\n",
+      "crate": "Web & client work",
+      "image": "/projects/mike-mechem-real-estate.png",
+      "imageNote": "mike-mechem-real-estate.vercel.app"
+    },
+    {
+      "published": true,
+      "slug": "vachegowanus",
+      "name": "Vachegowanus",
+      "cat": "VCH-018",
+      "years": "2023",
+      "kind": "Interactive drawing viewer (freelance)",
+      "stack": [
+        "React",
+        "three.js",
+        "react-three-fiber",
+        "Firebase Hosting"
+      ],
+      "summary": "A site for Zane Mechem that presents architectural drawings through a clickable plan: hover previews, full-screen plans and sections, and 360° panoramas rendered with three.js.",
+      "sideA": [
+        "Clickable SVG plan overlay",
+        "Preloaded hover previews",
+        "Full-screen plans & sections"
+      ],
+      "sideB": [
+        "360° panoramas in three.js",
+        "Embedded slide presentation",
+        "Firebase Hosting"
+      ],
+      "links": [
+        {
+          "label": "Live site",
+          "href": "https://vachegowanus.web.app"
+        },
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/vachegowanus"
+        }
+      ],
+      "body": "## Overview\n\nVachegowanus is a site I built for Zane Mechem to present a set of architectural drawings: plans, sections, renderings and five 360° panoramas. The README states the goal as presenting the images as efficiently as possible. My approach was to use the plan itself as the navigation, so every image is reached from the spot in the drawing it belongs to.\n\n## What I built\n\nIt's a React single-page app (Create React App, React Router) with three.js through react-three-fiber for the panoramas. It's deployed on Firebase Hosting.\n\n- **The plan is the menu.** The main page is a large plan drawing under an SVG overlay with a fixed 1728×1260 viewBox, so the hit areas scale with the drawing. Circles mark the panorama viewpoints, and traced polygons cover the parts of the building.\n- **Hover to preview.** Hovering a region shows its image over the plan at 75% opacity and hides the markers, so you see what's there before committing to it.\n- **Click to open.** A viewpoint opens its panorama on its own route. A building region opens its plan or section full-screen in an overlay with a close button. A \"view slides\" button opens the full presentation in an embedded viewer.\n\n## Making hover feel instant\n\nHover previews only work if the image is there the moment the pointer arrives. If each preview started loading on `mouseover`, the first pass over the plan would flicker through half-loaded images. On mount, the main page creates an `Image` object for every preview and overlay drawing, about thirty files, so the browser fetches and caches them up front. After that, every hover and click is served from cache.\n\n## 360° panoramas\n\nEach panorama is a large equirectangular render, around 12 to 15 MB. To view one, I map it onto the inside of a sphere and put the camera at the center:\n\n```jsx\n<mesh>\n  <sphereBufferGeometry attach=\"geometry\" args={[500, 60, 40]} />\n  <meshBasicMaterial attach=\"material\" map={texture} side={THREE.BackSide} />\n</mesh>\n```\n\nOrbitControls has zoom and pan turned off, so the only motion is looking around. Damping and a slow auto-rotate make the view drift until you grab it. A negative rotate speed makes dragging feel like turning your head, not spinning a globe. The texture loads inside `Suspense` behind a loading screen, because these files take a moment.\n\n## What I learned\n\nThis was an early project, and the repo shows it. The README admits it is \"filled with obsolete components\", including a three.js model viewer I experimented with that never made it into the routes. What held up was the core idea: let the drawing be the interface, and do the loading work before the user asks for it.\n",
+      "crate": "Web & client work",
+      "image": "/projects/vachegowanus.png",
+      "imageNote": "vachegowanus.web.app"
+    },
+    {
+      "published": true,
+      "slug": "jackmechem-dev",
+      "name": "jackmechem.dev",
+      "cat": "JMD-019",
+      "years": "2026",
+      "kind": "This website",
+      "stack": [
+        "Next.js 16",
+        "React 19",
+        "Convex",
+        "Vercel Blob"
+      ],
+      "summary": "The site you're on: a record-crate portfolio with an admin panel for gigs, clips and projects.",
+      "sideA": [
+        "Record crate & sleeve previews",
+        "Section paging"
+      ],
+      "sideB": [
+        "Convex-backed admin panel",
+        "Uploads to Vercel Blob"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/JackMechem/jack-mechem"
+        }
+      ],
+      "body": "## Overview\n\nThis is my portfolio. It shows my software to people hiring and my drumming to people booking gigs. I built it as a record shop. Projects are records filed in crates by category, each with a sleeve, a catalogue number and a Side A and Side B of features. Gigs and live clips fill out the rest.\n\nI wanted to update it without redeploying, so the content lives in a database and the site has its own admin panel.\n\n## What I built\n\n- **Next.js 16** (App Router) and **React 19**, styled with plain CSS.\n- **Convex** holds projects, crates, gigs and clips. Write-ups like this one are Markdown rendered with react-markdown, and drafts stay hidden.\n- **Vercel Blob** stores uploaded clips and images.\n- **`/admin`** edits all of it, with a live Markdown preview for write-ups.\n\n## Cached pages that update on save\n\nPublic pages read Convex on the server through its HTTP query API, using `fetch` so Next caches each result for an hour under a tag. Every admin save calls `updateTag` and revalidates the layout, so changes show up immediately and visitors still get cached pages.\n\nThe fetch helper throws on any failure. During background revalidation that means an unreachable Convex leaves the last good page in place instead of caching an empty one. Gigs and clips catch their errors instead, so the page still renders without them. A new project gets its `/work/<slug>` page on first request, with no rebuild.\n\n## Admin without a user system\n\nThere's one admin, so auth stays small. The password is checked in constant time by hashing both sides and comparing with `timingSafeEqual`. A login sets an HMAC-signed, expiring, `httpOnly`, `SameSite=Strict` cookie scoped to `/admin`.\n\nConvex mutations also require an `ADMIN_SECRET` that only the Next.js server knows. Convex functions are publicly reachable, but writes are rejected without the secret. Input is validated inside Convex as well: slug format, length limits, and links that must be `https://` or a site path.\n\n## Uploads straight to Blob\n\nVideo is too big to route through a serverless function. The browser asks `/admin/upload` for a short-lived Blob token, issued only to a signed-in admin, limited to video and image types and capped at 300 MB. It then uploads directly, switching to multipart above 50 MB.\n\nFor clips, the browser also grabs a frame through a `<canvas>` to make the poster image. If it can't decode the file (an iPhone HEVC clip in Chrome, for example), that step fails, which is an early warning that the clip won't play on the site.\n\n## Making the crate feel physical\n\nScrolling over the records flips through them. The first wheel tick flips immediately, then one record per 180 px. A gesture that has flipped a record stays with the crate, so trackpad momentum can't fling the page. A fresh gesture at either end scrolls the page as usual. Wheel deltas are normalised across pixel, line and page modes, and vertical swipes flip records on touch screens.\n",
+      "crate": "Web & client work",
+      "image": "/projects/jackmechem-dev.png",
+      "imageNote": "This site"
+    }
+  ],
+  "clips": [
+    {
+      "src": "/clips/toledo-show.mp4",
+      "poster": "/clips/toledo-show.jpg",
+      "title": "Toledo Show",
+      "detail": "Petit Ermitage, West Hollywood · Oct 16, 2026",
+      "alt": "Jack playing drums at the Toledo Show at Petit Ermitage in West Hollywood",
+      "credit": "@jizzrael",
+      "creditUrl": "https://www.instagram.com/jizzrael/"
+    }
+  ]
+}
