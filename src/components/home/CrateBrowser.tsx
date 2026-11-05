@@ -11,6 +11,11 @@
  * the front record opens its preview. The left column shows the front
  * record's notes and tracklist.
  *
+ * Until a visitor first flips a record, the crate shows how: a small "scroll
+ * to flip" (or, on touchscreens, "swipe to flip") hint beside it, and the
+ * front record tips forward a little every few seconds. Both stop for good
+ * after the first flip (markFlipped, below).
+ *
  * A case study's "Put it back" link returns here with ?crate=<id>&record=<slug>,
  * which opens that crate with that record in front.
  * Styles: styles/crate.css
@@ -19,6 +24,7 @@ import Link from "next/link";
 import { useCallback, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { fitStyle, pad2 } from "@/lib/format";
+import { CRATE_FLIPPED_STORAGE_KEY } from "@/lib/workView";
 import type { Shelf } from "@/lib/types";
 import { useCrateGestures } from "@/hooks/useCrateGestures";
 import { Cover } from "@/components/records/Cover";
@@ -148,6 +154,17 @@ const Chevron = ({ d }: { d: string }) => (
   </svg>
 );
 
+/** Retires the how-to-flip hint (styles/crate.css hides it under <html data-crate-flipped>), remembered across visits. */
+function markFlipped() {
+  if (document.documentElement.dataset.crateFlipped) return;
+  document.documentElement.dataset.crateFlipped = "1";
+  try {
+    localStorage.setItem(CRATE_FLIPPED_STORAGE_KEY, "1");
+  } catch {
+    // private browsing: the hint will just show again next visit
+  }
+}
+
 /** Runs a state change as a view transition (the picked crate morphs into the big one), where supported. */
 function transition(update: () => void) {
   if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) return update();
@@ -169,8 +186,13 @@ export function CrateBrowser({ shelves }: { shelves: Shelf[] }) {
   const last = projects.length - 1;
   const p = projects[front];
 
-  const go = useCallback((i: number) => setFront(Math.max(0, Math.min(last, i))), [last]);
-  const justSwiped = useCrateGestures({ crate: crateRef, front, last, setFront, resetKey: shelfIndex });
+  // every flip the visitor makes goes through here
+  const flipTo = useCallback((i: number) => {
+    markFlipped();
+    setFront(i);
+  }, []);
+  const go = useCallback((i: number) => flipTo(Math.max(0, Math.min(last, i))), [flipTo, last]);
+  const justSwiped = useCrateGestures({ crate: crateRef, front, last, setFront: flipTo, resetKey: shelfIndex });
 
   const pickShelf = (i: number) => {
     setShelfIndex(i);
@@ -223,7 +245,9 @@ export function CrateBrowser({ shelves }: { shelves: Shelf[] }) {
             </span>
             <span className="crate-pick-label">
               {s.name}
-              <span className="cap">{pad2(s.projects.length)} records</span>
+              <span className="cap">
+                {pad2(s.projects.length)} records <Arrow />
+              </span>
             </span>
           </button>
         ))}
@@ -318,12 +342,28 @@ export function CrateBrowser({ shelves }: { shelves: Shelf[] }) {
             </button>
           </div>
 
+          {/* how to flip, until the visitor first does (the crate's aria-label covers keyboard / screen readers) */}
+          {projects.length > 1 && (
+            <div className="crate-hint" aria-hidden="true">
+              <span className="crate-hint-icon crate-hint-wheel">
+                <i />
+              </span>
+              <span className="crate-hint-icon crate-hint-swipe">
+                <i />
+              </span>
+              <span className="cap">
+                <span className="crate-hint-wheel">Scroll</span>
+                <span className="crate-hint-swipe">Swipe</span> to flip
+              </span>
+            </div>
+          )}
+
           <CrateBox name={shelf.name} records={projects.length} front={front}>
             {projects.map((q, i) => (
               <button
                 key={q.slug}
                 type="button"
-                className="crate-record"
+                className={`crate-record${i === front && projects.length > 1 ? " is-front" : ""}`}
                 style={{ ...recordPosition(i, front, sleeveCount(projects.length), hovered === i), "--i": Math.min(i, 5) } as CSSProperties}
                 tabIndex={-1}
                 aria-label={i === front ? `${q.name}: open record` : `Flip to ${q.name}`}

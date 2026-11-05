@@ -4,7 +4,8 @@
  *
  * Dark is the default theme. The inline script below runs before the page
  * paints and applies a theme saved by the toggle (and the Work section's saved
- * layout, see components/home/WorkViewSwitch.tsx), so there's no flash.
+ * layout, see components/home/WorkViewSwitch.tsx, and whether the crate's
+ * how-to-flip hint has been retired), so there's no flash.
  * <BootScreen> covers the page with a loading screen until it has loaded.
  */
 import "@/styles/index.css";
@@ -13,13 +14,13 @@ import { Instrument_Sans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/content/site";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
-import { WORK_VIEW_STORAGE_KEY } from "@/lib/workView";
+import { CRATE_FLIPPED_STORAGE_KEY, WORK_VIEW_STORAGE_KEY } from "@/lib/workView";
 import { BootScreen } from "@/components/layout/Loader";
 
 // Instrument Sans for everything: titles use its condensed width (--display-stretch in styles/base.css).
 const sans = Instrument_Sans({ subsets: ["latin"], axes: ["wdth"], variable: "--font-sans", display: "swap" });
 
-const prefsScript = `try{var d=document.documentElement,t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}),w=localStorage.getItem(${JSON.stringify(WORK_VIEW_STORAGE_KEY)});if(t==="light"||t==="dark")d.dataset.theme=t;if(w==="shelf")d.dataset.workView=w}catch(e){}`;
+const prefsScript = `try{var d=document.documentElement,t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}),w=localStorage.getItem(${JSON.stringify(WORK_VIEW_STORAGE_KEY)});if(t==="light"||t==="dark")d.dataset.theme=t;if(w==="shelf")d.dataset.workView=w;if(localStorage.getItem(${JSON.stringify(CRATE_FLIPPED_STORAGE_KEY)}))d.dataset.crateFlipped="1"}catch(e){}`;
 
 export const viewport: Viewport = {
   width: "device-width",

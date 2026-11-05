@@ -69,5 +69,6 @@
 /* phones: the open crate is as wide as the screen allows, so make its frame only as tall as it needs
    (the picker's crates fill their grid cells instead) */
 @media (max-width: 760px) {
-  .crate-browser .crate--real { height: calc(100vw + 44px); }
+  .crate-browser .crate--real { height: calc(100vw + 84px); } /* + the controls above, the how-to-flip hint below */
+  .crate-browser .crate--real .crate-scene { bottom: calc(var(--rec) * .44 + 40px); }
 }

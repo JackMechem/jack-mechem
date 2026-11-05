@@ -114,6 +114,46 @@
 .crate-ticks button:hover { background: color-mix(in srgb, var(--ink) 40%, transparent); }
 .crate-ticks button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
+/* How to flip, shown until the visitor first flips a record (CrateBrowser's markFlipped sets
+   <html data-crate-flipped>): right of the stack, a mouse with its wheel turning, or on
+   touchscreens a fingertip swiping down, plus the front record tipping forward now and then. */
+.crate-hint {
+  position: absolute; z-index: 250; top: 50%; right: var(--pad); transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  pointer-events: none; opacity: .7; transition: opacity .4s, visibility 0s .4s;
+}
+html[data-crate-flipped] .crate-hint { opacity: 0; visibility: hidden; }
+.crate-hint .cap { font-size: 10px; letter-spacing: .16em; white-space: nowrap; }
+.crate-hint-icon { position: relative; display: block; width: 20px; height: 32px; }
+.crate-hint-icon.crate-hint-wheel { border: 2px solid var(--ink); border-radius: 10px; }
+.crate-hint-icon.crate-hint-wheel i { position: absolute; left: 50%; top: 5px; width: 2px; height: 6px; margin-left: -1px; background: var(--ink); }
+.crate-hint-icon.crate-hint-swipe::before { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; border-left: 2px dotted color-mix(in srgb, var(--ink) 45%, transparent); }
+.crate-hint-icon.crate-hint-swipe i { position: absolute; left: 50%; top: 0; width: 12px; height: 12px; margin-left: -6px; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); }
+/* mouse or trackpad by default; a finger where there's no hover */
+.crate-hint .crate-hint-swipe { display: none; }
+@media (hover: none) {
+  .crate-hint .crate-hint-wheel { display: none; }
+  .crate-hint .crate-hint-swipe { display: inline; }
+  .crate-hint .crate-hint-icon.crate-hint-swipe { display: block; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .crate-hint-icon.crate-hint-wheel i { animation: hint-wheel 1.6s ease-in infinite; }
+  .crate-hint-icon.crate-hint-swipe i { animation: hint-swipe 1.8s ease-in-out infinite; }
+  html:not([data-crate-flipped]) .crate-browser .crate-record.is-front {
+    animation: record-drop-in .6s cubic-bezier(.2,.8,.2,1) calc(var(--i, 0) * 45ms) both, record-nudge 6s ease-in-out 2.5s infinite;
+  }
+}
+@keyframes hint-wheel { from { translate: 0 0; opacity: 1; } to { translate: 0 10px; opacity: 0; } }
+@keyframes hint-swipe { 0% { translate: 0 0; opacity: 0; } 15% { opacity: 1; } 70% { translate: 0 18px; opacity: 1; } 100% { translate: 0 18px; opacity: 0; } }
+/* the front record tips toward you and settles, as if someone's about to flip it */
+@keyframes record-nudge {
+  0%, 74%, 100% { rotate: x 0deg; }
+  80% { rotate: x -12deg; }
+  87% { rotate: x 0deg; }
+  91% { rotate: x -5deg; }
+  95% { rotate: x 0deg; }
+}
+
 /* While the crate owns a wheel gesture the page can't scroll (hooks/useCrateGestures.ts). */
 html.crate-scroll-lock { overflow: hidden; }
 
@@ -150,4 +190,7 @@ html.crate-scroll-lock { overflow: hidden; }
   .crate-nav small { display: none; }
   .crate-ticks { flex-direction: row; }
   .crate-ticks div { flex-direction: row; }
+  /* the hint goes under the crate, icon beside the words */
+  .crate-hint { top: auto; right: auto; bottom: 8px; left: 50%; transform: translateX(-50%); flex-direction: row; gap: 8px; }
+  .crate-hint-icon { width: 16px; height: 26px; }
 }
